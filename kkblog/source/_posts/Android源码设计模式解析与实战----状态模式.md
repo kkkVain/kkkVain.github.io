@@ -1,5 +1,5 @@
 ---
-title: 常见查找算法总结
+title: Android源码设计模式解析与实战----状态模式
 date: 2017-10-24 13:21:34
 tags: [Android源码设计模式解析与实战, 读书笔记, 状态模式]
 categories: []

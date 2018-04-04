@@ -1,7 +1,7 @@
 ---
 title: EventBus源码解析(1)
 date: 2017-09-10 20:19:30
-tags: [eventbus,事件总线,观察者模式]
+tags: [Android,eventbus,事件总线,观察者模式]
 categories: Android
 ---
 
