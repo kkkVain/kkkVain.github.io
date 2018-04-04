@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="源码,rxjava,subscribe," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="RxJAVA ① subscribe函数： 调用了observable.onSubscribe.call(subscriber)observable:最后一个变换后的observableonSubscribe创建最后一个observable时传入的参数1234567891011121314151617181920@SchedulerSupport(SchedulerSupport.NONE)@Ov">
+<meta name="keywords" content="源码,rxjava,subscribe">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RxJAVA初步理解(1)">
+<meta property="og:url" content="http://yoursite.com/2017/09/11/RxJava/index.html">
+<meta property="og:site_name" content="Coco">
+<meta property="og:description" content="RxJAVA ① subscribe函数： 调用了observable.onSubscribe.call(subscriber)observable:最后一个变换后的observableonSubscribe创建最后一个observable时传入的参数1234567891011121314151617181920@SchedulerSupport(SchedulerSupport.NONE)@Ov">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-04-04T03:23:05.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RxJAVA初步理解(1)">
+<meta name="twitter:description" content="RxJAVA ① subscribe函数： 调用了observable.onSubscribe.call(subscriber)observable:最后一个变换后的observableonSubscribe创建最后一个observable时传入的参数1234567891011121314151617181920@SchedulerSupport(SchedulerSupport.NONE)@Ov">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/09/11/RxJava/"/>
+
+
+
+
+
+  <title>RxJAVA初步理解(1) | Coco</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Coco</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Hello world</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/11/RxJava/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">RxJAVA初步理解(1)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-11T23:29:17+08:00">
+                2017-09-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>RxJAVA</strong></p>
+<p>① subscribe函数：</p>
+<p>调用了observable.onSubscribe.call(subscriber)<br>observable:最后一个变换后的observable<br>onSubscribe创建最后一个observable时传入的参数<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SchedulerSupport</span>(SchedulerSupport.NONE)</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">subscribe</span><span class="params">(Observer&lt;? <span class="keyword">super</span> T&gt; observer)</span> </span>&#123;</span><br><span class="line">	ObjectHelper.requireNonNull(observer, <span class="string">"observer is null"</span>);</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">	<span class="comment">// onXXXX相关的，和刚才的onAssembly是一个套路，同样的使用了Hook</span></span><br><span class="line">		observer = RxJavaPlugins.onSubscribe(<span class="keyword">this</span>, observer);</span><br><span class="line">		ObjectHelper.requireNonNull(observer, <span class="string">"Plugin returned null Observer"</span>);</span><br><span class="line">		<span class="comment">//开始订阅，这个subscribeActual函数，作为onAssembly()的参数时的类，都有重写，</span></span><br><span class="line">		subscribeActual(observer);-----&gt; <span class="number">2</span>A</span><br><span class="line">	&#125; <span class="keyword">catch</span> (NullPointerException e) &#123; <span class="comment">// NOPMD</span></span><br><span class="line">		<span class="keyword">throw</span> e;</span><br><span class="line">	&#125; <span class="keyword">catch</span> (Throwable e) &#123;Exceptions.throwIfFatal(e);</span><br><span class="line">		<span class="comment">// can't call onError because no way to know if a Disposable has been set or not can't call onSubscribe because the call might have set a Subscription</span></span><br><span class="line">		already RxJavaPlugins.onError(e);</span><br><span class="line">		NullPointerException npe = <span class="keyword">new</span> NullPointerException(<span class="string">"Actually not, but can't throw other exceptions due to RS"</span>);</span><br><span class="line">			npe.initCause(e);</span><br><span class="line">			<span class="keyword">throw</span> npe;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>②create函数<br>onJust：<br>A.<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SchedulerSupport</span>(SchedulerSupport.NONE)</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">Observable&lt;T&gt; <span class="title">just</span><span class="params">(T item)</span> </span>&#123;</span><br><span class="line">	ObjectHelper.requireNonNull(item, <span class="string">"The item is null"</span>);</span><br><span class="line">	<span class="keyword">return</span> RxJavaPlugins.onAssembly(<span class="keyword">new</span> ObservableJust&lt;T&gt;(item));----&gt;B</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>B.</strong><br>所有onXXXX的函数，都是hook function.<br>onAssembly这个函数：把传进来的各种new<br>ObservableXXX<t>转换为Observable<t></t></t></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Calls the associated hook function.</span><br><span class="line"><span class="comment">/* @param &lt;T&gt; the value type</span></span><br><span class="line"><span class="comment">   @param source the hook's input value</span></span><br><span class="line"><span class="comment">   @return the value returned by the hook</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@SuppressWarnings</span>(&#123; <span class="string">"rawtypes"</span>, <span class="string">"unchecked"</span> &#125;)</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">Observable&lt;T&gt; <span class="title">onAssembly</span><span class="params">(Observable&lt;T&gt; source)</span> </span>&#123;</span><br><span class="line">	Function&lt;Observable, Observable&gt; f = onObservableAssembly; <span class="comment">// 初始值是null</span></span><br><span class="line">	<span class="keyword">if</span> (f != <span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> apply(f,source); ---\&gt;C,函数f是源码自带的onObservableAssembly</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> source;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>C.</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Wraps the call to the function in try-catch and propagates thrown checked exceptions as RuntimeException.</span></span><br><span class="line"><span class="comment">@param &lt;T&gt; the input type</span></span><br><span class="line"><span class="comment">@param &lt;R&gt; the output type</span></span><br><span class="line"><span class="comment">@param f the function to call, not null (not verified)</span></span><br><span class="line"><span class="comment">@param t the parameter value to the function</span></span><br><span class="line"><span class="comment">@return the result of the function call</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">static &lt;T, R&gt; R apply(Function&lt;T, R&gt; f, T t) &#123;</span></span><br><span class="line"><span class="comment">	try &#123;</span></span><br><span class="line"><span class="comment">		return f.apply(t); ---&gt;D，自带的函数f进行apply</span></span><br><span class="line"><span class="comment">	&#125; catch (Throwable ex) &#123;</span></span><br><span class="line"><span class="comment">		throw ExceptionHelper.wrapOrThrow(ex);</span></span><br><span class="line"><span class="comment">	&#125;</span></span><br><span class="line"><span class="comment">&#125;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>D.</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* A functional interface that takes a value and returns another value, possibly with a different type and allows throwing a checked exception.</span></span><br><span class="line"><span class="comment">@param &lt;T&gt; the input value type</span></span><br><span class="line"><span class="comment">@param &lt;R&gt; the output value type</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">public interface Function&lt;T, R&gt; &#123;</span></span><br><span class="line"><span class="comment">/* Apply some calculation to the input value and return some other value.*/</span></span><br><span class="line">	<span class="meta">@param</span> t the input value</span><br><span class="line">	<span class="meta">@return</span> the output value</span><br><span class="line">	<span class="meta">@throws</span> Exception on error</span><br><span class="line">	</span><br><span class="line">	<span class="function">R <span class="title">apply</span><span class="params">(T t)</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>E.subscribeOn:</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@param</span> scheduler the &#123;<span class="meta">@link</span> Scheduler&#125; to perform subscription actions on</span><br><span class="line"><span class="meta">@return</span> the source ObservableSource modified so that its subscriptions happen on the specified &#123;<span class="meta">@link</span> Scheduler&#125;</span><br><span class="line">@see &lt;a href="http://reactivex.io/documentation/operators/subscribeon.html"&gt;ReactiveX operators documentation: SubscribeOn&lt;/a&gt;</span><br><span class="line">@see &lt;a href="http://www.grahamlea.com/2014/07/rxjava-threading-examples/"&gt;RxJava Threading Examples&lt;/a&gt;</span><br><span class="line">@see #observeOn</span><br><span class="line"><span class="meta">@SchedulerSupport</span>(SchedulerSupport.CUSTOM)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Observable&lt;T&gt; <span class="title">subscribeOn</span><span class="params">(Scheduler scheduler)</span> </span>&#123;</span><br><span class="line">	ObjectHelper.requireNonNull(scheduler, <span class="string">"scheduler is null"</span>);</span><br><span class="line">		<span class="keyword">return</span> RxJavaPlugins.onAssembly(<span class="keyword">new</span> ObservableSubscribeOn&lt;T&gt;(<span class="keyword">this</span>,scheduler));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>onAssembly就是刚才分析的那个，把当前的observable和scheduler整合，并且以observable<t>的形式返回。</t></p>
+<p><strong>F.</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@param</span> &lt;R&gt; the value type of the inner ObservableSources and the output type</span><br><span class="line"><span class="meta">@param</span> mapper a function that, when applied to an item emitted by the source</span><br><span class="line">ObservableSource, returns an ObservableSource</span><br><span class="line"><span class="meta">@return</span> an Observable that emits the result of applying the transformation function to each item emitted by the source ObservableSource and merging the results of the</span><br><span class="line">ObservableSources obtained from <span class="keyword">this</span> transformation</span><br><span class="line">@see &lt;a href="http://reactivex.io/documentation/operators/flatmap.html"\&gt;ReactiveX operators documentation: FlatMap&lt;/a&gt;</span><br><span class="line"><span class="meta">@SchedulerSupport</span>(SchedulerSupport.NONE)</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> &lt;R&gt; <span class="function">Observable&lt;R&gt; <span class="title">flatMap</span><span class="params">(Function&lt;? <span class="keyword">super</span></span></span></span><br><span class="line"><span class="function"><span class="params">T, ? extends ObservableSource&lt;? extends R&gt;&gt; mapper)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> flatMap(mapper, <span class="keyword">false</span>); ----&gt; G</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>G.</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SchedulerSupport</span>(SchedulerSupport.NONE)</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> &lt;R&gt; <span class="function">Observable&lt;R&gt; <span class="title">flatMap</span><span class="params">(Function&lt;? <span class="keyword">super</span> T, ? extends ObservableSource&lt;? extends R&gt;&gt; mapper, <span class="keyword">boolean</span> delayErrors, <span class="keyword">int</span> maxConcurrency, <span class="keyword">int</span> bufferSize)</span> </span>&#123;</span><br><span class="line">	ObjectHelper.requireNonNull(mapper, <span class="string">"mapper is null"</span>);</span><br><span class="line">	ObjectHelper.verifyPositive(maxConcurrency, <span class="string">"maxConcurrency"</span>);</span><br><span class="line">	ObjectHelper.verifyPositive(bufferSize, <span class="string">"bufferSize"</span>);</span><br><span class="line">	<span class="keyword">if</span> (<span class="keyword">this</span> <span class="keyword">instanceof</span> ScalarCallable) &#123;</span><br><span class="line">		<span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line">		T v = ((ScalarCallable&lt;T&gt;)<span class="keyword">this</span>).call(); ----&gt;<span class="keyword">this</span>可能会重写call函数（这不就是flatmap实际使用时重写的call函数吗....(lambda传入的那个函数）</span><br><span class="line">		<span class="keyword">if</span> (v == <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> empty(); ---&gt; H</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> ObservableScalarXMap.scalarXMap(v,mapper); ---&gt; I</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> RxJavaPlugins.onAssembly(<span class="keyword">new</span> ObservableFlatMap&lt;T, R&gt;(<span class="keyword">this</span>, mapper, delayErrors, maxConcurrency, bufferSize));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>H.</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@param</span> &lt;T&gt; <span class="function">the type of the <span class="title">items</span> <span class="params">(ostensibly)</span> emitted by the ObservableSource</span></span><br><span class="line"><span class="function">@return an Observable that emits no items to the </span>&#123;\<span class="meta">@link</span> Observer&#125; but immediately invokes the &#123;<span class="meta">@link</span> Observer&#125;<span class="string">'s &#123;@link Observer#onComplete() onComplete&#125; method</span></span><br><span class="line"><span class="string">@see &lt;a href="http://reactivex.io/documentation/operators/empty-never-throw.html"&gt;ReactiveX operators documentation: Empty&lt;/a&gt;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">@SchedulerSupport(SchedulerSupport.NONE)</span></span><br><span class="line"><span class="string">@SuppressWarnings("unchecked")</span></span><br><span class="line"><span class="string">public static &lt;T&gt; Observable&lt;T&gt; empty() &#123;</span></span><br><span class="line"><span class="string">	return RxJavaPlugins.onAssembly((Observable&lt;T&gt; ObservableEmpty.INSTANCE);</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>I.</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*Maps a scalar value into an Observable and emits its values.*/</span></span><br><span class="line"><span class="meta">@param</span> &lt;T&gt; the scalar value type</span><br><span class="line"><span class="meta">@param</span> &lt;U&gt; the output value type</span><br><span class="line"><span class="meta">@param</span> value the scalar value to map</span><br><span class="line"><span class="meta">@param</span> mapper the function that gets the scalar value and should <span class="keyword">return</span> an ObservableSource that gets streamed</span><br><span class="line"><span class="meta">@return</span> the <span class="keyword">new</span> Observable instance*/</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T, U&gt; <span class="function">Observable&lt;U&gt; <span class="title">scalarXMap</span><span class="params">(T value, Function&lt;? <span class="keyword">super</span> T, ? extends ObservableSource&lt;? extends U&gt;&gt;</span></span></span><br><span class="line"><span class="function"><span class="params">mapper)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> RxJavaPlugins.onAssembly(<span class="keyword">new</span> ScalarXMapObservable&lt;T,</span><br><span class="line">U&gt;(value, mapper));---&gt;J 同样的，<span class="keyword">new</span>一个observable</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>J.</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 把标准值T映射为observableSource，并且订阅他 Maps a scalar value to an ObservableSource and subscribes to it.*/</span></span><br><span class="line"><span class="meta">@param</span> &lt;T&gt; the scalar value type</span><br><span class="line"><span class="meta">@param</span> \&lt;R\&gt; the mapped ObservableSource<span class="string">'s element type.</span></span><br><span class="line"><span class="string">static final class ScalarXMapObservable &lt;T, R&gt; extends</span></span><br><span class="line"><span class="string">Observable&lt;R&gt; &#123;</span></span><br><span class="line"><span class="string">	final T value;</span></span><br><span class="line"><span class="string">	final Function&lt;? super T, ? extends ObservableSource&lt;? extends R&gt;&gt; mapper;</span></span><br><span class="line"><span class="string">	ScalarXMapObservable(T value, Function &lt;? super T, ? extends ObservableSource&lt;? extends R&gt;&gt; mapper) &#123;</span></span><br><span class="line"><span class="string">		this.value = value;</span></span><br><span class="line"><span class="string">		this.mapper = mapper;</span></span><br><span class="line"><span class="string">	&#125;</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure></p>
+<p>2A.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public final class ObservableCreate&lt;T&gt; extends Observable&lt;T&gt; &#123;&#125;</span><br><span class="line">@Override</span><br><span class="line">protected void subscribeActual(Observer&lt;? super T&gt; observer) &#123;</span><br><span class="line">	//创建发射器，这个observer是我们在应用层自己定义的observer（重写了onNext,onSuccess等函数)</span><br><span class="line">	CreateEmitter&lt;T&gt; parent = new CreateEmitter&lt;T&gt;(observer);</span><br><span class="line">	observer.onSubscribe(parent); // 每个observer都要重写的四个函数之一</span><br><span class="line">	try &#123;</span><br><span class="line">		source.subscribe(parent); // 这个source是每个onXXXX(new ObservableXXX(ffff))中new这个类时传入的参数（其实就是我们在应用层调用create（ffff）时的参数ffff,那么，每个类，比如create的参数类ObservableOnSubscribe&lt;T&gt;，都会重写属于自己的subscribe函数。这样就创建了一个emmiter</span><br><span class="line">	&#125; catch (Throwable ex) &#123;</span><br><span class="line">		Exceptions.throwIfFatal(ex);</span><br><span class="line">		parent.onError(ex);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>K.</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ScalarDisposable</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">AtomicInteger</span></span></span><br><span class="line"><span class="class"><span class="keyword">implements</span> <span class="title">QueueDisposable</span> &lt;<span class="title">T</span>&gt;, <span class="title">Runnable</span> </span>&#123;&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ScalarDisposable</span><span class="params">(Observer &lt;? <span class="keyword">super</span> T&gt; observer, T</span></span></span><br><span class="line"><span class="function"><span class="params">value)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.observer = observer;</span><br><span class="line">	<span class="keyword">this</span>.value = value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>L.</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line"><span class="comment">// 继承了原子类，又用了CAS = =</span></span><br><span class="line">	<span class="keyword">if</span> (get() == START &amp;&amp; compareAndSet(START, ON_NEXT)) &#123;</span><br><span class="line">		observer.onNext(value);</span><br><span class="line">		<span class="keyword">if</span> (get() == ON_NEXT) &#123;</span><br><span class="line">			lazySet(ON_COMPLETE); </span><br><span class="line">			bserver.onComplete();</span><br><span class="line">		&#125;	</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>复习一下原子类<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">lazySet</span><span class="params">(<span class="keyword">int</span> newValue)</span> </span>&#123;</span><br><span class="line">	U.putOrderedInt(<span class="keyword">this</span>, VALUE, newValue);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>原子类设置值的时候像volatile一样，可以保证其他线程读取到最新的值，这个putOrderedInt其实是volatile的延迟版，也就是其他线程可能在值改变后仍然读到旧值。这有什么好处呢？性能：在多核处理器下，内存以及cpu缓存的读和写常常是顺序执行的，所以在多个cpu缓存之间同步一个内存值的代价是很昂贵的。</p>
+<p><strong>2B.</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ScalarDisposable</span><span class="params">(Observer&lt;? <span class="keyword">super</span> T&gt; observer, T</span></span></span><br><span class="line"><span class="function"><span class="params">value)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.observer = observer;</span><br><span class="line">	<span class="keyword">this</span>.value = value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>static final class ScalarXMapObservable&lt;T, R&gt; extends<br>Observable<r> {}</r></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">subscribeActual</span><span class="params">(Observer&lt;? <span class="keyword">super</span> R&gt; s)</span></span>&#123;</span><br><span class="line">ObservableSource&lt;? extends R&gt; other;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		other = ObjectHelper.requireNonNull(mapper.apply(value), <span class="string">"The mapper returned</span></span><br><span class="line"><span class="string">		a null ObservableSource"</span>); <span class="comment">//这个函数mapper就不再是源码自带的，而是我自己传的参数function</span></span><br><span class="line">	&#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">		EmptyDisposable.error(e, s);</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (other <span class="keyword">instanceof</span> Callable) &#123;</span><br><span class="line">		R u;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			u = ((Callable&lt;R&gt;)other).call(); <span class="comment">//调用这个Function的call函数（我们重写的)</span></span><br><span class="line">		&#125; <span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">			Exceptions.throwIfFatal(ex);</span><br><span class="line">			EmptyDisposable.error(ex, s);</span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	</span><br><span class="line">		<span class="keyword">if</span> (u == <span class="keyword">null</span>) &#123;</span><br><span class="line">			EmptyDisposable.complete(s);</span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		ScalarDisposable&lt;R&gt; sd = <span class="keyword">new</span> ScalarDisposable&lt;R&gt;(s,u);---&gt;K</span><br><span class="line">		s.onSubscribe(sd); <span class="comment">//observer都会重写onSubscribe函数（好像也没有...迷）</span></span><br><span class="line">		sd.run(); -----&gt;L</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		other.subscribe(s);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>总结一下几个常用的操作符：</strong><br>总结几个点：</p>
+<ul>
+<li><p>操作符的参数，就是我们应用层使用时候传入的参数</p>
+</li>
+<li><p>这个参数，又会被传进各种ObservableXXX的类进行改造（new<br>….），这些类，通常都会进行source （以及value等的存储），这个source，就是<br>subscribeActual中最后 source.subscribe(parent);<br>时的source(parent就是我们subscribe时写的四个函数的包装）</p>
+</li>
+</ul>
+<p><strong>1）</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SchedulerSupport</span>(SchedulerSupport.NONE)</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">Observable&lt;T&gt; <span class="title">create</span><span class="params">(ObservableOnSubscribe&lt;T&gt;</span></span></span><br><span class="line"><span class="function"><span class="params">source)</span> </span>&#123;</span><br><span class="line">	ObjectHelper.requireNonNull(source, <span class="string">"source is null"</span>);</span><br><span class="line">		<span class="keyword">return</span> RxJavaPlugins.onAssembly(<span class="keyword">new</span> ObservableCreate&lt;T&gt;(source));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>2）</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SchedulerSupport</span>(SchedulerSupport.NONE)</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">Observable&lt;T&gt; <span class="title">just</span><span class="params">(T item)</span> </span>&#123;</span><br><span class="line">	ObjectHelper.requireNonNull(item, <span class="string">"The item is null"</span>);</span><br><span class="line">		<span class="keyword">return</span> RxJavaPlugins.onAssembly(<span class="keyword">new</span> ObservableJust&lt;T&gt;(item));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>3）</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SchedulerSupport</span>(SchedulerSupport.CUSTOM)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Observable&lt;T&gt; <span class="title">subscribeOn</span><span class="params">(Scheduler scheduler)</span></span>&#123;</span><br><span class="line">	ObjectHelper.requireNonNull(scheduler, <span class="string">"scheduler is null"</span>);</span><br><span class="line">		<span class="keyword">return</span> RxJavaPlugins.onAssembly(<span class="keyword">new</span> ObservableSubscribeOn&lt;T&gt;(<span class="keyword">this</span>,scheduler));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>4）</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SchedulerSupport</span>(SchedulerSupport.CUSTOM)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Observable&lt;T&gt; <span class="title">observeOn</span><span class="params">(Scheduler scheduler, <span class="keyword">boolean</span></span></span></span><br><span class="line"><span class="function"><span class="params">delayError, <span class="keyword">int</span> bufferSize)</span> </span>&#123;</span><br><span class="line">	ObjectHelper.requireNonNull(scheduler, <span class="string">"scheduler is null"</span>);</span><br><span class="line">	ObjectHelper.verifyPositive(bufferSize, <span class="string">"bufferSize"</span>);</span><br><span class="line">	<span class="keyword">return</span> RxJavaPlugins.onAssembly(<span class="keyword">new</span> ObservableObserveOn&lt;T&gt;(<span class="keyword">this</span>,scheduler, delayError, bufferSize));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>思考一、为什么一定要调用subscribe？</strong></p>
+<p><strong>看源码可以看出，</strong><br>observer = RxJavaPlugins.onSubscribe(this,observer);<br><strong>和</strong><br>subscribeActual(observer);<br><strong>这两句</strong></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/源码/" rel="tag"># 源码</a>
+          
+            <a href="/tags/rxjava/" rel="tag"># rxjava</a>
+          
+            <a href="/tags/subscribe/" rel="tag"># subscribe</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/11/查找算法/" rel="next" title="常见查找算法总结">
+                <i class="fa fa-chevron-left"></i> 常见查找算法总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/24/Android源码设计模式解析与实战----状态模式/" rel="prev" title="常见查找算法总结">
+                常见查找算法总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ke Yu</p>
+              <p class="site-description motion-element" itemprop="description">Keep moving.Don't settle.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ke Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

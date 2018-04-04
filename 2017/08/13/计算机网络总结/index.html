@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="计算机网络,TCP,HTTP,自顶向下," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="大三上计网课内容整理。教材：《计算机网络：自顶向下方法》                                    2016.12 第三章 运输层 功能：进程通信 协议：UDP和TCP 特点：end-to-end 3.1 概述和运输层服务 1.运输层协议为运行在不同主机上的应用进程之间提供了逻辑通信。不是物理的通信。2.运输层分组：报文段segment3.书中将TCP和UDP的分组统称">
+<meta name="keywords" content="计算机网络,TCP,HTTP,自顶向下">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机网络知识整理">
+<meta property="og:url" content="http://yoursite.com/2017/08/13/计算机网络总结/index.html">
+<meta property="og:site_name" content="Coco">
+<meta property="og:description" content="大三上计网课内容整理。教材：《计算机网络：自顶向下方法》                                    2016.12 第三章 运输层 功能：进程通信 协议：UDP和TCP 特点：end-to-end 3.1 概述和运输层服务 1.运输层协议为运行在不同主机上的应用进程之间提供了逻辑通信。不是物理的通信。2.运输层分组：报文段segment3.书中将TCP和UDP的分组统称">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/cb9ef26da050c1340eb19142f02bfbca.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/140abcbbb7e9f1167bf7138fef969c73.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/a8cedd91720a451a7780e66afacaf1f6.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/ab439aa277d7f8c1a0d78494a8b07a98.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/d8a403edf7e74c616f15258f7a003ad2.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/5176e5cdde81af8496fbb6912f6771c9.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/d833c818e6c95efe6bece37849fdfb95.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/e50b79f22d6b083bb5030001f7d5d71c.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/51f9d03b6ecf1022ca50fb9a851fa735.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/b7329271f292aec87b0425c90b489923.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/ae52a87c9bd4a45a5cbe40aefb09434d.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/49bb38673b7fb137769ef59bc804970a.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/92bd88ddb0e8eddb59bcbcbbf2d59b3c.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/ed99f390b0b1931760c9ad255cd32f6e.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/ba364fc58b4463d2383f169a3488ba56.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/2b0359d6fe8a7c5b25048b32e949753d.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/34558633b770426a55d311cf6915a958.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/8ec7d15c24fdcd05b40422ada3630394.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/4a71010f9e467cf444b19f1dc76baaa3.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/8e3bb0378cefd36ab0e2e18e6cb50705.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/4e6383fde994e9cc19bfd7fec57b0958.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/bb24128244bd5a69e80919359732b37c.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/11a034910e857ba98021bac13ea8bbab.png">
+<meta property="og:updated_time" content="2018-04-04T03:23:05.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="计算机网络知识整理">
+<meta name="twitter:description" content="大三上计网课内容整理。教材：《计算机网络：自顶向下方法》                                    2016.12 第三章 运输层 功能：进程通信 协议：UDP和TCP 特点：end-to-end 3.1 概述和运输层服务 1.运输层协议为运行在不同主机上的应用进程之间提供了逻辑通信。不是物理的通信。2.运输层分组：报文段segment3.书中将TCP和UDP的分组统称">
+<meta name="twitter:image" content="http://yoursite.com/2017/08/13/计算机网络总结/media/cb9ef26da050c1340eb19142f02bfbca.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/08/13/计算机网络总结/"/>
+
+
+
+
+
+  <title>计算机网络知识整理 | Coco</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Coco</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Hello world</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/13/计算机网络总结/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">计算机网络知识整理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-13T17:29:31+08:00">
+                2017-08-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/计算机网络/" itemprop="url" rel="index">
+                    <span itemprop="name">计算机网络</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>大三上计网课内容整理。教材：《计算机网络：自顶向下方法》<br>                                    2016.12</p>
+<p><strong>第三章 运输层</strong></p>
+<p>功能：进程通信 协议：UDP和TCP 特点：end-to-end</p>
+<p>3.1 概述和运输层服务</p>
+<p>1.运输层协议为运行在不同主机上的应用进程之间提供了<strong>逻辑通信</strong>。不是物理的通信。<br>2.运输层分组：报文段segment<br>3.书中将TCP和UDP的分组统称为报文段</p>
+<p>3.1.2因特网运输层概述<br>表格。一会儿直接截图吧。</p>
+<p>1.UDP和TCP的任务是将两个端系统间IP的交付服务扩展为运行在两个端系统上的进程之间的交付服务。<br>2.将主机间交付扩展到进程间交付，称为运输层的多路复用（transport-layer multiplexing）与多路分解（demultiplexing）。<br>3.多路分解：将运输层报文段中的数据交付到正确的套接字的工作称为多路分解。<br>4.多路复用：从源主机的不同套接字中收集数据块，并为每个数据块封装上首部信息从而生成报文段，然后将报文段传递到网络层的工作称为多路复用。<br>5.他们与在某层（在运输层或其它层）的单一协议在何时由位于Nex higher<br>layer的多个协议使用有关。<br>6.TCP和UDP套接字的区别：<br>一个UDP的套接字由<strong>目的IP地址和目的端口号</strong>的二元组标识。<br>即使源IP和源端口号不同，具有相同的目的IP和目的端口，两个报文段会通过<strong>相同的目的套接字</strong>定向到相同的目的进程。<br>一个TCP的套接字由（源IP，源端口，目的IP，目的端口）的四元组标识。<br>只要源IP或源端口不同，TCP报文段都会定向到<strong>两个不同的套接字</strong>。<br>7.主机接收到一个IP数据报（datagram）：<br>每个datagram都有源IP和目的IP，携带一个传输层segment。每个segment又有源端口号和目的端口号，于是主机通过目的IP和目的端口将segment传给相应的socket。<br>8.源端口号提供返回地址。<br>9.web服务器为不同的客户端提供不同的socket。<br>一点WEB服务器的知识：<br>1）WEB服务器通常都只<strong>使用一个进程</strong>，但是为每个新的客户机连接创建一个具有新连接套接字的新线程。<br>2）使用持久HTTP，则在整个连接持续期间，客户机和服务器之间经由同一个服务器套接字交换HTTP报文；使用非持久HTTP，则对每一对请求/响应，都有一个新的TCP连接被创建，请求/响应完成后随即被关闭。</p>
+<p>3.3.2UDP校验和</p>
+<p>1.发送方：把UDP的segment中所有内容做16bits的加法，再将得到的和做反转（取反）放进报文的checksum域中。<br>2.接收方：把首部的4个16bits字（包括checksum）相加，如果结果为16个1，则分组无差错。注意：如果4个字相加后取反，则结果全为0时分组无差错。</p>
+<p>3.4 reliable data transfer 可靠数据传输</p>
+<p>GOALS:<br>知道几个可靠版本分别的假设是什么；几个版本的关系和不同，每个版本解决什么问题。</p>
+<p><strong>1.完全可靠信道上的可靠数据传输：rdt1.0</strong></p>
+<p>最简单的情况。<strong>但完全不现实！</strong></p>
+<p>假设:底层信道是完全可靠的,即没有比特误差，不会丢包。</p>
+<p>此时，1）所有的分组都是从发送方流向接收方。2）接收方不需要提供任何反馈信息给发送方，因为不会发生任何差错。3）接收方没有必要请求发送方放慢发送速度。</p>
+<p><strong>2.具有比特差错信道上的可靠数据传输：rdt2.0</strong></p>
+<p>假设：<strong>底层信道模型是分组中的比特可能受损。</strong>在分组的传输传播或缓存的过程中，比特差错通常会出现在网络的物理部件中。<strong>所有传输的分组按其发送的顺序被接收。</strong></p>
+<p>接收方正确接收后，进行肯定确认 ACK</p>
+<p>接收有误，进行否定确认<br>NAK，并要求重传。这种重传机制的可靠数据传输协议称为自动重传请求（ARQ）请求。</p>
+<p>ARQ协议中有另外三种协议（相对于rdt1.0的改进）：</p>
+<p>1）差错检测</p>
+<p>2）接收方反馈，接收方提供明确反馈信息（ACK,NAK）给发送方，只用一个bit长度。</p>
+<p>3）重传，接收方收到有误的分组时，发送方将重传该分组。</p>
+<p><strong>rdt2.0协议的缺陷：没有考虑ACK或NAK分组受损的可能性，即如果ACK或NAK分组出错怎么办。</strong>更难的是，这样纠正ACK或者NAK的差错？</p>
+<p><strong>如果一个ACK或NAK分组受损，发送方无法知道接收方是否正确接收了上一块发送的数据。</strong></p>
+<p><strong>ACK或NAK受损时有三种可能性：</strong></p>
+<p>1）发送方接收到迷惑性的ACK或者NAK，又问“你说什么？”，而接收方不明白这句话是一个新的数据还是请求重复发送（太搞笑了这个….）</p>
+<p>2）增加足够的校验和比特。这样发送方不但可以检测比特差错，还可以恢复比特差错。</p>
+<p>3）发送发只要接到含糊不清的ACK\NAK，就重复发送当前分组。信道中出现冗余分组，并且接收方不知道这个分组是重传的还是新的。</p>
+<p><strong>所以引入了数据分组的序号(sequence<br>number),这样接收方就知道收到的分组是否重传的。此时还需要停等协议，发送方等到接收方反馈后再继续。这就是RDT2.1。</strong></p>
+<p><strong>3.rdt2.1(rdt2.0的改进版)</strong></p>
+<p>此时，发送方为每个分组增加了序列号，但只有0和1。</p>
+<p>如果接收方期望收到序号0的分组，却收到1分组，就会反馈ACK<br>1给发送方，此时发送方正在等待ACK 0，<br>于是发送方知道分组0可能丢失，于是重发分组0。</p>
+<p>发送方必须知道ACK或者NAK是否出错，接收方不知道ACK/NAK是否被发送方正确接收。序列号只用两个，0和1.</p>
+<p>于是有了rdt2.2</p>
+<p><strong>4.rdt2.2</strong></p>
+<p><strong>具有比特差错信道上的一个无NAK的可靠数据传输协议。</strong></p>
+<p><strong>只使用ACK，</strong>接收方通过ACK告知发送方最后一个被正确接收的分组。在ACK消息中显式的加入被确认分组的序列号seq。</p>
+<p>发送方接收到<strong>重复的ACK</strong>，相当于收到了NAK，就会重传当前分组。</p>
+<p><strong>但是信道不丢包的假设不合理，如果丢包则协议无法工作。</strong></p>
+<p>5.rdt3.0</p>
+<p>具有比特差错的丢包信道上的可靠数据传输</p>
+<p>怎么样检验丢包以及丢包后做什么。后者可通过校验和、序号、ACK分组和重传等解决。</p>
+<p>如果发送方发送的分组丢失，或者接收方的ACK分组丢失，发送方都无法收到响应。此时，<strong>需要选择一个时间值来限定发送方等待的时间（定时器）</strong>，过了这个时间还没收到ACK，发送方就重传分组，这可能会造成冗余分组（没有丢包，只是延迟太久）。但是rdt2.2中的seq已经可以处理冗余分组了。</p>
+<p>所以定时器的作用就是用来恢复丢失的数据或确认分组。</p>
+<p>但是使用的停等协议，发送方只有等待对方回应才能继续发送，使得发送方的利用率太小！！于是到下一部分内容….</p>
+<p><strong>流水线协议</strong></p>
+<p>1.允许发送方发送多个分组而无需等待确认。</p>
+<p>2.流水线技术给可靠数据传输协议带来如下影响：</p>
+<p>1）增加序号范围。每个传输的分组必须有一个唯一的序号。</p>
+<p>2）协议的发送方和接收方需要<strong>缓存</strong>多个分组。发送方最少要能缓冲那些已经发送但还没有确认的分组。接收方<strong>可能</strong>需要缓存已正确接收的分组。</p>
+<p>所需序号范围和对缓冲的要求取决于数据传输协议处理丢失、损坏及过度延时分组的方式。</p>
+<p>3.解决流水线的差错恢复有两种基本方法：GO-BACK-N回退N步和selective<br>repeat选择重传。</p>
+<p>GBN(滑动窗口协议 sliding-window protcol):</p>
+<p>1.发送未确认的分组允许的范围为N，N被称为窗口长度。</p>
+<p>过程：</p>
+<p>发送方：</p>
+<p>1.如果窗口未满，发送方就继续发送分组。窗口已满，就缓存或者让上层等一会儿再试。</p>
+<p>2.超时时间：定时器为最早的已发送但还未确认的分组使用的定时器。若果收到一个ACK，但还有已发送但还未确认的分组，定时器重新启动。如果没有了，定时器终止。定时器n超时，则分组n重发。</p>
+<p>接收方：</p>
+<p>1）对序号为n的分组的确认采用累积确认。如果序号n分组被正确接收，并且按序接收，那么接收方为分组n发送ACK，并将分组交付给上层。如果分组k已接收并交付，则所有比k小的分组也一定已经交付。</p>
+<p>2）接收方丢失所有失序分组。如果分组n丢失，接收到了分组n+1，那么n和n+1根据重传规则都会被重传，所以分组n+1不必交付给上层，可以直接丢弃。这样接收方<strong>不用缓存</strong>任何失序分组。</p>
+<p>综上，发送方只用维护窗口的上下边界和nextsequnum在窗口中的位置，接收方需要维护下一个按序接收的分组序号。</p>
+<p>缺点：窗口长度和带宽时延很大，在流水线中有很多分组时，一个单个分组的差错就可能引起GBN重传大量分组。</p>
+<p><strong>选择重传（SR）</strong></p>
+<p>让发送方仅重传那些它怀疑在接收方出错的分组（丢失或受损的分组）而避免了重传。</p>
+<p>发送方：</p>
+<p>1）接收到数据后，发送方检查下一个可用于该分组的序号，如果这个序号在发送窗口内，就打包数据并发送；否则要么缓存数据，要么返回给上层</p>
+<p>2）超时，每个分组都拥有自己的定时器</p>
+<p>3）收到ACK后，如果该序号在窗口内，则发送方将这个被确认的分组标记为已接收，如果恰好是send_base，则窗口基序号移动到最小序号的<strong>已发送未确认分组</strong>处，如果移动后有序号落到窗口的未发送分组，则发送这些分组。</p>
+<p>接收方：</p>
+<p>确认正确接收的分组不管是否按序。失序的分组会被缓存直到所有丢失分组都被收到。</p>
+<p>这样可以将一批分组按序交给上层。</p>
+<p>1）分组n处于[rcvbase,<br>rcvbase+N-1]，发送分组n的ACK，非按序的分组先缓存；如果是按序的，连同之间在缓存中的按序分组一起交付给上层。窗口移动到下一个未收到的分组处。</p>
+<p>2）分组n处于[rcvbase-N,rcvbase-1]，直接回复ACK（n）</p>
+<p>3)其他情况，忽略。</p>
+<p>注意：对于2），一定要对这些分组重新确认，否则发送窗口的一些分组永远收不到ACK，该分组一直重传且发送窗口无法前进。</p>
+<p>4）有一个例子表示窗口长度比序号空间大小小1时协议无法工作。</p>
+<p>窗口长度必须小于或等于序号空间大小的一半。</p>
+<p>3.5 面向连接的传输</p>
+<p>3.5.1 TCP连接</p>
+<p>特点：</p>
+<p>1）全双工服务，建立连接后，数据可以在进程A和进程B之间互相流动。</p>
+<p>2）点对点，单个发送方与单个接收方。</p>
+<p>3）可靠的，按序投递</p>
+<p>4）流水线，流量控制和拥塞控制需要设置窗口长度</p>
+<p>5）面向对象的，发送数据时要先经过三次握手</p>
+<p>6）流量控制，发送方的速率不能快于接收方</p>
+<p>1.发送缓存，是在三次握手初期设置的缓存之一，接下来TCP会不时地从发送缓存里取出一块数据。</p>
+<p>2.TCP可从缓存中取出并放入报文段中的数据量受限于最大报文段长（MSS），MSS根据最初确定的最大链路层帧长度，即本地发送主机发送长度，最大传输单元MTU来确定。</p>
+<p>3.MSS是指报文段里<strong>应用层数据的最大长度</strong>，而不是指包括TCP首部报文段的最大长度。</p>
+<p>4.TCP报文段：</p>
+<p><img src="media/cb9ef26da050c1340eb19142f02bfbca.png" alt=""></p>
+<p>接收窗口：用于流量控制，用于指示接收方愿意接受的字节数量。</p>
+<p>首部长度：由于TCP选项字段的原因,TCP首部的长度是可变的，不过由于选项段一般为空，通常是20字节。</p>
+<p>选项字段：发送方和接收方协商最大报文段长度MSS</p>
+<p>PSH：指示接收方应立即将数据交给上层。</p>
+<p>URG：指示报文段里存在着被发送方的上层实体置为“紧急”的数据。</p>
+<p>紧急数据的最后一个字节由16比特的紧急数据指针字段指出。</p>
+<p><strong>序号seq：建立在传送的字节流，而不是建立在传送的报文段的序列上。</strong></p>
+<p><strong>一个报文段的序号，是该报文段首字节的字节流编号。</strong></p>
+<p>假设数据流由一个500000字节的文件组成，MSS为1000字节，则500个报文段的首字节序号依次为0,1000,2000<br>……</p>
+<p><strong>确认序号ACK：主机A期望从主机B收到的下一字节的序号。比如A已经收到来自B的编号为0-535的所有字节，那么此时A发送给B的报文段的确认号字段就是536。</strong></p>
+<p><strong>累积确认：TCP只确认数据流中至第一个丢失字节为止的字节。</strong></p>
+<p>主机在TCP连接中收到失序报文段怎么办？</p>
+<p><img src="media/140abcbbb7e9f1167bf7138fef969c73.png" alt=""></p>
+<p>3.5.3 往返时延的估计与超时</p>
+<p>1.估计往返时延</p>
+<p>样本RTT：从某报文段被发出（交给IP）到对该报文段的确认被收到之间的时间量（忽略重传）</p>
+<p>1）RTT计算：</p>
+<p>显然样本RTT会出现波动，所以使用 <strong>最近几个值的算术平均</strong>，<br>而不是当前的样本RTT峰值。</p>
+<p>EstimatedRTT = (1- α)*EstimatedRTT + α*SampleRTT</p>
+<p>在统计学中被称为指数加权移动平均。</p>
+<p>通常α=0.125</p>
+<p>2）RTT偏差DevRTT,用于估算SampleRTT一般会偏离EstimatedRTT的程度：</p>
+<p>DevRTT = (1-β)*DevRTT +β*|SampleRTT-EstimatedRTT|</p>
+<p>通常β=0.25</p>
+<p>如果样本RTT波动较小，DevRTT的值就会很小。</p>
+<p>2.设置和管理重传超时间隔</p>
+<p>TimeoutInterval = EstimatedRTT + 4*DevRTT</p>
+<p>3.5.4 可靠的数据传输</p>
+<p>1）在不可靠的IP协议的尽力而为服务上建立了可靠的数据传输协议</p>
+<p>2）流水线技术发送报文段</p>
+<p>3）确认累积</p>
+<p><strong>4）使用单重发计时器</strong></p>
+<p>1.重发由超时间隔控制，每次TCP重传都会将下一次的超时间隔设为先前值的两倍，提供了一种拥塞控制。</p>
+<p>2.</p>
+<p><img src="media/a8cedd91720a451a7780e66afacaf1f6.png" alt=""></p>
+<p>3.快速重传</p>
+<p>1）为什么会发送冗余ACK？接收方收到一个具有大于期望序号的失序报文时，<strong>检测到数据流中的一个间隔</strong>，就是有报文段丢失，TCP不使用否定确认，只需对<strong>按序收到的</strong>最后一个字节数据进行重复确认，产生一个冗余ACK。</p>
+<p>2）如果TCP发送方接收到对相同数据的<strong>3个冗余ACK</strong>，它就认为跟在这个已被确认过3次的报文段<strong>之后的报文段已经丢失。</strong></p>
+<p>3）快速重传，即在该报文段的定时器过期之前重传丢失的报文段。</p>
+<p>3.5.5 流量控制</p>
+<p>TCP连接的两端的发送方都各自维护一个接收窗口。</p>
+<p>1.当TCP连接收到正确、按序的字节后，它就将数据放入接收缓存，相关联的应用进程会从该缓存中读取数据。</p>
+<p><img src="media/ab439aa277d7f8c1a0d78494a8b07a98.png" alt="rcvwin"></p>
+<p>2.流量控制以<strong>消除发送方使接收方缓存溢出的可能性。可以说是一个速度匹配服务，即发送方的发送速率与接收方应用程序的读速率相匹配。</strong></p>
+<p>3.接收窗口用于<strong>告诉发送方</strong>，该接收方还有多少<strong>可用的缓存空间</strong>。接收方会把这个值发送给发送方的报文段的接收窗口字段中。</p>
+<p>4.</p>
+<p><img src="media/d8a403edf7e74c616f15258f7a003ad2.png" alt=""></p>
+<p>主机A跟踪的两个变量LastByteSent-LastByteAcked,<br>就是主机A发送到连接中但未被确认的数据量unAcked<br>Data。主机A需要将这个量控制在RcvWindow以内。可用保证主机A不会使主机B的接收缓存溢出。</p>
+<p>3.5 连接控制</p>
+<p><img src="media/5176e5cdde81af8496fbb6912f6771c9.png" alt=""></p>
+<p><img src="media/d833c818e6c95efe6bece37849fdfb95.png" alt=""></p>
+<p>处理同时发送的FIN？？？</p>
+<p>3.6 拥塞控制原理</p>
+<p>1.<strong>网络</strong>拥塞：太多的源主机想以过高的速率发送数据，网络难以处理过来。</p>
+<p>2.表征：</p>
+<p>1）丢包。路由器缓存溢出。</p>
+<p>2）时延过长。路由器缓存队列过长。</p>
+<p>拥塞情况</p>
+<p>1.共享单跳具有<strong>无限大缓存</strong>的两个连接</p>
+<p>数据被封装发送，不执行差错恢复（如重传）、流量控制或拥塞控制。</p>
+<p><img src="media/e50b79f22d6b083bb5030001f7d5d71c.png" alt=""></p>
+<p><img src="media/51f9d03b6ecf1022ca50fb9a851fa735.png" alt=""></p>
+<p>发送速率在0~R/2间时，接收方 发送速率接近R/2时</p>
+<p>吞吐量=发送方的发送速率 平均时延越来越大，超过R/2</p>
+<p>吞吐上限R/2：两个连接之间对 源与目的地的平均时间无穷大</p>
+<p>链路容量的共享</p>
+<p>2.两个发送方和一个具有有限缓存的路由器</p>
+<p>每个连接都可靠，分组可以被重传。</p>
+<p><img src="media/b7329271f292aec87b0425c90b489923.png" alt=""></p>
+<p>λ`in也表示供给载荷。</p>
+<p><img src="media/ae52a87c9bd4a45a5cbe40aefb09434d.png" alt=""></p>
+<p><img src="media/49bb38673b7fb137769ef59bc804970a.png" alt=""></p>
+<p><img src="media/92bd88ddb0e8eddb59bcbcbbf2d59b3c.png" alt=""></p>
+<p>仅当缓存空闲时发送分组 发送方仅当在确定了一个分组 发送方重传在队列中</p>
+<p>不产生丢包，λin=λ`in 已经丢失时才重传 已推迟但未丢失的分组</p>
+<p>吞吐量就等于λin 这条线假定每个分组被路</p>
+<p>由器转发平均两次的情况</p>
+<p>这里有两个拥塞带来的开销：</p>
+<p>b. 发送方执行重传以补偿因为缓存溢出而丢失的分组</p>
+<p>c.发送遇到大时延时进行的不必要重传引起路由器利用链路带宽来转发不必要<br>的分组拷贝。</p>
+<ol start="3">
+<li>暂时不管了…..</li>
+</ol>
+<p>3.6.2 拥塞控制方法</p>
+<p>两种拥塞控制方法。</p>
+<p>1.端到端拥塞控制。</p>
+<p><img src="media/ed99f390b0b1931760c9ad255cd32f6e.png" alt=""></p>
+<p>2.网络辅助的拥塞控制</p>
+<p><img src="media/ba364fc58b4463d2383f169a3488ba56.png" alt=""></p>
+<p><img src="media/2b0359d6fe8a7c5b25048b32e949753d.png" alt=""></p>
+<p>3.7 TCP拥塞控制</p>
+<p>基本思想：出现丢包时间时，让发送方降低发送速率（通过减少拥塞窗口CongWin）的大小。</p>
+<p>TCP拥塞控制算法：三个部分。</p>
+<p><strong>1.加性增、乘性减 AIMD</strong></p>
+<p>加性增：每次它收到一个确认后就把CongWin增大一点，目标是<strong>在每个往返时延内CongWin增加一个MSS</strong></p>
+<p>乘性减：每发生一次丢包事件，就将当前的CongWin值减半</p>
+<p>TCP拥塞控制协议的<strong>线性增长阶段被称为避免拥塞。</strong>CongWin值重复地经历一种升降循环，即重复<strong>地线性增长</strong>，然后又突然降至当前值的一半（当发生丢包事件时），使得TCP连接的CongWin变化<strong>呈锯齿形状：</strong></p>
+<p>2.TCP拥塞控制的细节</p>
+<p>1）发送方能发送的字节限制：</p>
+<p>LastByteSent-LastByteAcked ≤ CongWin</p>
+<p>2）发送方的发送速率：</p>
+<p><img src="media/34558633b770426a55d311cf6915a958.png" alt=""></p>
+<p>CongWin是动态的。</p>
+<p><strong>发送方怎么知道发生了拥塞？？</strong></p>
+<p><strong>丢包事件。 超时或者收到三个重复的ACK</strong></p>
+<p>发现丢包后，发送方会降低速率（减少CongWin）.</p>
+<p><strong>3.慢启动</strong></p>
+<p>TCP连接开始时，CongWin的最初值为1个MSS，则初始发送速率为MSS/RTT，可能带宽可能比这个值大得多，但仅仅线性地增加发送速率，将会非常慢。</p>
+<p>所以TCP发送方，以指数的速度增加发送速率，<strong>每过一个RTT将CongWin值翻倍</strong>。直到一个丢包事件出现，CongWin变为一半，然后会开始线性增长。这被称为慢启动。慢启动阶段，每过一个RTT，CongWin的值都有效地增加一倍。</p>
+<p>TCP发送方以慢速率发送，但是以指数的速度快速增加其发送速率。</p>
+<p>4.怎样推断丢包事件</p>
+<p>1）3个重复ACK，CongWin会降低为一半，然后线性增长（拥塞避免）。</p>
+<p>2）超时时间，CongWin重新<strong>设置为1MSS</strong>,然后指数增长（慢启动），到达阙值后线性增长（拥塞避免）。</p>
+<p>为什么两种丢包事件的处理不同？？</p>
+<p>1）.如果是收到3个冗余ACK，网络表明它至少能交付一些报文段，即使一些报文段因为拥塞而丢失。这是<strong>快速恢复。</strong></p>
+<p>2）超时事件表明拥塞情况更加严重。</p>
+<p>5.阙值，用来确定慢启动将结束并且拥塞避免将开始的窗口长度。初始值很大，<strong>每发生一个丢包事件（不管因为什么原因），就被设置为当前CongWin值的一半。注意：这个阙值将会在丢包事件之后的指数和线性拐点才能看到！</strong></p>
+<p><img src="media/8ec7d15c24fdcd05b40422ada3630394.png" alt=""></p>
+<p>何时发生指数转线性？？</p>
+<p>当遇到阙值时。也就是，congwin大小为之前超时发生丢包时大小的一半时。</p>
+<p>5.TCP吞吐量</p>
+<p>1）设丢包时的窗口大小为w，忽略慢启动阶段。</p>
+<p>2）此时吞吐量为w/RTT</p>
+<p>3）发生了丢包，w减少到w/2，此时吞吐量w/2rtt</p>
+<p>4）平均吞吐量：0.75w/RTT</p>
+<p>TCP未来（有点有趣）：</p>
+<p><img src="media/4a71010f9e467cf444b19f1dc76baaa3.png" alt=""></p>
+<p><strong>第四章 网络层</strong></p>
+<p>网络层：将分组从一台发送主机移动到一台接收主机</p>
+<p>路由器检查经过它的所有IP的datagram的报头。</p>
+<p>1.转发：将分组从一个输入链路接口转移到适当的输出链路接口的路由器本地动作。</p>
+<p>2.选录：分组从源到目的地时，决定端到端路径的网络范围的进程。</p>
+<p>3.虚电路：仅在网络层提供<strong>连接服务</strong>的计算机网络。比如ATM, 帧中继。</p>
+<p>1）建立、拆卸在数据可以传输之前</p>
+<p>2）每个分组携带一个VC号</p>
+<p>3）源到目的路径上的每个路由器都保持连接状态</p>
+<p>4）网络层可以预留资源，比如带宽，缓存等。</p>
+<p>组成：</p>
+<p><img src="media/8e3bb0378cefd36ab0e2e18e6cb50705.png" alt=""></p>
+<p>4.数据报网络：仅在网络层提供<strong>无连接服务</strong>的计算机网络</p>
+<p>5.网络层提供的特定服务包括：</p>
+<p>1）确保交付；2）具有时延上界的确保交付；</p>
+<p>下列服务为给定的源和目的之间提供分组的流：</p>
+<p>1）有序分组交付； 2）确保最小带宽；3）确保最大时延抖动。</p>
+<p>4.2.2 数据报网络</p>
+<p>1.最长前缀匹配</p>
+<p>根据匹配表，确定想哪个链路接口转发该分组。</p>
+<p>2.数据报网络和VC的区别：</p>
+<table>
+<thead>
+<tr>
+<th>数据报</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>在电脑之间交换数据，没有时间要求</td>
+<td>电话通讯</td>
+</tr>
+<tr>
+<td>终端更smart，可以进行控制，差错恢复 网络中更简单</td>
+<td>人类通讯，严格的时间控制，可靠性需求高，提供的服务保证多</td>
+</tr>
+<tr>
+<td>很多种链接类型</td>
+<td>终端比较蠢，网络中复杂度高</td>
+</tr>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>4.3 什么是路由器</p>
+<p>4.3.3 输出端口</p>
+<p>4.3.4何时出现排队</p>
+<p>1.输出端口队列</p>
+<p>输出阻塞</p>
+<p>当交换结构将分组交付给输出端口的速率超过输出链路速率时<br>，需要<strong>排队与缓存功能</strong>。</p>
+<p>排队（延时）和丢包由输出端口缓存溢出造成。</p>
+<p>1）.输出端口上的一个分组调度程序从这些排队的分组中选出一个来传送，这种选择根据简单的调度原则来定。</p>
+<p>2.输入端口队列</p>
+<p>1）.输入排队交换机中的线路前部（HOL）阻塞：队列的首个packet由于它的目的端口正忙而被延迟转发，导致后面的packets被blocked。</p>
+<p>也就是只要这个队列的头部被阻塞，它后面的数据报即使不是去同一个输出端口，也会被阻塞。</p>
+<p>2.RFC 3439提出，平均缓存量=RTT*C(平均往返时延x链路容量)</p>
+<p>3.最新建议：当大量的TCP流（N）经过一条链路时：B=RTT*C/根号N。</p>
+<p>4.4 IP （Internet Protocol）</p>
+<p>网络层主要有三个组件：</p>
+<p><img src="media/4e6383fde994e9cc19bfd7fec57b0958.png" alt=""></p>
+<p>1）IP协议</p>
+<p>2）选录组件，决定数据报从源到目的地所流经的路径</p>
+<p>3）报告数据中的差错和对某些网络层信息请求进行响应</p>
+<p>也就是ICMP协议（比如ping的时候用的是这个）</p>
+<p>1.数据报格式</p>
+<p><img src="media/bb24128244bd5a69e80919359732b37c.png" alt=""></p>
+<p>首部长度：因为IPV4数据报可以包含一些可选项，所以用这4比特确定IP数据报中的数据报部分实际从哪里开始。</p>
+<p>服务类型（TOS）：区分数据类型。</p>
+<p>数据报长度。IP数据报的总长度（首部加数据）</p>
+<p>生存时间（TTL）：数据报最多经过的跳数（每经过一台路由器就减1）</p>
+<p><strong>协议（upper layer）：表明数据报的数据应该给哪个运输层协议（TCP或UDP）<br>。类似运输层的端口号。是两个层之间的粘合剂。</strong></p>
+<p>首部校验和：帮助路由器检测数据报中的比特错误。</p>
+<ol start="2">
+<li>how much overhead with TCP?</li>
+</ol>
+<p>20 bytes of TCP</p>
+<p>20 bytes of IP</p>
+<p>= 40 bytes + app layer overhead</p>
+<p>4.4.2 IPv4编址</p>
+<p>1.接口，主机与物理链路之间的边界；路由器与它的任意一条链路之间的边界。</p>
+<p>2.每个IP地址长度为32比特（4字节），共有2\^32个可能的IP地址。</p>
+<p>3.每台主机和路由器上的每个接口都必须有一个全球唯一的IP地址。</p>
+<p>4.子网：分开主机和路由器的每个接口，从而产生了几个分离的网络岛，接口端接了这些独立的网络的断点，这些独立的网络中的每个都叫做一个子网。</p>
+<p>IP地址的子网部分相同的接口；彼此可以不通过路由器物理连接；</p>
+<p>5.因特网的地址分配策略：无类别域间选路（Classless Interdomain Routing,CIDR）.</p>
+<p>表示格式为a.b.c.d/x x构成了IP地址的网络部分，被称为该地址的前缀。</p>
+<p>6.DHCP动态主机配置协议：可以让主机每次与该网络连接时能得到一个相同的IP地址，或者被分配一个临时的IP地址。</p>
+<p>plug and play protocol ： 即播即用协议</p>
+<p>1）可以重复利用IP地址（每个主机只有在于该网络连接时才有这个网络的IP地址）</p>
+<p>2）便于移动用户连接进网络</p>
+<p>7.DHCP协议的四个步骤：（不太会考，但是不难理解…记一下）</p>
+<p>1）客户机发现DHCP服务器。host broadcasts “DHCP discover” msg</p>
+<p>2）DHCP服务器提供报文，对客户机做出响应。DHCP server responds with “DHCP offer”<br>msg</p>
+<p>3）客户机从DHCP提供的IP地址中选一个（可能有很多个DHCP服务器），发出请求响应。host<br>requests IP address: “DHCP request” msg</p>
+<p>4）服务器发送ACK响应客户机请求。DHCP server sends address: “DHCP ack” msg</p>
+<p>客户机收到ACK后 交互完成。</p>
+<p>8.Q: How does network get subnet part of IP addr?</p>
+<p>A: gets allocated portion of its provider ISP’s address space</p>
+<p>获取IP地址的维护商ISP的地址空间？？</p>
+<p>9.</p>
+<p>Q: How does an ISP get block of addresses?</p>
+<p>A: ICANN: Internet Corporation for Assigned Names and Numbers<br>互联网名称与数字地址分配机构</p>
+<p>allocates addresses IP地址的空间分配</p>
+<p>manages DNS 管理DNS</p>
+<p>assigns domain names, resolves disputes 域名系统的管理，解决争端</p>
+<p>10.网络地址转换（NAT Network Adress Translation）</p>
+<p>11.具有专用地址的地域：指其地址仅对该网络中的设备有意义的网络。</p>
+<p>12.由于专用地址仅在给定的网络中有意义，所以如果数以千计的家庭网络都使用10.0.0.0/24这个网络的话，怎么办呢？使用NAT.</p>
+<p>13.家庭网络计算机从哪里得到其地址？路由器从哪里得到其单个IP地址？</p>
+<p>路由器从ISP的DHCP服务器得到其地址，它再运行一个DHCP服务器，在NAT-DHCP路由器控制的家庭网络的地址空间中为计算机提供地址。</p>
+<p>14.本地网只需要一个IP地址；本地网的各设备间的IP地址可以互相交换，外界不会知道；本地网可以在不改IP的情况下改变ISP；本地网里设备的地址不被外界所知（被NAT使能路由器隐藏了本地网的细节）</p>
+<p>15.NAT路由器转换过程注意</p>
+<p>家庭网向外界请求：</p>
+<p>路由器将发送请求的源IP地址改为广域网一侧接口的IP地址</p>
+<p>路由器生成新端口号时，可以选任意一个当前未在NAT转换表中使用的源端口号</p>
+<p>把这个IP和端口号发送给目的主机。</p>
+<p>目的主机响应时，什么都不知道，按照IP和端口号反馈回去，</p>
+<p><strong>路由器在NAT转换表中，找到他们对应在家庭网络的IP和端口号，</strong>把数据报发送给家庭网。</p>
+<p>NAT把运输层的端口号和网络层的IP地址结合了。</p>
+<p>16.NAT端口长16位，支持60000多个并行使用广域网一侧IP地址的连接。</p>
+<p>NAT很有争议。</p>
+<p>17.有趣的问题，如果外界请求的服务器在家庭网中怎么办？</p>
+<p>方法一，固定转发IP地址和接口，NAT将连接请求固定为服务器家庭IP和端口</p>
+<p>方法二，UpnP，IGD</p>
+<p>UpnP（即插即用）可以让一台主机（家庭网内）上运行的应用程序为某些请求的公共端口号请求一个NAT地址。如果NAT接收该请求，外部的节点就可以发起到（公共IP地址，公共端口号）的请求。比如家庭网的（10.0.0.1,<br>3345）请求映射到（138.76.29,7， 5001），这个主机就可以和外部世界联系了。</p>
+<p>方法三，relaying(used in skype)</p>
+<p>4.4.3 ICMP: Internet Control Message Protocol</p>
+<p>1.ICMP报文：体系上是在IP之上，是作为IP有效载荷承载的。</p>
+<p>2.差错报告：主机/网络/端口/协议不可达</p>
+<p>echo回复/请求</p>
+<p>3.ICMP报文：一个类型字段和一个编码字段，包含引起该ICMP报文首次生成IP数据报的首部和前8字节的内容。</p>
+<p>4.Traceroute程序和ICMP。</p>
+<p>4.4.4 IPv6</p>
+<p>相比IPV4：</p>
+<p>1）扩大地址容量，128比特</p>
+<p>2）定长的40字节首部，简单高效</p>
+<p>3）流标签与优先级，优先级给出一个流中某些数据报的优先级。</p>
+<p>流标签标识一个数据报的流，20比特。</p>
+<p>不在的：</p>
+<p>4）切分和重组。</p>
+<p>5）首部校验和</p>
+<p>6）选项字段不在头部中，可能出现在 下一个头 字段中。</p>
+<p><img src="media/11a034910e857ba98021bac13ea8bbab.png" alt=""></p>
+<p>流量类型8比特：类似于v4中的TOS，区分数据类型。</p>
+<p>有效载荷长度：16比特值，给出了v6数据报中跟在定长的40字节数据报首部后面的字节数量。</p>
+<p>下一个首部：交付给哪个协议。和v4中的协议字段相同。</p>
+<p>2.ICMPv6</p>
+<p>1）增加了数据类型，“大数据包”</p>
+<p>2）多广播组管理功能</p>
+<p>3.隧道：两台IPv6路由器之间中间IPv4路由器的集合</p>
+<p>4.5 选路算法</p>
+<p>1.选路算法：寻找最低费用路径的算法</p>
+<p>2.分类</p>
+<p>1）全局选路算法，以所有节点之间的连通性及所有链路的费用为输入。</p>
+<p>2）分布式选路算法，迭代的、分布式的方式计算最低费用路径。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/计算机网络/" rel="tag"># 计算机网络</a>
+          
+            <a href="/tags/TCP/" rel="tag"># TCP</a>
+          
+            <a href="/tags/HTTP/" rel="tag"># HTTP</a>
+          
+            <a href="/tags/自顶向下/" rel="tag"># 自顶向下</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/24/HandlerThread/" rel="next" title="Effective Java 读书笔记（2.5）">
+                <i class="fa fa-chevron-left"></i> Effective Java 读书笔记（2.5）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/18/okhttp3/" rel="prev" title="okhttp3源码解析(1)">
+                okhttp3源码解析(1) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ke Yu</p>
+              <p class="site-description motion-element" itemprop="description">Keep moving.Don't settle.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ke Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="activity,启动过程," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Android四大组件—-Activity（2） 基础概念  通信  1.ActivityManagerService  2.IApplicationThread  3.IActivityManager  4.基本联系    协助  1.ActivityRecord  2.TaskRecord  3.ActivityStack  4.ActivityThread    5.Instrumentat">
+<meta name="keywords" content="activity,启动过程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Activity(2)">
+<meta property="og:url" content="http://yoursite.com/2017/09/07/Android四大组件----Activity（2）/index.html">
+<meta property="og:site_name" content="Coco">
+<meta property="og:description" content="Android四大组件—-Activity（2） 基础概念  通信  1.ActivityManagerService  2.IApplicationThread  3.IActivityManager  4.基本联系    协助  1.ActivityRecord  2.TaskRecord  3.ActivityStack  4.ActivityThread    5.Instrumentat">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-04-04T03:23:05.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Activity(2)">
+<meta name="twitter:description" content="Android四大组件—-Activity（2） 基础概念  通信  1.ActivityManagerService  2.IApplicationThread  3.IActivityManager  4.基本联系    协助  1.ActivityRecord  2.TaskRecord  3.ActivityStack  4.ActivityThread    5.Instrumentat">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/09/07/Android四大组件----Activity（2）/"/>
+
+
+
+
+
+  <title>Activity(2) | Coco</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Coco</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Hello world</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/07/Android四大组件----Activity（2）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Activity(2)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-07T17:19:20+08:00">
+                2017-09-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Android四大组件—-Activity（2）"><a href="#Android四大组件—-Activity（2）" class="headerlink" title="Android四大组件—-Activity（2）"></a>Android四大组件—-Activity（2）</h1><ul>
+<li><p><a href="#Android四大组件----Activity（2）-基础概念">基础概念</a></p>
+<ul>
+<li><p><a href="#Android四大组件----Activity（2）-通信">通信</a></p>
+<ul>
+<li><p><a href="#Android四大组件----Activity（2）-1.ActivityMa">1.ActivityManagerService</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-2.IApplicati">2.IApplicationThread</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-3.IActivityM">3.IActivityManager</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-4.基本联系">4.基本联系</a></p>
+</li>
+</ul>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-协助">协助</a></p>
+<ul>
+<li><p><a href="#Android四大组件----Activity（2）-1.ActivityRe">1.ActivityRecord</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-2.TaskRecord">2.TaskRecord</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-3.ActivitySt">3.ActivityStack</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-4.ActivityTh">4.ActivityThread</a></p>
+</li>
+</ul>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-5.Instrument">5.Instrumentation</a></p>
+</li>
+</ul>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-基本过程">基本过程</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-一些问题">一些问题</a></p>
+<ul>
+<li><p><a href="#Android四大组件----Activity（2）-问题1">问题1</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-问题2">问题2</a></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h3><h4 id="通信"><a href="#通信" class="headerlink" title="通信"></a>通信</h4><h5 id="1-ActivityManagerService"><a href="#1-ActivityManagerService" class="headerlink" title="1.ActivityManagerService"></a>1.ActivityManagerService</h5><p>主要管理应用进程的生命周期以及进程的Activity,Service,Broadcast等等。</p>
+<p>可以分为client端与Server端：</p>
+<ul>
+<li><p>Client端运行在app的各个进程，这些进程实现了具体的activity和service，通过调用系统接口来完成显示。</p>
+</li>
+<li><p>Service端运行在系统进程中，是系统级别的AMS的实现，响应client端的系统调用请求，并且管理client端的各个APP的生命周期。</p>
+</li>
+</ul>
+<h5 id="2-IApplicationThread"><a href="#2-IApplicationThread" class="headerlink" title="2.IApplicationThread"></a>2.IApplicationThread</h5><p>该接口定义了AMS访问App的接口。AMS通过这个接口的实现控制App的进程完成App的响应。</p>
+<p>实现：ApplicationThread。实质上是一个Binder对象，在进程启动，创建ActivityThread时实例化，AMS通过它的代理ApplicationThreadProxy和Activity进行进程间通信。</p>
+<h5 id="3-IActivityManager"><a href="#3-IActivityManager" class="headerlink" title="3.IActivityManager"></a>3.IActivityManager</h5><p>该接口定义了App访问AMS的接口。App通过这个接口的实现对请求AMS完成某些操作。</p>
+<p>实现：ActivityManagerNative。Activity通过代理ActivityManagerProxy将请求送到AMS进行进程间通信。</p>
+<h5 id="4-基本联系"><a href="#4-基本联系" class="headerlink" title="4.基本联系"></a>4.基本联系</h5><ul>
+<li><p>一个进程对应一个ActivityThread实例，这个进程里面所有的activity对应这一个ActivityThread实例</p>
+</li>
+<li><p>一个进程对应一个ApplicationThread对象，此对象是ActivityThread 与<br>ActivityManagerService连接的桥梁。</p>
+</li>
+</ul>
+<h4 id="协助"><a href="#协助" class="headerlink" title="协助"></a>协助</h4><h5 id="1-ActivityRecord"><a href="#1-ActivityRecord" class="headerlink" title="1.ActivityRecord"></a>1.ActivityRecord</h5><ul>
+<li>记录一个Activity的相关信息</li>
+</ul>
+<h5 id="2-TaskRecord"><a href="#2-TaskRecord" class="headerlink" title="2.TaskRecord"></a>2.TaskRecord</h5><ul>
+<li><p>记录当前Task中所有Activity：ArrayList\&lt;ActivityRecord> mActivities</p>
+</li>
+<li><p>ActivityStack成员stack记录Task所在的栈，用于执行ActivityStack的方法</p>
+</li>
+</ul>
+<h5 id="3-ActivityStack"><a href="#3-ActivityStack" class="headerlink" title="3.ActivityStack"></a>3.ActivityStack</h5><p>管理协调ActivityRecord和TaskRecord</p>
+<ul>
+<li><p>记录所有的栈</p>
+</li>
+<li><p>通知WindowManagerService的监听器</p>
+</li>
+</ul>
+<h5 id="4-ActivityThread"><a href="#4-ActivityThread" class="headerlink" title="4.ActivityThread"></a>4.ActivityThread</h5><ul>
+<li><p>应用程序的入口</p>
+</li>
+<li><p>管理【应用程序的主线程】—–它自己不是线程</p>
+</li>
+<li><p>根据AMS的要求，进行Activity的调度</p>
+</li>
+</ul>
+<h4 id="5-Instrumentation"><a href="#5-Instrumentation" class="headerlink" title="5.Instrumentation"></a>5.Instrumentation</h4><ul>
+<li><p>管理监测Android控件的运行</p>
+</li>
+<li><p>根据ActivityThread的要求，完成Activity的生命周期控制</p>
+</li>
+</ul>
+<h3 id="基本过程"><a href="#基本过程" class="headerlink" title="基本过程"></a>基本过程</h3><p>step1：无论是launcher启动，还是activity内部调用startActivity接口来启动新的Activity，都是通过Binder的进程间通信进入到AMS进程中，然后调用ActivityManagerService.startActivity。</p>
+<p>期间主要经历以下过程：</p>
+<p> 1)在Launcher.startActivity中由于.MainActivity在注册文件中设置了intent，所以点击图标时，launcher会将这个activity启动。<br>问题1：intent的信息怎么被Launcher找到？</p>
+<p> 2)在Activity.startActivityForResult中，通过mMainThread（应用的主线程）.getApplicationThread获得了<strong>ApplicationThread</strong>对象，用于AMS和ActivityThread的通信，然后执行了Instrumentation.execStartActivity。</p>
+<p> 3)在Instrumentation.execStartActivity中，通过ActivityManagerNative.getDefault返回ActivityManagerService的远程接口，得到了<strong>ActivityManagerProxy</strong>接口。</p>
+<p> 4)通过<strong>ActivityManagerProxy</strong>接口，向AMS发出请求，也就是执行ActivityManagerService.startActivity。</p>
+<p>step2：AMS.startActivity将操作转发给成员变量mMainStack（ActivityStack类型）的startActivityMayWait函数，来准备要启动的Activity的相关信息。</p>
+<p>之后会经历以下过程：</p>
+<p> 1)在 ActivityStack.startActivityLocked中，可以从传进来的参数中得到调用者的信息，即Laucher应用程序的进程信息。</p>
+<p> 2)在ActivityStack.startActivityUncheckedLocked中，根据当前Activity的启动模式、taskAfiinity属性，设置的intent<br>flags等选择Task。为当前新创建的ActivityRecord找到Task。</p>
+<pre><code>比较复杂，其实是理解启动模式的关键。还是需要结合源码才能理解。
+</code></pre><p> 3)根据启动模式的相关知识，寻找Task还涉及到Task顶端的Activty。这个过程由resumeTopActivityLocked完成，主要就是看我们要启动的Activity是否在栈顶，如果不是的话，需要将当前运行的Activity暂停。这个工作还是由ActivityStack.startPausingLocked()来完成。</p>
+<p>step3：ActivityStack在startPausingLocked中会将需要暂停的Activity暂停，主要经历以下过程：</p>
+<p> 1)通过ApplicationThread.schedulePauseActivity进行通信，告诉ActivityThread执行handlePauseActivity</p>
+<p> 2)ActivityThread接收到通知，于是通过ActivityManager向ActivityManagerService发起activityPaused的请求</p>
+<p> 3) ActivityManagerService接收到请求，把工作交给ActivityStack，它进行了Activity的停止工作</p>
+<p> 4)停止了该停止了Activity，又通过ApplicationThread来告诉系统服务进程要进行真正的Activity启动调度了。这个系统进程就是在step1中发出startActivity请求的Activity对应的进程，比如对于点击程序图标启动，那么就是Launcher所在进程，而对于Activity内部调用startActivity的情景，这个就是这个Activity所在进程。</p>
+<p>step4：ApplicationThread不执行真正的启动操作，它通过ActivityManagerService.activityPause接口进入到AMS进程中，看是否需要创建新的进程来启动Activity。<br>如果是点击应用图标启动的话， ActivityManagerService<br>在这步会调用startProcessLocked来创建一个新的进程，而对于通过在Activty内部调用startActivity来启动新的Activity来说，这步不需要，因为新的activity就在原来的activity所在的进程中启动。</p>
+<p>step5：ActivityManagerService调用ApplicationThread.scheduleLaunchActivity，通知相应的进程执行Activity的操作。<br>ApplicationThread把这个启动Activity的操作转发给ActivityThread，ActivityThread发送msg，接收到消息后进行handleLaunchActivity操作，该操作主要是调用进行PerformLaunchActivity</p>
+<p>主要是以下过程：</p>
+<pre><code>1）ActivityThread
+</code></pre><p>调用Instrumentation的newOnActivity方法，通过ClassLoader导入相应的Activity类</p>
+<p>2）创建Application对象（一个应用只有一个Application），然后通过attach把activity的上下文信息（Context）设置到mainActivity去。</p>
+<p>3）Instrumentation调用callActivityOnCreate()执行Activity的onCreate()方法。</p>
+<h3 id="一些问题"><a href="#一些问题" class="headerlink" title="一些问题"></a>一些问题</h3><h4 id="问题1"><a href="#问题1" class="headerlink" title="问题1"></a>问题1</h4><p>Launcher怎么获得intent信息？</p>
+<ul>
+<li>涉及到PackageManagerService。它负责apk的安装、卸载等，在安装apk时会进行package的解析，把四大组件的相关信息存储下来。解析时，PMS中有相关的操作，对intentFiters查找、添加与匹配。对于一个新安装的应用，PMS找到intent-fileter中action为“android.intent.action.MAIN”并且category为“android.intent.category.LAUNCHER”的Activity，就会为这种应用程序创建桌面图标。</li>
+</ul>
+<h4 id="问题2"><a href="#问题2" class="headerlink" title="问题2"></a>问题2</h4><p>ActivityThread如何管理主线程？</p>
+<ul>
+<li><p>从上述对Activity启动过程的简单介绍中，可以看到ActivityThread会执行handlePauseActivity、PerformLaunchActivity等操作，也就是说ActivityThread控制了Activity的暂停、创建等操作，在ActivityThread的main()函数中可以看到它做了这样的事：</p>
+</li>
+<li><p>1)创建Looper</p>
+</li>
+<li><p>2)创建ActivityThread对象</p>
+</li>
+<li><p>3)创建binder对象ApplicationThread，将它和当前ActivityThread以及Application绑定</p>
+</li>
+<li><p>4)Looper循环，Handler接收消息，然后ActivityThread就可以执行handle方法，通过ActivityManager向ActivityManagerService发出请求</p>
+</li>
+</ul>
+<p>参考资料：</p>
+<p><a href="http://blog.csdn.net/luoshengyang/article/details/6689748" target="_blank" rel="noopener">http://blog.csdn.net/luoshengyang/article/details/6689748</a></p>
+<p><a href="http://blog.csdn.net/luoshengyang/article/details/6685853" target="_blank" rel="noopener">http://blog.csdn.net/luoshengyang/article/details/6685853</a></p>
+<p><a href="http://www.2cto.com/kf/201610/554316.html" target="_blank" rel="noopener">http://www.2cto.com/kf/201610/554316.html</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/activity/" rel="tag"># activity</a>
+          
+            <a href="/tags/启动过程/" rel="tag"># 启动过程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/07/volleySourceAny/" rel="next" title="volly源码解析">
+                <i class="fa fa-chevron-left"></i> volly源码解析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/07/SparseArray/" rel="prev" title="SparseArray源码解析">
+                SparseArray源码解析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ke Yu</p>
+              <p class="site-description motion-element" itemprop="description">Keep moving.Don't settle.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Android四大组件—-Activity（2）"><span class="nav-number">1.</span> <span class="nav-text">Android四大组件—-Activity（2）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基础概念"><span class="nav-number">1.0.1.</span> <span class="nav-text">基础概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#通信"><span class="nav-number">1.0.1.1.</span> <span class="nav-text">通信</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-ActivityManagerService"><span class="nav-number">1.0.1.1.1.</span> <span class="nav-text">1.ActivityManagerService</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-IApplicationThread"><span class="nav-number">1.0.1.1.2.</span> <span class="nav-text">2.IApplicationThread</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-IActivityManager"><span class="nav-number">1.0.1.1.3.</span> <span class="nav-text">3.IActivityManager</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-基本联系"><span class="nav-number">1.0.1.1.4.</span> <span class="nav-text">4.基本联系</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#协助"><span class="nav-number">1.0.1.2.</span> <span class="nav-text">协助</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-ActivityRecord"><span class="nav-number">1.0.1.2.1.</span> <span class="nav-text">1.ActivityRecord</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-TaskRecord"><span class="nav-number">1.0.1.2.2.</span> <span class="nav-text">2.TaskRecord</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-ActivityStack"><span class="nav-number">1.0.1.2.3.</span> <span class="nav-text">3.ActivityStack</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-ActivityThread"><span class="nav-number">1.0.1.2.4.</span> <span class="nav-text">4.ActivityThread</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-Instrumentation"><span class="nav-number">1.0.1.3.</span> <span class="nav-text">5.Instrumentation</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基本过程"><span class="nav-number">1.0.2.</span> <span class="nav-text">基本过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一些问题"><span class="nav-number">1.0.3.</span> <span class="nav-text">一些问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#问题1"><span class="nav-number">1.0.3.1.</span> <span class="nav-text">问题1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#问题2"><span class="nav-number">1.0.3.2.</span> <span class="nav-text">问题2</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ke Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

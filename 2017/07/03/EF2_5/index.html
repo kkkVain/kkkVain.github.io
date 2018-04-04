@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="读书笔记,Effective java,java," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="第二章 创建和销毁对象 第五条.避免创建不必要的对象 ① 传进去的参数“stringette”本身就是一个实例，然后又用new新建一个实例。很明显创建了不必要的实例。  这种方法，就只会创建一个实例。 ②  TimeZone tz1 = timeZone.getTimeZone(“GMT”); // 指定时区Calendar cal1 = Calendar.getInstance(tz1); //">
+<meta name="keywords" content="读书笔记,Effective java,java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Effective Java 读书笔记（2.5）">
+<meta property="og:url" content="http://yoursite.com/2017/07/03/EF2_5/index.html">
+<meta property="og:site_name" content="Coco">
+<meta property="og:description" content="第二章 创建和销毁对象 第五条.避免创建不必要的对象 ① 传进去的参数“stringette”本身就是一个实例，然后又用new新建一个实例。很明显创建了不必要的实例。  这种方法，就只会创建一个实例。 ②  TimeZone tz1 = timeZone.getTimeZone(“GMT”); // 指定时区Calendar cal1 = Calendar.getInstance(tz1); //">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF50.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF51.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF52.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF53.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/ef54.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF55.png">
+<meta property="og:updated_time" content="2018-04-04T03:23:05.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Effective Java 读书笔记（2.5）">
+<meta name="twitter:description" content="第二章 创建和销毁对象 第五条.避免创建不必要的对象 ① 传进去的参数“stringette”本身就是一个实例，然后又用new新建一个实例。很明显创建了不必要的实例。  这种方法，就只会创建一个实例。 ②  TimeZone tz1 = timeZone.getTimeZone(“GMT”); // 指定时区Calendar cal1 = Calendar.getInstance(tz1); //">
+<meta name="twitter:image" content="http://ovwunej09.bkt.clouddn.com/EF50.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/07/03/EF2_5/"/>
+
+
+
+
+
+  <title>Effective Java 读书笔记（2.5） | Coco</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Coco</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Hello world</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/03/EF2_5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Effective Java 读书笔记（2.5）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-03T22:23:42+08:00">
+                2017-07-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>第二章 创建和销毁对象</p>
+<p><strong>第五条.避免创建不必要的对象</strong></p>
+<h3 id="①"><a href="#①" class="headerlink" title="①"></a>①</h3><p><img src="http://ovwunej09.bkt.clouddn.com/EF50.png" alt="clipboard.png"></p>
+<p>传进去的参数“stringette”本身就是一个实例，然后又用new新建一个实例。很明显创建了不必要的实例。</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF51.png" alt="clipboard.png"></p>
+<p>这种方法，就只会创建一个实例。</p>
+<h3 id="②"><a href="#②" class="headerlink" title="②"></a><strong>②</strong></h3><p><img src="http://ovwunej09.bkt.clouddn.com/EF52.png" alt="clipboard.png"></p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF53.png" alt="clipboard.png"></p>
+<p>TimeZone tz1 = timeZone.getTimeZone(“GMT”); // 指定时区<br>Calendar cal1 = Calendar.getInstance(tz1); // 使用指定的时区和当前语言环境的日历<br>每次isbabyboomer()被调用的时候，都会创建一个calendar，一个timezone和两个date。<br>改进：将两个Date声明为static<br>final，把他们的初始化和Calendar的声明定义一起放到static代码块中。</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/ef54.png" alt="clipboard.png"></p>
+<p>这种方法只在类初始化时创建Date，Calendar，TimeZone一次。不会在每次调用isBabyBoomer()的时候创建这些实例，那么<strong>万一isBabyBoomer()永远不被调用</strong>，不是浪费了BoomStart和BoomEND吗？可以采用延迟初始化的方法进行，也就是第一次调用isBabyBoomer()的时候进行初始化。但书上不建议这么做，认为这会使方法变得更复杂，并且无法带来太大的性能提高。</p>
+<h3 id="③考虑适配器，也被叫做视图。"><a href="#③考虑适配器，也被叫做视图。" class="headerlink" title="③考虑适配器，也被叫做视图。"></a>③考虑适配器，也被叫做视图。</h3><p>Map接口的keySet()返回Map对象的Set视图，视图中包含Map中所以的key。每次调用keySet()返回的都是同样的Set实例。所以当对其中一个返回Set实例进行更改时，其他的Set实例也会被改变。</p>
+<p>④JAVA5开始，有一种<strong>创建多余对象的新方法，也就是自动装箱。</strong>基本类型和装箱类型混用，按需要自动装箱或者拆箱，他们的差别变得模糊，但还是有区别。比如以下这个例子：</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF55.png" alt="clipboard.png"></p>
+<p>这样程序会构造2\^31个多余的Long实例，在for循环中，每次增加long时，i都会被转为Long实例。如果把sum的声明从Long改成long，会显著提高性能。</p>
+<p>建议：<strong>优先使用基本类型而不是装箱基本类型，</strong>以防止无意识的自动装箱。</p>
+<p>但是这个条目并不是说要避免创建对象，一些小对象的创建和回收动作是很廉价的，所以通过创建附加的对象，可以提升程序的清晰性、简洁性和功能性。<br>维护自己的对象池反而不是一种好做法。除非其中的对象非常重量级。（比如android中的bitmap）。维护对象池会增加内存的占用，损害性能，所以进行不要使用轻量级对象池。</p>
+<p>对象池的典型用法：数据库连接池。<br>建立数据库连接代价很昂贵，所以重用对象很有意义。</p>
+<p>这个条目讲的是<strong>，应该重用现有对象的时候，不要创建新的对象。</strong></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/读书笔记/" rel="tag"># 读书笔记</a>
+          
+            <a href="/tags/Effective-java/" rel="tag"># Effective java</a>
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/30/EF2_3/" rel="next" title="Effective Java 读书笔记（2.3）">
+                <i class="fa fa-chevron-left"></i> Effective Java 读书笔记（2.3）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/04/EF2_6/" rel="prev" title="Effective Java 读书笔记（2.1）">
+                Effective Java 读书笔记（2.1） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ke Yu</p>
+              <p class="site-description motion-element" itemprop="description">Keep moving.Don't settle.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#①"><span class="nav-number">1.</span> <span class="nav-text">①</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#②"><span class="nav-number">2.</span> <span class="nav-text">②</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#③考虑适配器，也被叫做视图。"><span class="nav-number">3.</span> <span class="nav-text">③考虑适配器，也被叫做视图。</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ke Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

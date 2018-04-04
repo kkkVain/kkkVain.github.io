@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="读书笔记,Effective java,java," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="第三章 对于所有对象都通用的方法 Object类的所有非final方法（equals，hashcode，toString，clone和finalize）都有明确的通用约定，因为这些方法是被设计成要被覆盖的，所以覆盖时需要遵循这些通用的约定。否则依赖这些约定的类（hashset,hashmap）等，就无法正常工作。 这一章主要是讨论何时以及如何覆盖这些非final的Object方法 第8条 覆盖eq">
+<meta name="keywords" content="读书笔记,Effective java,java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Effective Java 读书笔记（3.8）">
+<meta property="og:url" content="http://yoursite.com/2017/07/07/EF3_8/index.html">
+<meta property="og:site_name" content="Coco">
+<meta property="og:description" content="第三章 对于所有对象都通用的方法 Object类的所有非final方法（equals，hashcode，toString，clone和finalize）都有明确的通用约定，因为这些方法是被设计成要被覆盖的，所以覆盖时需要遵循这些通用的约定。否则依赖这些约定的类（hashset,hashmap）等，就无法正常工作。 这一章主要是讨论何时以及如何覆盖这些非final的Object方法 第8条 覆盖eq">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF81.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF82.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF83.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF84.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF85.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF86.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF87.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF88.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF89.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF810.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF811.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF812.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF813.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF814.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF815.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF816.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF817.png">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/EF818.png">
+<meta property="og:updated_time" content="2018-04-04T03:23:05.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Effective Java 读书笔记（3.8）">
+<meta name="twitter:description" content="第三章 对于所有对象都通用的方法 Object类的所有非final方法（equals，hashcode，toString，clone和finalize）都有明确的通用约定，因为这些方法是被设计成要被覆盖的，所以覆盖时需要遵循这些通用的约定。否则依赖这些约定的类（hashset,hashmap）等，就无法正常工作。 这一章主要是讨论何时以及如何覆盖这些非final的Object方法 第8条 覆盖eq">
+<meta name="twitter:image" content="http://ovwunej09.bkt.clouddn.com/EF81.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/07/07/EF3_8/"/>
+
+
+
+
+
+  <title>Effective Java 读书笔记（3.8） | Coco</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Coco</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Hello world</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/07/EF3_8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Effective Java 读书笔记（3.8）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-07T22:43:32+08:00">
+                2017-07-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>第三章 对于所有对象都通用的方法</p>
+<p>Object类的所有非final方法（equals，hashcode，toString，clone和finalize）都有明确的通用约定，因为这些方法是被设计成要被覆盖的，所以覆盖时需要遵循这些通用的约定。否则依赖这些约定的类（hashset,hashmap）等，就无法正常工作。</p>
+<p>这一章主要是讨论何时以及如何覆盖这些非final的Object方法</p>
+<p><strong>第8条 覆盖equals时请遵守通用约定</strong></p>
+<h3 id="何时应该覆盖Object-equals？"><a href="#何时应该覆盖Object-equals？" class="headerlink" title="何时应该覆盖Object.equals？"></a>何时应该覆盖Object.equals？</h3><ul>
+<li>①类具有自己特有的“逻辑相等”概念（<strong>不是对象等同</strong>），并且超类没有符号equals以实现期望的行为。<br>“值类”一般就属于这种，也就是仅仅表示值的类，比如Integer或者Date。<br>我们在使用equals方法时，希望知道他们逻辑上是否相等，而不是想知道他们是否指向同一个对象。</li>
+</ul>
+<p>要满足这种期望，不但要重写equals方法，还要使这个类的实例可以被map或者set用作key。</p>
+<p>但是有一些“值类”不需要覆盖equals方法：比如用实例受控（第一条）来确保“每个值至多只存在一个对象”的类。枚举类型就属于这种类。对于这种类，逻辑相同和对象等同是一回事，所以Object的equals方法等同于逻辑意义上的equals方法。</p>
+<p>覆盖equals方法时候，要遵守以下通用约定：<br>1）自反性。对于任何非null的引用值x，x.equals(x)必须返回true<br>2）对称性。对于任何非null的引用值x和y，x.equals(y)是等价的y.equals(x）</p>
+<p>以下代码可能会违反这个特性：</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF81.png" alt="clipboard.png"></p>
+<p>这个比较是不区分大小写的，并且试图完成与普通String的互操作，但是</p>
+<p>对于：</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF82.png" alt="clipboard.png"></p>
+<p>cis.equasl(s)会返回true，s.equals(cis)却会返回false，因为String的equal是区分大小写的</p>
+<p>要想保持特性需要重构这个方法：</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF83.png" alt="clipboard.png"></p>
+<p><strong>感觉这个代码不对啊,,,, 如果是CIS了… 就不用转换了。但为什么还是&amp;&amp;？</strong></p>
+<p><strong>这时，针对是同一个类的不同实例之间的比较，不再是不同类的不同实例的比较了。</strong></p>
+<p>3）传递性。对于任何非null的引用值x,y和z，如果x.equals(y)并且y.equals(z)那么y.equals(z)</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF84.png" alt="clipboard.png"></p>
+<p>如果打算扩展这个类，增加颜色信息：</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF85.png" alt="clipboard.png"></p>
+<p>很明显，如果不重写equals，那么作equals操作时，颜色信息就会被忽略掉。</p>
+<p>如果这样重写：</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF86.png" alt="clipboard.png"></p>
+<p>如果O只是一个普通Point，那么需要忽略颜色进行比较。</p>
+<p><strong>问题：为什么不用super.equals(o)而用o.equals(this);</strong><br>如果O是一个有色Point，那么调用父类的equals比较位置，并且比较颜色。<br>由于进行A.equals(B)时，调用了子类的equals，说明A是有色Point，那么构造它肯定会首先构造父类（super(x,y)），所以在调用equals时，super.equals(o)意味着用A构造的父类对象和O进行位置的比较，再单独比较颜色。<br>但是假设：</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF87.png" alt="clipboard.png"></p>
+<p>那么p.equals(cp)，直接调用了普通Point的equals。首先cp instanceof<br>Point是真，那么就接着判断位置，相同的，所以返回true；</p>
+<p>cp.equals(p)，调用的是有色Point的equals。首先p instanceof<br>ColorPoint是假，所以返回false。</p>
+<p><strong>这样就丧失了对称性！</strong></p>
+<p><strong>所以需要进行修改：</strong></p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF88.png" alt="clipboard.png"></p>
+<p>先判断是不是Point，如果是的话，判断是不是colorPoint，不是的话说明它仅仅是普通点，那么调用o.equals(this),这样的话调用的就是父类的equal了。</p>
+<p>否则当然就是有色点，先调用父类的equals，再比较color。</p>
+<p><strong>这样虽然保留了对称性，但是丧失了传递性！</strong></p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF89.png" alt="clipboard.png"></p>
+<p>p1.equals(p2)返回true,p2.equals(p3)也返回true，但是p1.equals(p3)却不能返回true。</p>
+<p><strong>这是面向对象中关于等价关系的一个基本问题，我们无法在扩展可实例化的类的同时，既增加新的值组件，同时又保留equals约定。</strong></p>
+<p><strong>如果使用getClass()代替instanceof测试，可以扩展可实例化的类和增加新的值组件，同时保留equals约定。</strong></p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF810.png" alt="clipboard.png"></p>
+<p>但是<strong>这违反了里氏替换原则。</strong>此时只有当对象具有相同的实现时，才能使对象等同。这样不算糟糕，但是the<br>consequences are unacceptable</p>
+<p><strong>为什么说违反了里氏替换原则？？</strong></p>
+<p><strong>假设有一个方法，用来检验某个整值点是否处在单位圆中：</strong></p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF811.png" alt="clipboard.png"></p>
+<p>加入我们扩展point但是不增加值组件，只是让构造器记录创建了多少个实例：</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF812.png" alt="clipboard.png"></p>
+<p>里氏替换原则表示：一个类型的任何重要属性也将适用于它的子类型。所以为该类型编写的任何方法，在它的子类型上也应该同样运行得很好。</p>
+<p>但是如果我们使用getClass的equals方法，那么我们把CounterPoint实例传入，onUnitCircle方法都会返回false。</p>
+<p>也就是说，我们很难找到一个很好的办法，既扩展不可实例化的类，又增加值组件。</p>
+<p>有一种方法可以作为权宜之计：复合由于继承。（有点像适配器…..）</p>
+<p>比如我们不让ColorPoint扩展Point，而是在ColorPoint中加入一个私有的Point域，以及一个共有的view方法。</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF813.png" alt="clipboard.png"></p>
+<p>4）一致性。对于任何非null的引用值x,y，只要equals操作用到的object的信息没有修改，那么对于多次调用，会一致返回true或者false.<br>如果x.equals(y)并且y.equals(z)那么y.equals(z)</p>
+<p>可变对象在不同的时候可以与不同的对象相等，不可变对象则不会这样。</p>
+<p>在写类的时候，就应该考虑是否应该不可变。如果是的话，那么要保持这样的限制条件：<strong>相等的对象永远相等，不相等的对象永远不相等。</strong></p>
+<p>但是无论类是否可变，都不要使equals方法依赖于不可靠的资源比如java.net.URL的equals方法依赖于对URL中主机IP地址的比较。<br>很明显主机名转变为的IP地址具有不稳定性。</p>
+<p>5）非空性。对于任何非null的引用值x，x.equals(null)一定返回false。</p>
+<p>一些类在equals中首先使用:</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF814.png" alt="clipboard.png"></p>
+<p>其实没什么必要。通常来说是直接使用instanceof判断类型。</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF815.png" alt="clipboard.png"></p>
+<p>如果漏掉了这一步的类型检查，并且传递给equals方法的参数又是错误的类型，那么equals方法会抛出ClassCastException异常。</p>
+<p>所以综合以上要求，实现高质量equals方法的技巧：</p>
+<p><strong>①使用“==”检查“参数是否为这个对象的引用”</strong>，如果返回真，那么equals也可以返回true。特别是equals操作比较昂贵时，可以使用这种方法提高性能。</p>
+<p><strong>②使用instanceof操作符检查“参数是否为正确的类型”</strong>。如果返回假，那么equals直接防护假。</p>
+<p>如果类实现的接口改进了equals约定，允许在实现了该接口的类之间进行比较，那么</p>
+<p><strong>③把参数转换成正确的类型。</strong>由于进行了第②步，所以这步一定会成功。</p>
+<p><strong>④对于该类中的每个“关键”域，检查参数中的域是否与该对象中对应的域想匹配。</strong></p>
+<p><strong>比如为了避免NullPointerException：</strong></p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF816.png" alt="clipboard.png"></p>
+<p>但是如果field和o.field常常是相同的对象引用，那么可以使用下面的做法：</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF817.png" alt="clipboard.png"></p>
+<p>为了获得最佳的性能，应该最先比较最有可能不一致的域。</p>
+<p>⑤编写完了equals方法之后，有三个问题需要注意：是否是对称的；是否第传递的；是否是一致的。</p>
+<p>自反性和非空性通常会自动满足。</p>
+<p>总结：</p>
+<p>①覆盖equals总要覆盖hashCode</p>
+<p>②不要企图让equals方法过于智能</p>
+<p>③不要将equals声明中的Object对象替换为其他的类型</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF818.png" alt="clipboard.png"></p>
+<p>这种方法不是重写了equals而是重载了Object</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/读书笔记/" rel="tag"># 读书笔记</a>
+          
+            <a href="/tags/Effective-java/" rel="tag"># Effective java</a>
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/06/EF2_7/" rel="next" title="Effective Java 读书笔记（2.5）">
+                <i class="fa fa-chevron-left"></i> Effective Java 读书笔记（2.5）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/24/HandlerThread/" rel="prev" title="Effective Java 读书笔记（2.5）">
+                Effective Java 读书笔记（2.5） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ke Yu</p>
+              <p class="site-description motion-element" itemprop="description">Keep moving.Don't settle.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#何时应该覆盖Object-equals？"><span class="nav-number">1.</span> <span class="nav-text">何时应该覆盖Object.equals？</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ke Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

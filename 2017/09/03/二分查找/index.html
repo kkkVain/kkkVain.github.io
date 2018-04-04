@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="二分查找,上界,下界," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="查找1）顺序查找在n个元素的表上直接用key进行比较。只适用于较短的表。  最好情况：1次比较 最坏情况：n次比较 平均情况：(1+2+3+…+n)/n = （n+1)/2  2）二分查找将target与表中央的key进行比较。然后向左或向右二分此表。适用于有序表。 List的insert和replace操作对有序表不适用，如果想要通过List派生出有序表，要对这两个方法进行重载。bottom=0">
+<meta name="keywords" content="二分查找,上界,下界">
+<meta property="og:type" content="article">
+<meta property="og:title" content="二分查找和一些扩展">
+<meta property="og:url" content="http://yoursite.com/2017/09/03/二分查找/index.html">
+<meta property="og:site_name" content="Coco">
+<meta property="og:description" content="查找1）顺序查找在n个元素的表上直接用key进行比较。只适用于较短的表。  最好情况：1次比较 最坏情况：n次比较 平均情况：(1+2+3+…+n)/n = （n+1)/2  2）二分查找将target与表中央的key进行比较。然后向左或向右二分此表。适用于有序表。 List的insert和replace操作对有序表不适用，如果想要通过List派生出有序表，要对这两个方法进行重载。bottom=0">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/search02.jpg">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/search03.jpg">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/search04.jpg">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/search02.jpg">
+<meta property="og:image" content="http://ovwunej09.bkt.clouddn.com/search04.jpg">
+<meta property="og:updated_time" content="2018-04-04T03:23:05.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="二分查找和一些扩展">
+<meta name="twitter:description" content="查找1）顺序查找在n个元素的表上直接用key进行比较。只适用于较短的表。  最好情况：1次比较 最坏情况：n次比较 平均情况：(1+2+3+…+n)/n = （n+1)/2  2）二分查找将target与表中央的key进行比较。然后向左或向右二分此表。适用于有序表。 List的insert和replace操作对有序表不适用，如果想要通过List派生出有序表，要对这两个方法进行重载。bottom=0">
+<meta name="twitter:image" content="http://ovwunej09.bkt.clouddn.com/search02.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/09/03/二分查找/"/>
+
+
+
+
+
+  <title>二分查找和一些扩展 | Coco</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Coco</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Hello world</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/03/二分查找/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">二分查找和一些扩展</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-03T15:23:18+08:00">
+                2017-09-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="查找"><a href="#查找" class="headerlink" title="查找"></a>查找</h3><h4 id="1）顺序查找"><a href="#1）顺序查找" class="headerlink" title="1）顺序查找"></a>1）顺序查找</h4><p><strong>在n个元素的表上直接用key进行比较。</strong><br><strong>只适用于较短的表。</strong></p>
+<ul>
+<li>最好情况：1次比较</li>
+<li>最坏情况：n次比较</li>
+<li>平均情况：(1+2+3+…+n)/n = （n+1)/2</li>
+</ul>
+<h4 id="2）二分查找"><a href="#2）二分查找" class="headerlink" title="2）二分查找"></a>2）二分查找</h4><p><strong>将target与表中央的key进行比较。然后向左或向右二分此表。</strong><br><strong>适用于有序表。</strong></p>
+<p>List的insert和replace操作对有序表不适用，如果想要通过List派生出有序表，要对这两个方法进行重载。<br>bottom=0,top=size-1<br>mid = (bottom+top)/2=(size-1)/2;<br>由于终止条件的不同，可以有几种二分：<br><img src="http://ovwunej09.bkt.clouddn.com/search02.jpg" alt="48151C421AD4433B84D5ADCDC78B1AC5.jpg"></p>
+<h5 id="查找算法："><a href="#查找算法：" class="headerlink" title="查找算法："></a>查找算法：</h5><p><strong>①无论有没有找到target，都一直对表进行二分，直到剩下的表长为1；</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(bottom &lt; top) then 继续递归 <span class="comment">// 表中元素大于1</span></span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span>(top &lt; bottom) then 不存在target </span><br><span class="line"><span class="keyword">else</span> then    <span class="comment">//top==bottom   相等判断在这个位置</span></span><br><span class="line">如果data等于target  then 找到target</span><br></pre></td></tr></table></figure>
+<h5 id="递归条件："><a href="#递归条件：" class="headerlink" title="递归条件："></a>递归条件：</h5><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(data&lt;target) <span class="function">then <span class="title">return</span> <span class="params">(mid+<span class="number">1</span>,top)</span></span></span><br><span class="line"><span class="function"><span class="keyword">else</span> then <span class="title">return</span> <span class="params">(bottom,mid)</span></span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>此时表的分割如下：</li>
+</ul>
+<p><img src="http://ovwunej09.bkt.clouddn.com/search03.jpg" alt="D74F53DC1BCF45CB8B8C9CE2CEDD1CD7.jpg"></p>
+<p>如果表中的目标出现超过一次，当中间的表长为1并且命中目标时，<strong>可以保证它是第一个出现的目标。</strong><br>每次查找终止于一个树叶，可能成功可能不成功。<br>外部路径长度：从根到树中每个树叶各遍历一次所经过的分支数的综合。</p>
+<ul>
+<li>查找n个元素的表：</li>
+</ul>
+<p><img src="http://ovwunej09.bkt.clouddn.com/search04.jpg" alt="45DBF761E7064BC2960FF114DC06699C.jpg"></p>
+<p><strong>(成功查找和不成功查找的次数一样的）</strong></p>
+<ul>
+<li>最坏情况：lgn+1</li>
+<li>平均情况：lgn</li>
+</ul>
+<p><strong>②进行相等识别。</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(bottom &lt;= top) then 继续递归 <span class="comment">// 表中元素大于1</span></span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span>(top &lt; bottom) then 不存在target </span><br><span class="line"><span class="keyword">else</span> then    <span class="comment">//top==bottom</span></span><br><span class="line"> <span class="comment">//如果data等于target  then 找到target</span></span><br></pre></td></tr></table></figure>
+<h5 id="递归条件：-1"><a href="#递归条件：-1" class="headerlink" title="递归条件："></a>递归条件：</h5><p>可加上相等判断<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(data==target) position=mid; <span class="comment">//相等判断在这里</span></span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span>(data &lt; target) then <span class="keyword">return</span> (mid+<span class="number">1</span>,top)</span><br><span class="line"><span class="keyword">else</span> then <span class="keyword">return</span> (bottom,mid<span class="number">-1</span>)</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>此时表的分割如下：</li>
+</ul>
+<p><img src="http://ovwunej09.bkt.clouddn.com/search02.jpg" alt="clipboard.png"></p>
+<p>如果表中的目标出现超过一次，会返回目标中的任一实例。<br>树叶都是不成功查找，所以外部路径长度就是不成功的比较次数。</p>
+<p>成功查找：<br>内部路径长度：根到所有非树叶上的分支数上的和。<br>所有树叶都是不成功查找，n+1个树叶即n+1个不成功结果n+1约等于2\^h (h是树高）,<br>h约等于lg(n+1)，在此方法中，</p>
+<p>每个内部定点执行2次比较，<strong>所以不成功查找的比较次数为2lg(n+1)</strong></p>
+<p><strong>成功查找： (       ( (n+1)lg(n+1)-2n ) / 2 + 1     ) *2 - 1 = 2(n+1)/n *<br>lg(n+1) -3 </strong></p>
+<ul>
+<li>两种比较</li>
+</ul>
+<p><img src="http://ovwunej09.bkt.clouddn.com/search04.jpg" alt="clipboard.png"></p>
+<h4 id="二分查找的应用-lower-bound"><a href="#二分查找的应用-lower-bound" class="headerlink" title="二分查找的应用(lower_bound"></a>二分查找的应用(lower_bound</h4><p>第一个大于等于target和upper_bound第一个大于target):<br>1)方法①得到的就是lower_bound那个数。<br><strong>但注意pos的位置：右序列中记录第一个数位置（bottom)</strong><br><strong>左序列中记录最后一个数位置（top)</strong></p>
+<h4 id="递归条件：-2"><a href="#递归条件：-2" class="headerlink" title="递归条件："></a>递归条件：</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(data &lt; target) <span class="function">then <span class="title">return</span> <span class="params">(mid+<span class="number">1</span>,top)</span></span></span><br><span class="line"><span class="function"><span class="keyword">else</span> then <span class="title">return</span> <span class="params">(bottom,mid)</span></span></span><br></pre></td></tr></table></figure>
+<p><strong>2)方法①中递归条件做一点修改：</strong></p>
+<h4 id="递归条件：-3"><a href="#递归条件：-3" class="headerlink" title="递归条件："></a>递归条件：</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(data &gt; target) <span class="function">then <span class="title">return</span> <span class="params">(bottom, mid)</span></span></span><br><span class="line"><span class="function"><span class="keyword">else</span> then <span class="title">return</span> <span class="params">(mid+<span class="number">1</span>, top)</span></span></span><br><span class="line"><span class="function"><span class="comment">// pos的位置和1）中一样</span></span></span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/二分查找/" rel="tag"># 二分查找</a>
+          
+            <a href="/tags/上界/" rel="tag"># 上界</a>
+          
+            <a href="/tags/下界/" rel="tag"># 下界</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/18/okhttp3/" rel="next" title="okhttp3源码解析(1)">
+                <i class="fa fa-chevron-left"></i> okhttp3源码解析(1)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/04/List的删除/" rel="prev" title="List遍历要注意的坑">
+                List遍历要注意的坑 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ke Yu</p>
+              <p class="site-description motion-element" itemprop="description">Keep moving.Don't settle.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#查找"><span class="nav-number">1.</span> <span class="nav-text">查找</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1）顺序查找"><span class="nav-number">1.1.</span> <span class="nav-text">1）顺序查找</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2）二分查找"><span class="nav-number">1.2.</span> <span class="nav-text">2）二分查找</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#查找算法："><span class="nav-number">1.2.1.</span> <span class="nav-text">查找算法：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#递归条件："><span class="nav-number">1.2.2.</span> <span class="nav-text">递归条件：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#递归条件：-1"><span class="nav-number">1.2.3.</span> <span class="nav-text">递归条件：</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#二分查找的应用-lower-bound"><span class="nav-number">1.3.</span> <span class="nav-text">二分查找的应用(lower_bound</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#递归条件：-2"><span class="nav-number">1.4.</span> <span class="nav-text">递归条件：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#递归条件：-3"><span class="nav-number">1.5.</span> <span class="nav-text">递归条件：</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ke Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

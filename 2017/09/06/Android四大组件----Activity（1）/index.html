@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="activity,launchmode,intent flag,状态恢复与保存," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Android四大组件—-Activity（1） 简介  Activity的主要作用   通信方式（待续）  关联处理  关联起作用的两种情况  启动Activity的Intent包含FLAG_ACTIVITY_NEW_TASK  Activity的allowTaskReparenting属性被设置为”true”      加载方式  使用清单文件  singleTop  singleTask">
+<meta name="keywords" content="activity,launchmode,intent flag,状态恢复与保存">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Activity(1)">
+<meta property="og:url" content="http://yoursite.com/2017/09/06/Android四大组件----Activity（1）/index.html">
+<meta property="og:site_name" content="Coco">
+<meta property="og:description" content="Android四大组件—-Activity（1） 简介  Activity的主要作用   通信方式（待续）  关联处理  关联起作用的两种情况  启动Activity的Intent包含FLAG_ACTIVITY_NEW_TASK  Activity的allowTaskReparenting属性被设置为”true”      加载方式  使用清单文件  singleTop  singleTask">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-04-04T03:23:05.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Activity(1)">
+<meta name="twitter:description" content="Android四大组件—-Activity（1） 简介  Activity的主要作用   通信方式（待续）  关联处理  关联起作用的两种情况  启动Activity的Intent包含FLAG_ACTIVITY_NEW_TASK  Activity的allowTaskReparenting属性被设置为”true”      加载方式  使用清单文件  singleTop  singleTask">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/09/06/Android四大组件----Activity（1）/"/>
+
+
+
+
+
+  <title>Activity(1) | Coco</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Coco</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Hello world</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/06/Android四大组件----Activity（1）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Activity(1)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-06T14:09:30+08:00">
+                2017-09-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Android四大组件—-Activity（1）"><a href="#Android四大组件—-Activity（1）" class="headerlink" title="Android四大组件—-Activity（1）"></a>Android四大组件—-Activity（1）</h1><ul>
+<li><p><a href="#Android四大组件----Activity（1）-简介">简介</a></p>
+<ul>
+<li><a href="#Android四大组件----Activity（1）-Activity的主要作">Activity的主要作用</a></li>
+</ul>
+</li>
+<li><p><a href="#Android四大组件----Activity（1）-通信方式（待续）">通信方式（待续）</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（1）-关联处理">关联处理</a></p>
+<ul>
+<li><p><a href="#Android四大组件----Activity（1）-关联起作用的两种情况">关联起作用的两种情况</a></p>
+<ul>
+<li><p><a href="#Android四大组件----Activity（1）-启动Activity的I">启动Activity的Intent包含FLAG_ACTIVITY_NEW_TASK</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（1）-Activity的all">Activity的allowTaskReparenting属性被设置为”true”</a></p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><a href="#Android四大组件----Activity（1）-加载方式">加载方式</a></p>
+<ul>
+<li><p><a href="#Android四大组件----Activity（1）-使用清单文件">使用清单文件</a></p>
+<ul>
+<li><p><a href="#Android四大组件----Activity（1）-singleTop">singleTop</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（1）-singleTask">singleTask</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（1）-singleInstan">singleInstance</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（1）-singleTop和si">singleTop和singleTask的区别</a></p>
+</li>
+</ul>
+</li>
+<li><p><a href="#Android四大组件----Activity（1）-使用intentFlag">使用intent Flag</a></p>
+<ul>
+<li><p><a href="#Android四大组件----Activity（1）-FLAG_ACTIVIT">FLAG_ACTIVITY_NEW_TASK</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（1）-FLAG_ACTIVIT">FLAG_ACTIVITY_SINGLE_TOP</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（1）-FLAG_ACTIVIT">FLAG_ACTIVITY_CLEAR_TOP</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（1）-SINGLE_TOP和C">SINGLE_TOP和CLEART_TOP的配合使用</a></p>
+<ul>
+<li><p><a href="#Android四大组件----Activity（1）-为什么？">为什么？</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（1）-可能出现的Bug">可能出现的Bug</a></p>
+</li>
+</ul>
+</li>
+<li><p><a href="#Android四大组件----Activity（1）-NEW_TASK和CLE">NEW_TASK和CLEART_TOP的配合使用</a></p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><a href="#Android四大组件----Activity（1）-Lifecycle">Lifecycle</a></p>
+<ul>
+<li><p><a href="#Android四大组件----Activity（1）-生命状态">生命状态</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（1）-LifeTime">LifeTime</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（1）-生命周期方法">生命周期方法</a></p>
+</li>
+</ul>
+</li>
+<li><p><a href="#Android四大组件----Activity（1）-状态保存与恢复">状态保存与恢复</a></p>
+<ul>
+<li><p><a href="#Android四大组件----Activity（1）-onSaveInstan">onSaveInstanceState()</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（1）-onRestoreIns">onRestoreInstanceState()或onCreate()</a></p>
+</li>
+</ul>
+</li>
+<li><p><a href="#Android四大组件----Activity（1）-参考资料">参考资料</a></p>
+</li>
+</ul>
+<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><h4 id="Activity的主要作用"><a href="#Activity的主要作用" class="headerlink" title="Activity的主要作用"></a>Activity的主要作用</h4><ul>
+<li><p>显示UI</p>
+</li>
+<li><p>和用户进行交互，对用户的操作进行监听并响应</p>
+</li>
+</ul>
+<h3 id="通信方式（待续）"><a href="#通信方式（待续）" class="headerlink" title="通信方式（待续）"></a>通信方式（待续）</h3><p>1.Activity之间的通信</p>
+<p>2.Activity和Service之间的通信</p>
+<p>3.Activity和Fragment之间的通信</p>
+<h3 id="关联处理"><a href="#关联处理" class="headerlink" title="关联处理"></a>关联处理</h3><p>关联代表Activity属于哪个Task，默认情况下，同一个应用中的所有Activities属于一个Task，但是可以通过<activity>元素的taskAffinity属性修改任何给定Activity的关联任务。</activity></p>
+<p>该属性值必须不同于<manifest>元素中默认的软件包名。</manifest></p>
+<h4 id="关联起作用的两种情况"><a href="#关联起作用的两种情况" class="headerlink" title="关联起作用的两种情况"></a>关联起作用的两种情况</h4><h5 id="启动Activity的Intent包含FLAG-ACTIVITY-NEW-TASK"><a href="#启动Activity的Intent包含FLAG-ACTIVITY-NEW-TASK" class="headerlink" title="启动Activity的Intent包含FLAG_ACTIVITY_NEW_TASK"></a>启动Activity的Intent包含FLAG_ACTIVITY_NEW_TASK</h5><ul>
+<li><p>默认情况下，存在此FLAG时，Activity通常会被放入新的Task中，但如果使用了taskAffinity将它与现有Task关联，Activity会在现有Task中启动，否则会开始新的Task（singleTask的实验证明了不会有新的Task，这里待定）。</p>
+</li>
+<li><p>如果使用此FLAG使得Activity开始新任务，当用户按“home”按钮离开时，必须为用户提供回到任务的方式。比如通知管理器所启动的Activity都是在别的Task中。</p>
+</li>
+</ul>
+<h5 id="Activity的allowTaskReparenting属性被设置为”true”"><a href="#Activity的allowTaskReparenting属性被设置为”true”" class="headerlink" title="Activity的allowTaskReparenting属性被设置为”true”"></a>Activity的allowTaskReparenting属性被设置为”true”</h5><ul>
+<li><p>Activity可以从它当前所在的Task移动到与其具有关联的任务。</p>
+</li>
+<li><p>比如一个天气预报Activity，它默认与旅行应用关联。如果不是这个应用的其他某个Activity启动了这个天气预报，之后旅行应用又启动了这个天气预报，那么天气预报Activity会被重新分配到旅行应用的Task。疑问：这样的意义何在？？</p>
+</li>
+</ul>
+<h3 id="加载方式"><a href="#加载方式" class="headerlink" title="加载方式"></a>加载方式</h3><p>当Activity A用设置intent flag的方式定义了Activity<br>B应当如何和任务关联，而Activity B又在清单中设置了launchMode，那么Activity A的设置优先级高于B的设置。也就是Intent flag的优先级大于launchMode</p>
+<h4 id="使用清单文件"><a href="#使用清单文件" class="headerlink" title="使用清单文件"></a>使用清单文件</h4><p>共有四种，主要是控制Activity的创建模式。</p>
+<p><strong>standard</strong></p>
+<ul>
+<li><p>如果intent来自同一个应用，且Activity没指定taskAffinity，那么生成Activity的新实例放在发出启动请求的Activity所在的Task顶端。</p>
+</li>
+<li><p>如果intent来自其他应用，那么会生成这个Activity的新实例，并以这个Activity为根创建一个新的Task</p>
+</li>
+</ul>
+<blockquote>
+<p>  使用场景：</p>
+</blockquote>
+<ul>
+<li><p>大多数撰写邮件或者发布社交网络状态的Activity。此时每个Activity实例服务于一个intent。比如从别的应用分享内容给微信朋友，跳到了那个选择联系人的list，这个页面很可能符合这种场景。</p>
+<p>可能出现的Bug：</p>
+</li>
+<li><p>使用ApplicationContext去启动standard模式的Activity会出现报错<br>因为standard模式的Activity会默认进入启动它的Activity所属的任务栈中，但是非Activity类型的Context没有所谓的任务栈。（why，因为任务栈是对于Activity来说的呀，而不是Application)<br>solution：使用FLAG_ACTIVITY_NEW_TASK启动Activity，启动的时候Activity就会进入新的Task。</p>
+</li>
+</ul>
+<h5 id="singleTop"><a href="#singleTop" class="headerlink" title="singleTop"></a>singleTop</h5><ul>
+<li><p>如果intent来自同一个应用，视栈顶是否有它的实例而定。如果已经有实例在栈顶了(发起启动的和已经启动的Task中），就不产生新实例，会通过<br>onNewIntent()把intent发送给现有的实例；如果有实例但不位于栈顶，就再创建新的实例并放入栈顶(实例可能重复）</p>
+</li>
+<li><p>如果intent来自其他应用，那么会生成这个Activity的新实例，并以这个Activity为根创建一个新的Task。  </p>
+<p>使用场景：</p>
+</li>
+<li><p>新闻类或者阅读类App的内容页面。在读新闻的时候，来了个该新闻APP的消息通知，点击这个通知就会打开新闻APP，由于此时这个App实例位于栈顶，那么此时就直接调用onNewintent()，无需产生新的实例</p>
+</li>
+<li><p>搜索功能的页面。在带有搜索功能的页面中，如果每次搜索都生成新的Activity，那么我们想回到最初搜索前的页面，就需要按很多次Back，但如果使用singleTop模式，每次搜索时，把intent发送给现有的Activity，更新搜索结果即可，只需要一次Back就可以回到搜索前的页面。</p>
+</li>
+</ul>
+<h5 id="singleTask"><a href="#singleTask" class="headerlink" title="singleTask"></a>singleTask</h5><ul>
+<li>如果intent来自同一个应用，如果栈中<strong>存在这个Activity的实例</strong>就会复用这个Activity，不管它是否位于栈顶，复用时，会将它上面的Activity全部出栈，并且将intent发送给该实例的onNewIntent()方法；如果当前栈没有这个实例，就新建一个，并且放在栈顶。（官方文档说是创建新Task并且以他为根，实验证明这种说法不完全正确）。</li>
+</ul>
+<blockquote>
+<p>  疑问：当前栈没有实例以及别的栈也没有实例，究竟是否一样结果？是新建后放栈顶，还是以实例为根创建Task？待实验证明。</p>
+</blockquote>
+<blockquote>
+<p>  实验：</p>
+</blockquote>
+<blockquote>
+<p>  1）同一个应用下，两个Stack，我们的应用在Stack#1，其中已经有一个Task，<strong>没有设置taskAffinity</strong>，所有栈中都没有要找的Act。从.mainActivity跳转到另一个模式为singleTask的TestAct中，利用adb命令可以看到，Act新建后放到当前Task顶端。没有以实例为根创建新的Task。</p>
+</blockquote>
+<blockquote>
+<p>  2）同一个应用下，两个Stack，我们的应用在Stack#1，其中已经有一个Task，<strong>设置了TestAct的taskAffinity</strong>，所有栈中都没有要找的Act。通过adb命令可以看到，在当前Stack中新建了一个Task，也就是以新建的Activity为根创建了Task。</p>
+</blockquote>
+<blockquote>
+<p>  猜想：</p>
+</blockquote>
+<blockquote>
+<p>  如果设置了taskAffinity，当前Task没有实例，就找它想要的Task，查找是否有与这个Activity相同taskAffinity的Task已经存在。如果不存在，创建实例时以这个Activity为根创建一个新的Task，这个新的实例就在这个Task中，以后每次调动都不会产生新的实例；如果存在Task，就再看是否有实例从而决定是复用还是新建。</p>
+</blockquote>
+<blockquote>
+<p>  但如果没有设置taskAffinity这个属性，它默认和当前应用处于一个Task，所以直接查找发出intent的当前Task，如果找不到就直接在当前Task顶端新建实例。</p>
+</blockquote>
+<blockquote>
+<p>  注意的是，<strong>虽然系统创建了一个新的Task，但是只要按下返回键还是会回到原来的Activity</strong>。</p>
+</blockquote>
+<ul>
+<li><p>如果intent来自别的应用，无论哪个Task存在这个Activity的实例都会复用这个Activity，不管它是否位于栈顶，复用时，会将它上面的Activity全部出栈，并且将intent发送给该实例的onNewIntent()方法；如果系统中（当前栈和别的Task）都没有这个Activity的实例，那么就创建新实例并以它为根创建新的Task。</p>
+<p>  使用场景：</p>
+</li>
+<li><p>浏览器的主界面。不管从多少个应用启动浏览器，只会启动主界面一次，其余情况都会走onNewIntent()，同时会清空主界面上面的其他页面。</p>
+</li>
+<li><p>邮件客户端的收件箱。不管从哪个应用进入收件箱，都会结束客户端中别的页面，进入到收件箱页面。</p>
+</li>
+</ul>
+<h5 id="singleInstance"><a href="#singleInstance" class="headerlink" title="singleInstance"></a>singleInstance</h5><ul>
+<li><p>和singleTask类似，不但要创建一个新的Task，而且该Task中只能有这个实例。其效果相当于多个应用共享一个应用，不管谁激活该Activity 都会进入同一个应用中。</p>
+<p>  使用场景：</p>
+</li>
+<li><p>几乎不使用这种模式，除非是100%确定这个应用只有一个Activity。</p>
+</li>
+<li><p>闹铃提醒，将闹铃提醒与闹铃设置分离。此时要保证这个应用只有闹铃提醒这个Act。</p>
+</li>
+</ul>
+<h5 id="singleTop和singleTask的区别"><a href="#singleTop和singleTask的区别" class="headerlink" title="singleTop和singleTask的区别"></a>singleTop和singleTask的区别</h5><p>当已经存在要启动的Activity时</p>
+<ul>
+<li><p>如果它在栈顶，那么都会把intent发送给onNewIntent()。</p>
+</li>
+<li><p>如果它不在栈顶，singleTop会在栈顶新建实例，而singleTask会把这个Activity上面的实例弹出，再发送intent给栈顶的这个Activity。<br><strong><em>也就是说，singleTop会造成重复的实例</em></strong>。</p>
+</li>
+</ul>
+<h4 id="使用intent-Flag"><a href="#使用intent-Flag" class="headerlink" title="使用intent Flag"></a>使用intent Flag</h4><h5 id="FLAG-ACTIVITY-NEW-TASK"><a href="#FLAG-ACTIVITY-NEW-TASK" class="headerlink" title="FLAG_ACTIVITY_NEW_TASK"></a>FLAG_ACTIVITY_NEW_TASK</h5><p>与singleTask有相同行为。</p>
+<h5 id="FLAG-ACTIVITY-SINGLE-TOP"><a href="#FLAG-ACTIVITY-SINGLE-TOP" class="headerlink" title="FLAG_ACTIVITY_SINGLE_TOP"></a>FLAG_ACTIVITY_SINGLE_TOP</h5><p>与singleTop有相同行为。</p>
+<h5 id="FLAG-ACTIVITY-CLEAR-TOP"><a href="#FLAG-ACTIVITY-CLEAR-TOP" class="headerlink" title="FLAG_ACTIVITY_CLEAR_TOP"></a>FLAG_ACTIVITY_CLEAR_TOP</h5><p>如果已经有了Activity实例，那么就会销毁Task中当前Activity之上的所有Activity，然后把intent发送给已经位于Task顶端的Act实例的onNewIntent()。</p>
+<h5 id="SINGLE-TOP和CLEART-TOP的配合使用"><a href="#SINGLE-TOP和CLEART-TOP的配合使用" class="headerlink" title="SINGLE_TOP和CLEART_TOP的配合使用"></a>SINGLE_TOP和CLEART_TOP的配合使用</h5><h6 id="为什么？"><a href="#为什么？" class="headerlink" title="为什么？"></a>为什么？</h6><pre><code>如果要启动的Activity为”standard&quot;：
+</code></pre><ul>
+<li><p>只使用CLEAR_TOP，想要启动的Activity已存在时，该实例<strong>以及</strong>它上面的Activity会被销毁，然后创建新实例(onCreate())</p>
+</li>
+<li><p>配合SINGLE_UP使用<strong>或者</strong>要启动的Activity为<strong>“standard”之外</strong>的模式，想要启动的Activity已存在时，该实例不会被销毁，只有它上面的实例会被销毁，然后调用onNewIntent()</p>
+</li>
+<li><p>详情：</p>
+</li>
+</ul>
+<p><a href="https://stackoverflow.com/questions/31926315/why-do-people-like-to-pair-clear-top-and-single-top-in-android" target="_blank" rel="noopener">https://stackoverflow.com/questions/31926315/why-do-people-like-to-pair-clear-top-and-single-top-in-android</a><br><a href="https://developer.android.com/reference/android/content/Intent.html#FLAG_ACTIVITY_CLEAR_TOP" target="_blank" rel="noopener">https://developer.android.com/reference/android/content/Intent.html#FLAG_ACTIVITY_CLEAR_TOP</a></p>
+<h6 id="可能出现的Bug"><a href="#可能出现的Bug" class="headerlink" title="可能出现的Bug"></a>可能出现的Bug</h6><p>问题：<a href="https://stackoverflow.com/questions/5489592/single-top-clear-top-seem-to-work-95-of-the-time-why-the-5" target="_blank" rel="noopener">https://stackoverflow.com/questions/5489592/single-top-clear-top-seem-to-work-95-of-the-time-why-the-5</a></p>
+<p>有人回答道这涉及到并发问题，如果CLEAR_UP和SINGLE_TOP被同时读取，CLEAR_UP会调用onCreate()，SINGLE_UPC此时也没有找到Act，也调用onCreate()，造成一个Activity同时创建两次。</p>
+<p>存疑：逻辑或 | ，运算优先级为从左到右，会发生同时读取两个条件的情况吗？</p>
+<p>猜想：此时intent进行setFlags，不是简单的立刻进行false/true的判断，而是需要使用这两个参数，所以可能在启动过程中，对参数进行读取，然后根据参数进行相应的操作。结合对启动过程的了解，答案应该还是在ActivityStack.startActivityUncheckedLocked中。</p>
+<h5 id="NEW-TASK和CLEART-TOP的配合使用"><a href="#NEW-TASK和CLEART-TOP的配合使用" class="headerlink" title="NEW_TASK和CLEART_TOP的配合使用"></a>NEW_TASK和CLEART_TOP的配合使用</h5><ul>
+<li>如果在一个Task的根Act中使用这个FLAGS,可以找到当前Task中运行的Activity实例并使它在前台运行，并且清除这个根Act和需要的Activity之外的其余实例。</li>
+</ul>
+<h3 id="Lifecycle"><a href="#Lifecycle" class="headerlink" title="Lifecycle"></a>Lifecycle</h3><h4 id="生命状态"><a href="#生命状态" class="headerlink" title="生命状态"></a>生命状态</h4><ul>
+<li><p>活动（running）状态：当Activity处于可见，位于屏幕前台，获得焦点，正在和用户进行交互时为活动状态，此时它位于任务栈的最顶端。</p>
+</li>
+<li><p>暂停状态：Activity半可见或者透明时（比如出现了toast、alertdialog等时），它没有焦点，无法和用户进行交互，此时活动仍是存活的，它保留着所有的状态和成员信息。系统内存资源不够时可能被杀死。</p>
+</li>
+<li><p>停止状态：完全不可见时为停止状态，但仍保持所有的状态和成员信息。随时可能会被系统杀死。</p>
+</li>
+<li><p>非活动状态：Activity处于暂停或停止状态，Activity被手动终止，或者被系统回收资源时,可以称为非活动状态。</p>
+</li>
+</ul>
+<h4 id="LifeTime"><a href="#LifeTime" class="headerlink" title="LifeTime"></a>LifeTime</h4><ul>
+<li>entiere lifetime：调用onCreate()到相应的调用onDestroy()</li>
+</ul>
+<ul>
+<li>visible lifetime: 调用onStart()到相应的调用onStop()</li>
+</ul>
+<ul>
+<li>foreground lifetime：调用onResume()到相应的调用onPause()</li>
+</ul>
+<h4 id="生命周期方法"><a href="#生命周期方法" class="headerlink" title="生命周期方法"></a><strong>生命周期方法</strong></h4><p><strong>      以下六个方法从外向内两两对应：</strong></p>
+<ul>
+<li><p>onCreate（）：活动第一次启动时会首先调用该方法</p>
+</li>
+<li><p>onStart（）：有一个参数，可能为null， 或者是onSaveInstanceState()<br>保存的状态信息。<br>启动后或者当活动从停止状态转到活动状态时会调用该方法。onStart（）是activity界面被显示出来的时候执行的，用户可见，包括有一个activity在他上面，但没有将它完全覆盖，用户可以看到部分activity但不能与它交互。</p>
+</li>
+<li><p>onResume（）：活动和用户进行交互时会调用该方法，当从pause状态转为活动状态时回调该方法，是当该activity与用户能进行交互时被执行，用户可以获得activity的焦点，能够与用户交互。</p>
+</li>
+<li><p>onPause（）：一个活动在前台运行时，别的活动需要前台运行，这时该活动会保存当前状态信息，活动变为暂停状态</p>
+</li>
+<li><p>onStop（）：活动不需要展示给用户时触发该方法，活动变为停止状态</p>
+</li>
+<li><p>onDestroy（）：活动停止时调用该方法</p>
+</li>
+</ul>
+<ul>
+<li>onRestart（）：活动从停止状态转为活动状态时调用该方法</li>
+</ul>
+<p>onStart()和onResume()区别：</p>
+<ul>
+<li><p>onStart()通常就是onStop()（也就是用户按下了home键，activity变为后台后），之后用户再切换回这个Activity就会调用onRestart()而后调用onStart()</p>
+</li>
+<li><p>onResume()是onPause()（通常是当前的Activity被暂停了，比如被另一个透明或者Dialog样式的Activity覆盖了），之后dialog取消，activity回到可交互状态，调用onResume()。</p>
+</li>
+</ul>
+<h3 id="状态保存与恢复"><a href="#状态保存与恢复" class="headerlink" title="状态保存与恢复"></a>状态保存与恢复</h3><p>Activity遇到意外被关闭时，需要对一些状态如文本输入、ListView位置进行记录</p>
+<h4 id="onSaveInstanceState"><a href="#onSaveInstanceState" class="headerlink" title="onSaveInstanceState()"></a>onSaveInstanceState()</h4><pre><code>1）在回调onStop()之前调用
+
+2）与onPause()的调用顺序不一定
+</code></pre><p>  3）只有当Activity可能会重建时，比如系统资源不足或者配置改变导致Activity关闭时，才会调用该函数</p>
+<h4 id="onRestoreInstanceState-或onCreate"><a href="#onRestoreInstanceState-或onCreate" class="headerlink" title="onRestoreInstanceState()或onCreate()"></a>onRestoreInstanceState()或onCreate()</h4><pre><code>1）onRestoreInstanceState()在回调onStart()之后调用，此时Bundle一定不为null
+
+2）回调onCreate()时Bundle可能为null，所以需要进行判断
+</code></pre><p> 3）根据两者差异，如果需要根据Activity是第一次创建还是重建进行不同的初始化操作，可以使用onCreate()</p>
+<p> 4）官方文档建议使用onRestoreInstanceState()，有利于继承这个Activity的子类决定是否使用父类的状态恢复实现</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://inthecheesefactory.com/blog/understand-android-activity-launchmode/en" target="_blank" rel="noopener">https://inthecheesefactory.com/blog/understand-android-activity-launchmode/en</a></p>
+<p><a href="https://developer.android.com/reference/android/app/Activity.html" target="_blank" rel="noopener">https://developer.android.com/reference/android/app/Activity.html</a></p>
+<p><a href="https://developer.android.com/guide/components/tasks-and-back-stack.html?hl=zh-cn" target="_blank" rel="noopener">https://developer.android.com/guide/components/tasks-and-back-stack.html?hl=zh-cn</a></p>
+<p><a href="https://stackoverflow.com/questions/4342761/how-do-you-use-intent-flag-activity-clear-top-to-clear-the-activity-stack" target="_blank" rel="noopener">https://stackoverflow.com/questions/4342761/how-do-you-use-intent-flag-activity-clear-top-to-clear-the-activity-stack</a></p>
+<p><a href="https://stackoverflow.com/questions/12683779/are-oncreate-and-onrestoreinstancestate-mutually-exclusive" target="_blank" rel="noopener">https://stackoverflow.com/questions/12683779/are-oncreate-and-onrestoreinstancestate-mutually-exclusive</a></p>
+<p><a href="https://developer.android.com/reference/android/app/Activity.html#onSaveInstanceState(android.os.Bundle)" target="_blank" rel="noopener">https://developer.android.com/reference/android/app/Activity.html#onSaveInstanceState(android.os.Bundle)</a></p>
+<p><a href="https://developer.android.com/reference/android/app/Activity.html#onRestoreInstanceState(android.os.Bundle)" target="_blank" rel="noopener">https://developer.android.com/reference/android/app/Activity.html#onRestoreInstanceState(android.os.Bundle)</a></p>
+<p><a href="https://www.reddit.com/r/androiddev/comments/2afx13/onrestoreinstancestate_vs_oncreate/" target="_blank" rel="noopener">https://www.reddit.com/r/androiddev/comments/2afx13/onrestoreinstancestate_vs_oncreate/</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/activity/" rel="tag"># activity</a>
+          
+            <a href="/tags/launchmode/" rel="tag"># launchmode</a>
+          
+            <a href="/tags/intent-flag/" rel="tag"># intent flag</a>
+          
+            <a href="/tags/状态恢复与保存/" rel="tag"># 状态恢复与保存</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/04/List的删除/" rel="next" title="List遍历要注意的坑">
+                <i class="fa fa-chevron-left"></i> List遍历要注意的坑
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/07/各种设置“/" rel="prev" title="各种设置">
+                各种设置 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ke Yu</p>
+              <p class="site-description motion-element" itemprop="description">Keep moving.Don't settle.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Android四大组件—-Activity（1）"><span class="nav-number">1.</span> <span class="nav-text">Android四大组件—-Activity（1）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#简介"><span class="nav-number">1.0.1.</span> <span class="nav-text">简介</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Activity的主要作用"><span class="nav-number">1.0.1.1.</span> <span class="nav-text">Activity的主要作用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通信方式（待续）"><span class="nav-number">1.0.2.</span> <span class="nav-text">通信方式（待续）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关联处理"><span class="nav-number">1.0.3.</span> <span class="nav-text">关联处理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#关联起作用的两种情况"><span class="nav-number">1.0.3.1.</span> <span class="nav-text">关联起作用的两种情况</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#启动Activity的Intent包含FLAG-ACTIVITY-NEW-TASK"><span class="nav-number">1.0.3.1.1.</span> <span class="nav-text">启动Activity的Intent包含FLAG_ACTIVITY_NEW_TASK</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Activity的allowTaskReparenting属性被设置为”true”"><span class="nav-number">1.0.3.1.2.</span> <span class="nav-text">Activity的allowTaskReparenting属性被设置为”true”</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加载方式"><span class="nav-number">1.0.4.</span> <span class="nav-text">加载方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#使用清单文件"><span class="nav-number">1.0.4.1.</span> <span class="nav-text">使用清单文件</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#singleTop"><span class="nav-number">1.0.4.1.1.</span> <span class="nav-text">singleTop</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#singleTask"><span class="nav-number">1.0.4.1.2.</span> <span class="nav-text">singleTask</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#singleInstance"><span class="nav-number">1.0.4.1.3.</span> <span class="nav-text">singleInstance</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#singleTop和singleTask的区别"><span class="nav-number">1.0.4.1.4.</span> <span class="nav-text">singleTop和singleTask的区别</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用intent-Flag"><span class="nav-number">1.0.4.2.</span> <span class="nav-text">使用intent Flag</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#FLAG-ACTIVITY-NEW-TASK"><span class="nav-number">1.0.4.2.1.</span> <span class="nav-text">FLAG_ACTIVITY_NEW_TASK</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#FLAG-ACTIVITY-SINGLE-TOP"><span class="nav-number">1.0.4.2.2.</span> <span class="nav-text">FLAG_ACTIVITY_SINGLE_TOP</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#FLAG-ACTIVITY-CLEAR-TOP"><span class="nav-number">1.0.4.2.3.</span> <span class="nav-text">FLAG_ACTIVITY_CLEAR_TOP</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#SINGLE-TOP和CLEART-TOP的配合使用"><span class="nav-number">1.0.4.2.4.</span> <span class="nav-text">SINGLE_TOP和CLEART_TOP的配合使用</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#为什么？"><span class="nav-number">1.0.4.2.4.1.</span> <span class="nav-text">为什么？</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#可能出现的Bug"><span class="nav-number">1.0.4.2.4.2.</span> <span class="nav-text">可能出现的Bug</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#NEW-TASK和CLEART-TOP的配合使用"><span class="nav-number">1.0.4.2.5.</span> <span class="nav-text">NEW_TASK和CLEART_TOP的配合使用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Lifecycle"><span class="nav-number">1.0.5.</span> <span class="nav-text">Lifecycle</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#生命状态"><span class="nav-number">1.0.5.1.</span> <span class="nav-text">生命状态</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LifeTime"><span class="nav-number">1.0.5.2.</span> <span class="nav-text">LifeTime</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#生命周期方法"><span class="nav-number">1.0.5.3.</span> <span class="nav-text">生命周期方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#状态保存与恢复"><span class="nav-number">1.0.6.</span> <span class="nav-text">状态保存与恢复</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#onSaveInstanceState"><span class="nav-number">1.0.6.1.</span> <span class="nav-text">onSaveInstanceState()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#onRestoreInstanceState-或onCreate"><span class="nav-number">1.0.6.2.</span> <span class="nav-text">onRestoreInstanceState()或onCreate()</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">1.0.7.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ke Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
