@@ -252,6 +252,724 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/07/EF3_8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/07/07/EF3_8/" itemprop="url">Effective Java 读书笔记（3.8）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-07T22:43:32+08:00">
+                2017-07-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>第三章 对于所有对象都通用的方法</p>
+<p>Object类的所有非final方法（equals，hashcode，toString，clone和finalize）都有明确的通用约定，因为这些方法是被设计成要被覆盖的，所以覆盖时需要遵循这些通用的约定。否则依赖这些约定的类（hashset,hashmap）等，就无法正常工作。</p>
+<p>这一章主要是讨论何时以及如何覆盖这些非final的Object方法</p>
+<p><strong>第8条 覆盖equals时请遵守通用约定</strong></p>
+<h3 id="何时应该覆盖Object-equals？"><a href="#何时应该覆盖Object-equals？" class="headerlink" title="何时应该覆盖Object.equals？"></a>何时应该覆盖Object.equals？</h3><ul>
+<li>①类具有自己特有的“逻辑相等”概念（<strong>不是对象等同</strong>），并且超类没有符号equals以实现期望的行为。<br>“值类”一般就属于这种，也就是仅仅表示值的类，比如Integer或者Date。<br>我们在使用equals方法时，希望知道他们逻辑上是否相等，而不是想知道他们是否指向同一个对象。</li>
+</ul>
+<p>要满足这种期望，不但要重写equals方法，还要使这个类的实例可以被map或者set用作key。</p>
+<p>但是有一些“值类”不需要覆盖equals方法：比如用实例受控（第一条）来确保“每个值至多只存在一个对象”的类。枚举类型就属于这种类。对于这种类，逻辑相同和对象等同是一回事，所以Object的equals方法等同于逻辑意义上的equals方法。</p>
+<p>覆盖equals方法时候，要遵守以下通用约定：<br>1）自反性。对于任何非null的引用值x，x.equals(x)必须返回true<br>2）对称性。对于任何非null的引用值x和y，x.equals(y)是等价的y.equals(x）</p>
+<p>以下代码可能会违反这个特性：</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF81.png" alt="clipboard.png"></p>
+<p>这个比较是不区分大小写的，并且试图完成与普通String的互操作，但是</p>
+<p>对于：</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF82.png" alt="clipboard.png"></p>
+<p>cis.equasl(s)会返回true，s.equals(cis)却会返回false，因为String的equal是区分大小写的</p>
+<p>要想保持特性需要重构这个方法：</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF83.png" alt="clipboard.png"></p>
+<p><strong>感觉这个代码不对啊,,,, 如果是CIS了… 就不用转换了。但为什么还是&amp;&amp;？</strong></p>
+<p><strong>这时，针对是同一个类的不同实例之间的比较，不再是不同类的不同实例的比较了。</strong></p>
+<p>3）传递性。对于任何非null的引用值x,y和z，如果x.equals(y)并且y.equals(z)那么y.equals(z)</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF84.png" alt="clipboard.png"></p>
+<p>如果打算扩展这个类，增加颜色信息：</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF85.png" alt="clipboard.png"></p>
+<p>很明显，如果不重写equals，那么作equals操作时，颜色信息就会被忽略掉。</p>
+<p>如果这样重写：</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF86.png" alt="clipboard.png"></p>
+<p>如果O只是一个普通Point，那么需要忽略颜色进行比较。</p>
+<p><strong>问题：为什么不用super.equals(o)而用o.equals(this);</strong><br>如果O是一个有色Point，那么调用父类的equals比较位置，并且比较颜色。<br>由于进行A.equals(B)时，调用了子类的equals，说明A是有色Point，那么构造它肯定会首先构造父类（super(x,y)），所以在调用equals时，super.equals(o)意味着用A构造的父类对象和O进行位置的比较，再单独比较颜色。<br>但是假设：</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF87.png" alt="clipboard.png"></p>
+<p>那么p.equals(cp)，直接调用了普通Point的equals。首先cp instanceof<br>Point是真，那么就接着判断位置，相同的，所以返回true；</p>
+<p>cp.equals(p)，调用的是有色Point的equals。首先p instanceof<br>ColorPoint是假，所以返回false。</p>
+<p><strong>这样就丧失了对称性！</strong></p>
+<p><strong>所以需要进行修改：</strong></p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF88.png" alt="clipboard.png"></p>
+<p>先判断是不是Point，如果是的话，判断是不是colorPoint，不是的话说明它仅仅是普通点，那么调用o.equals(this),这样的话调用的就是父类的equal了。</p>
+<p>否则当然就是有色点，先调用父类的equals，再比较color。</p>
+<p><strong>这样虽然保留了对称性，但是丧失了传递性！</strong></p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF89.png" alt="clipboard.png"></p>
+<p>p1.equals(p2)返回true,p2.equals(p3)也返回true，但是p1.equals(p3)却不能返回true。</p>
+<p><strong>这是面向对象中关于等价关系的一个基本问题，我们无法在扩展可实例化的类的同时，既增加新的值组件，同时又保留equals约定。</strong></p>
+<p><strong>如果使用getClass()代替instanceof测试，可以扩展可实例化的类和增加新的值组件，同时保留equals约定。</strong></p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF810.png" alt="clipboard.png"></p>
+<p>但是<strong>这违反了里氏替换原则。</strong>此时只有当对象具有相同的实现时，才能使对象等同。这样不算糟糕，但是the<br>consequences are unacceptable</p>
+<p><strong>为什么说违反了里氏替换原则？？</strong></p>
+<p><strong>假设有一个方法，用来检验某个整值点是否处在单位圆中：</strong></p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF811.png" alt="clipboard.png"></p>
+<p>加入我们扩展point但是不增加值组件，只是让构造器记录创建了多少个实例：</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF812.png" alt="clipboard.png"></p>
+<p>里氏替换原则表示：一个类型的任何重要属性也将适用于它的子类型。所以为该类型编写的任何方法，在它的子类型上也应该同样运行得很好。</p>
+<p>但是如果我们使用getClass的equals方法，那么我们把CounterPoint实例传入，onUnitCircle方法都会返回false。</p>
+<p>也就是说，我们很难找到一个很好的办法，既扩展不可实例化的类，又增加值组件。</p>
+<p>有一种方法可以作为权宜之计：复合由于继承。（有点像适配器…..）</p>
+<p>比如我们不让ColorPoint扩展Point，而是在ColorPoint中加入一个私有的Point域，以及一个共有的view方法。</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF813.png" alt="clipboard.png"></p>
+<p>4）一致性。对于任何非null的引用值x,y，只要equals操作用到的object的信息没有修改，那么对于多次调用，会一致返回true或者false.<br>如果x.equals(y)并且y.equals(z)那么y.equals(z)</p>
+<p>可变对象在不同的时候可以与不同的对象相等，不可变对象则不会这样。</p>
+<p>在写类的时候，就应该考虑是否应该不可变。如果是的话，那么要保持这样的限制条件：<strong>相等的对象永远相等，不相等的对象永远不相等。</strong></p>
+<p>但是无论类是否可变，都不要使equals方法依赖于不可靠的资源比如java.net.URL的equals方法依赖于对URL中主机IP地址的比较。<br>很明显主机名转变为的IP地址具有不稳定性。</p>
+<p>5）非空性。对于任何非null的引用值x，x.equals(null)一定返回false。</p>
+<p>一些类在equals中首先使用:</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF814.png" alt="clipboard.png"></p>
+<p>其实没什么必要。通常来说是直接使用instanceof判断类型。</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF815.png" alt="clipboard.png"></p>
+<p>如果漏掉了这一步的类型检查，并且传递给equals方法的参数又是错误的类型，那么equals方法会抛出ClassCastException异常。</p>
+<p>所以综合以上要求，实现高质量equals方法的技巧：</p>
+<p><strong>①使用“==”检查“参数是否为这个对象的引用”</strong>，如果返回真，那么equals也可以返回true。特别是equals操作比较昂贵时，可以使用这种方法提高性能。</p>
+<p><strong>②使用instanceof操作符检查“参数是否为正确的类型”</strong>。如果返回假，那么equals直接防护假。</p>
+<p>如果类实现的接口改进了equals约定，允许在实现了该接口的类之间进行比较，那么</p>
+<p><strong>③把参数转换成正确的类型。</strong>由于进行了第②步，所以这步一定会成功。</p>
+<p><strong>④对于该类中的每个“关键”域，检查参数中的域是否与该对象中对应的域想匹配。</strong></p>
+<p><strong>比如为了避免NullPointerException：</strong></p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF816.png" alt="clipboard.png"></p>
+<p>但是如果field和o.field常常是相同的对象引用，那么可以使用下面的做法：</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF817.png" alt="clipboard.png"></p>
+<p>为了获得最佳的性能，应该最先比较最有可能不一致的域。</p>
+<p>⑤编写完了equals方法之后，有三个问题需要注意：是否是对称的；是否第传递的；是否是一致的。</p>
+<p>自反性和非空性通常会自动满足。</p>
+<p>总结：</p>
+<p>①覆盖equals总要覆盖hashCode</p>
+<p>②不要企图让equals方法过于智能</p>
+<p>③不要将equals声明中的Object对象替换为其他的类型</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF818.png" alt="clipboard.png"></p>
+<p>这种方法不是重写了equals而是重载了Object</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/06/EF2_7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/07/06/EF2_7/" itemprop="url">Effective Java 读书笔记（2.5）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-06T22:23:42+08:00">
+                2017-07-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>第二章 创建和销毁对象</p>
+<p><strong>第七条 避免使用终结（finalizer）方法</strong></p>
+<h3 id="终结方法的缺点"><a href="#终结方法的缺点" class="headerlink" title="终结方法的缺点"></a><strong>终结方法的缺点</strong></h3><ul>
+<li><p>①<strong>不能保证会被及时地执行，升职不能保证它会执行。</strong>从一个对象不可达开始，到它的终结方法被执行，所花费的这段时间是任意长的。</p>
+<p>  比如，用终结方法来关闭已经打开的文件是不对的，因为打开文件的描述符是一种有限的资源。由于JVM会延迟执行终结方法，所以大量的文件会保留在打开的状态，当一个程序再不能打开文件的时候，可能会运行失败。</p>
+<p>  <strong>及时执行终结方法是垃圾回收算法的一个主要功能，这种算法在不同的JVM实现中会大相径庭。</strong></p>
+<p>  在一些情况下，为类提供终结方法，可能会随意地延迟其实例的回收过程。</p>
+<p>  <strong>结论：不应该依赖终结方法来更新重要的持久状态。比如依赖终结方法释放共享资源（比如数据库）上的永久锁。</strong></p>
+<p>  System.gc和System.runFinalization增加了终结方法被执行的机会，但不保证终结方法一定会被执行。唯一保证终结方法执行的方法是：System.runFinalizersOnExit和它臭名昭著的孪生兄弟：Runtime.runFinalizersOnExit.<br>  这两个方法都被废弃了。</p>
+</li>
+<li><p>②如果未被捕获的异常在终结过程中被抛出，那么这种异常会被忽略，并且该对象的终结过程也会被终止。这会使对象处于破坏的状态，如果有另一个线程企图使用这种被破坏的对象，会产生意想不到的结果。<strong>发生在终结方法中的异常不会打印出stack<br>trace.</strong></p>
+</li>
+<li><p><strong>③使用终结方法会有严重的性能损失。</strong></p>
+<p>  <strong>如果类对象的资源（文件或者线程等）需要终止的话，怎么做才能不用编写终结方法呢？</strong></p>
+<p>  <strong>提供显式的终止方法。</strong><br>  并要求该类的客户端在每个实例不再有用的时候调用这个方法。但是，<strong>实例必须记录下自己是否已经被终止了，需要在一个私域中记录下“该对象不再有效”，如果这些方法是在对象已经终止之后被调用，其他的方法就必须检查这个域，如果检查到这个域已经不再有效，就会抛出异常。</strong></p>
+<p>  使用显式调用的终止方法的几个例子：<br>  a.InputStream；<br>  b.OutputStream<br>  c.java.sql.Connection 上的close方法<br>  d.java.util.Timer的cancel方法</p>
+<p>  用法：</p>
+<p>  <img src="http://ovwunej09.bkt.clouddn.com/EF71.png" alt="clipboard.png"></p>
+<p>  在finally中显式地调用终止方法，即使try中有异常抛出，也会执行finally中的方法。</p>
+</li>
+</ul>
+<h3 id="终结方法的优点"><a href="#终结方法的优点" class="headerlink" title="终结方法的优点"></a>终结方法的优点</h3><ul>
+<li><p>①当对象的所有者<strong>忘记调用显式的终止方法时，终结方法可以充当“安全网”</strong>，虽然这个方法不会及时被调用，但如果客户端无法通过调用显式的终止方法来正常结束操作，那么迟一点释放资源总比不释放资源好。如果<strong>终结方法发现资源还未终止，则应该在日志中记录一条警告。这表示客户端中有bug。</strong></p>
+<p>  刚才列举的显示调用终止方法的四个类，都有终结方法。终止方法未被调用的时候，终结方法会充当安全网。</p>
+</li>
+<li><p>②与对象的本地对等体（native peer）有关。本地对等体是一个本地对象（native object），<br>普通方法通过本地方法（native method）委托给一个本地对象，因为本地对等体不是一个普通对象，所以垃圾回收器不会知道它。它的JAVA对等体被回收的时候，它不会被回收。如果本地对等体拥有必须被及时终止的资源，那么该类就应该具有一个显式的终止方法。<strong>终止方法应该完成所有必要的工作以便释放关键的资源。</strong></p>
+<p>  <strong>终止方法可以是本地方法，或者它也可以调用本地方法。</strong></p>
+<p>  “终结方法链”并不会被自动执行。如果类有终结方法，并且子类覆盖了终结方法，子类的终结方法就必须手工调用超类的终结方法。<strong>可以在try块中终结子类，并在相应的finally块中调用超类的终结方法。<br>这样即使子类的终结过程抛出异常，超类的终结方法也会执行。反之亦然。</strong></p>
+<p>  <strong>如果子类覆盖了超类的终结方法，但忘记手工调用超类supe的终结方法，怎么避免这种粗心或者恶意？？</strong></p>
+<p>  <strong>为每个要被终结的对象（外围实例Foo）创建一个附加的对象，把终结方法放到匿名类中，这个匿名类（下图的finalizerGuardian）的作用就是终结它的外围实例。这个匿名类的单个实例被称为终结方法守卫者（finallzer guardian）</strong></p>
+<p>  <img src="http://ovwunej09.bkt.clouddn.com/EF72.png" alt="clipboard.png"></p>
+<p>  外围类的每个实例都会创建这样一个守卫者，<strong>外围实例在它的私有实例域中保存着一个对其终结方法守卫者的唯一引用</strong>，所以终结方法守卫者和外围实例可以同时启动终结过程。</p>
+<p>  <strong>守卫者被终结的时候，它执行外围实例所期望的终结行为</strong>，就好像它的终结方法是外围对象上的一个方法一样。</p>
+<p>  这个例子中的Foo没有终结方法，它的子类所以是否调用super.finalize并不重要。</p>
+<p>  <strong>但是对于带有finalize的非final公有类，都应该考虑使用守卫者的这种方法以确保子类不调用super.finalize时也能执行终结方法。</strong></p>
+<p>  所以，只有需要以上两种用途的时候，需要使用终结方法，其他时候，最好都不要使用。</p>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/04/EF2_6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/07/04/EF2_6/" itemprop="url">Effective Java 读书笔记（2.1）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-04T23:53:42+08:00">
+                2017-07-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>第二章 创建和销毁对象</p>
+<p><strong>第6条.消除过期的对象引用</strong></p>
+<h3 id="内存泄漏的一个原因—-过期的对象引用"><a href="#内存泄漏的一个原因—-过期的对象引用" class="headerlink" title="内存泄漏的一个原因—-过期的对象引用"></a>内存泄漏的一个原因—-过期的对象引用</h3><p><img src="http://ovwunej09.bkt.clouddn.com/EF61.png" alt="clipboard.png"></p>
+<p>pop()后，从栈中弹出的对象不会被当做垃圾回收，（这些对象只是不能再从栈中取到而已），下标大于等于size的部分，属于对象的过期引用（永远不会被解除的引用），这就造成了内存泄漏。</p>
+<h4 id="修复方法"><a href="#修复方法" class="headerlink" title="修复方法"></a>修复方法</h4><p>只要对象引用过期，就清空这些引用，pop()像这样修改：</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF62.png" alt="clipboard.png"></p>
+<p>这样就清除了过期引用，并且如果以后又被错误地解除引用，程序还会抛出nullPointerException异常。<br>但<strong>清除对象引用只是一种例外，不是一种规范工作。清除过期引用的最好方法是让包含该引用的变量结束其生命周期。</strong></p>
+<p><strong>何时应该清除引用？</strong><br>在<strong>需要自己管理内存的时候需要格外注意</strong>。比如我们举例的Stack类。存储池中包含了elements数组，垃圾回收期不知道哪些是活动的，哪些是非活动的，所以程序员需要在数组元素变成非活动部分的一部分的时候，手工清空这些数组元素。</p>
+<h3 id="缓存造成的内存泄漏"><a href="#缓存造成的内存泄漏" class="headerlink" title="缓存造成的内存泄漏"></a>缓存造成的内存泄漏</h3><p>对象引用放到缓存中后，很容易被遗忘掉。</p>
+<h4 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h4><p>只要缓存之外有对某个项的<strong>键</strong>的引用，该项就有意义，可以使用WeakHashMap。缓存中的项过期后，他们会被自动删除。</p>
+<p>但是 缓存项的生命周期是否有意义<br>并不是很容易确定，随着时间推移，其中的项会变得越来越没有价值，所以缓存应该时不时清楚掉没用的项，可以使用后台线程（如timer或者scheduledThreadPoolExcutor）来完成。</p>
+<h3 id="监听器和其他回调"><a href="#监听器和其他回调" class="headerlink" title="监听器和其他回调"></a>监听器和其他回调</h3><p>比如在一个API中注册回调，但没有显式的取消注册。</p>
+<h4 id="解决方案："><a href="#解决方案：" class="headerlink" title="解决方案："></a>解决方案：</h4><p>确保回调立即被当作垃圾回收的最佳方法是只保存他们的弱引用，比如，只将他们保存成WeakHashMap中的键。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/03/EF2_5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/07/03/EF2_5/" itemprop="url">Effective Java 读书笔记（2.5）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-03T22:23:42+08:00">
+                2017-07-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>第二章 创建和销毁对象</p>
+<p><strong>第五条.避免创建不必要的对象</strong></p>
+<h3 id="①"><a href="#①" class="headerlink" title="①"></a>①</h3><p><img src="http://ovwunej09.bkt.clouddn.com/EF50.png" alt="clipboard.png"></p>
+<p>传进去的参数“stringette”本身就是一个实例，然后又用new新建一个实例。很明显创建了不必要的实例。</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF51.png" alt="clipboard.png"></p>
+<p>这种方法，就只会创建一个实例。</p>
+<h3 id="②"><a href="#②" class="headerlink" title="②"></a><strong>②</strong></h3><p><img src="http://ovwunej09.bkt.clouddn.com/EF52.png" alt="clipboard.png"></p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF53.png" alt="clipboard.png"></p>
+<p>TimeZone tz1 = timeZone.getTimeZone(“GMT”); // 指定时区<br>Calendar cal1 = Calendar.getInstance(tz1); // 使用指定的时区和当前语言环境的日历<br>每次isbabyboomer()被调用的时候，都会创建一个calendar，一个timezone和两个date。<br>改进：将两个Date声明为static<br>final，把他们的初始化和Calendar的声明定义一起放到static代码块中。</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/ef54.png" alt="clipboard.png"></p>
+<p>这种方法只在类初始化时创建Date，Calendar，TimeZone一次。不会在每次调用isBabyBoomer()的时候创建这些实例，那么<strong>万一isBabyBoomer()永远不被调用</strong>，不是浪费了BoomStart和BoomEND吗？可以采用延迟初始化的方法进行，也就是第一次调用isBabyBoomer()的时候进行初始化。但书上不建议这么做，认为这会使方法变得更复杂，并且无法带来太大的性能提高。</p>
+<h3 id="③考虑适配器，也被叫做视图。"><a href="#③考虑适配器，也被叫做视图。" class="headerlink" title="③考虑适配器，也被叫做视图。"></a>③考虑适配器，也被叫做视图。</h3><p>Map接口的keySet()返回Map对象的Set视图，视图中包含Map中所以的key。每次调用keySet()返回的都是同样的Set实例。所以当对其中一个返回Set实例进行更改时，其他的Set实例也会被改变。</p>
+<p>④JAVA5开始，有一种<strong>创建多余对象的新方法，也就是自动装箱。</strong>基本类型和装箱类型混用，按需要自动装箱或者拆箱，他们的差别变得模糊，但还是有区别。比如以下这个例子：</p>
+<p><img src="http://ovwunej09.bkt.clouddn.com/EF55.png" alt="clipboard.png"></p>
+<p>这样程序会构造2\^31个多余的Long实例，在for循环中，每次增加long时，i都会被转为Long实例。如果把sum的声明从Long改成long，会显著提高性能。</p>
+<p>建议：<strong>优先使用基本类型而不是装箱基本类型，</strong>以防止无意识的自动装箱。</p>
+<p>但是这个条目并不是说要避免创建对象，一些小对象的创建和回收动作是很廉价的，所以通过创建附加的对象，可以提升程序的清晰性、简洁性和功能性。<br>维护自己的对象池反而不是一种好做法。除非其中的对象非常重量级。（比如android中的bitmap）。维护对象池会增加内存的占用，损害性能，所以进行不要使用轻量级对象池。</p>
+<p>对象池的典型用法：数据库连接池。<br>建立数据库连接代价很昂贵，所以重用对象很有意义。</p>
+<p>这个条目讲的是<strong>，应该重用现有对象的时候，不要创建新的对象。</strong></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/30/EF2_3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -755,125 +1473,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/11/我的article/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ke Yu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Coco">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/11/我的article/" itemprop="url">我的article</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-11T14:38:30+08:00">
-                2017-06-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -928,7 +1527,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-count">37</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -950,7 +1549,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-count">51</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

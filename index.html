@@ -252,7 +252,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/04/hello-world/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/27/tf05/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ke Yu">
@@ -271,7 +271,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/04/04/hello-world/" itemprop="url">Hello World</a></h1>
+                <a class="post-title-link" href="/2018/03/27/tf05/" itemprop="url">Tensorflow api整理(5)</a></h1>
         
 
         <div class="post-meta">
@@ -283,8 +283,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-04T11:23:05+08:00">
-                2018-04-04
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-27T16:11:32+08:00">
+                2018-03-27
               </time>
             
 
@@ -293,6 +293,28 @@
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -323,15 +345,36 @@
       
         
           
-            <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+            <h4 id="tf-train-exponential-decay-learning-rate-global-step-decay-steps-decay-rate-staircase-False-name-None"><a href="#tf-train-exponential-decay-learning-rate-global-step-decay-steps-decay-rate-staircase-False-name-None" class="headerlink" title="tf.train.exponential_decay(learning_rate, global_step, decay_steps, decay_rate, staircase=False, name=None)"></a>tf.train.exponential_decay(learning_rate, global_step, decay_steps, decay_rate, staircase=False, name=None)</h4><p>Applies exponential decay to the learning rate.<br>When training a model, it is often recommended to <strong><em>lower the learning rate as the training progresses</em></strong>. This function applies an exponential decay function to a provided initial learning rate. It requires <strong><em>a global_step value to compute the decayed learning rate</em></strong>. You can just pass a TensorFlow variable that you increment at each training step.</p>
+<p>The function returns the decayed learning rate. It is computed as:</p>
+<blockquote>
+<p>decayed_learning_rate = learning_rate *<br>                      decay_rate ^ (global_step / decay_steps)</p>
+</blockquote>
+<p>If the argument staircase is True, then global_step /decay_steps is an integer division and the decayed learning rate follows a staircase function.</p>
+<h5 id="Example-decay-every-100000-steps-with-a-base-of-0-96"><a href="#Example-decay-every-100000-steps-with-a-base-of-0-96" class="headerlink" title="Example: decay every 100000 steps with a base of 0.96"></a>Example: decay every 100000 steps with a base of 0.96</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">global_step = tf.Variable(<span class="number">0</span>, trainable=<span class="keyword">False</span>)</span><br><span class="line">starter_learning_rate = <span class="number">0.1</span></span><br><span class="line">learning_rate = tf.exponential_decay(starter_learning_rate, global_step,</span><br><span class="line">                                     <span class="number">100000</span>, <span class="number">0.96</span>, staircase=<span class="keyword">True</span>)</span><br><span class="line">optimizer = tf.GradientDescent(learning_rate)</span><br><span class="line"><span class="comment"># Passing global_step to minimize() will increment it at each step.</span></span><br><span class="line">optimizer.minimize(...my loss..., global_step=global_step)</span><br></pre></td></tr></table></figure>
+<p>Args:</p>
+<ul>
+<li>learning_rate: A scalar float32 or float64 Tensor or a Python number. The initial learning rate.</li>
+<li>global_step: A scalar int32 or int64 Tensor or a Python number. Global step to use for the decay computation. Must not be negative.</li>
+<li>decay_steps: A scalar int32 or int64 Tensor or a Python number. Must be positive. See the decay computation above.</li>
+<li>decay_rate: A scalar float32 or float64 Tensor or a Python number. The decay rate.</li>
+<li>staircase: Boolean. It True decay the learning rate at discrete intervals.</li>
+<li>name: string. Optional name of the operation. Defaults to ‘ExponentialDecay’</li>
+</ul>
+<p>Returns:<br>A scalar Tensor of the same type as learning_rate. <strong><em>The decayed learning rate</em></strong>.</p>
+<h4 id="class-tf-train-ExponentialMovingAverage"><a href="#class-tf-train-ExponentialMovingAverage" class="headerlink" title="class tf.train.ExponentialMovingAverage"></a>class tf.train.ExponentialMovingAverage</h4><p>Some training algorithms, such as <strong><em>GradientDescent and Momentum often benefit from maintaining a moving average of variables during optimization</em></strong>. Using the moving averages for evaluations often improve results significantly.</p>
+<p>Maintains moving averages of variables by employing and exponential decay.</p>
+<p>When training a model, it is often beneficial to maintain moving averages of the trained parameters. Evaluations that use averaged parameters sometimes produce significantly better results than the final trained values.</p>
+<p>The apply() method adds shadow copies of trained variables and add ops that maintain a moving average of the trained variables in their shadow copies. It is used when building the training model. The ops that maintain moving averages are typically run after each training step. The average() and average_name() methods give access to the shadow variables and their names. They are useful when building an evaluation model, or when restoring a model from a checkpoint file. They help use the moving averages in place of the last trained values for evaluations.</p>
+<p>The moving averages are computed using exponential decay. You specify the decay value when creating the ExponentialMovingAverage object. The shadow variables are initialized with the same initial values as the trained variables. When you run the ops to maintain the moving averages, each shadow variable is updated with the formula:</p>
+<p>shadow_variable -= (1 - decay) * (shadow_variable - variable)</p>
+<p>This is mathematically equivalent to the classic formula below, but the use of an assign_sub op (the “-=” in the formula) allows concurrent lockless updates to the variables:</p>
+<p>shadow_variable = decay <em> shadow_variable + (1 - decay) </em> variable</p>
+<p>Reasonable values for decay are close to 1.0, typically in the multiple-nines range: 0.999, 0.9999, etc.</p>
+<p>Example usage when creating a training model:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Create variables.</span></span><br><span class="line">var0 = tf.Variable(...)</span><br><span class="line">var1 = tf.Variable(...)</span><br><span class="line"><span class="comment"># ... use the variables to build a training model...</span></span><br><span class="line">...</span><br><span class="line"><span class="comment"># Create an op that applies the optimizer.  This is what we usually</span></span><br><span class="line"><span class="comment"># would use as a training op.</span></span><br><span class="line">opt_op = opt.minimize(my_loss, [var0, var1])</span><br><span class="line"></span><br><span class="line"><span class="comment"># Create an ExponentialMovingAverage object</span></span><br><span class="line">ema = tf.train.ExponentialMovingAverage(decay=<span class="number">0.9999</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Create the shadow variables, and add ops to maintain moving averages</span></span><br><span class="line"><span class="comment"># of var0 and var1.</span></span><br><span class="line">maintain_averages_op = ema.apply([var0, var1])</span><br><span class="line"></span><br><span class="line"><span class="comment"># Create an op that will update the moving averages after each training</span></span><br><span class="line"><span class="comment"># step.  This is what we will use in place of the usuall trainig op.</span></span><br><span class="line"><span class="keyword">with</span> tf.control_dependencies([opt_op]):</span><br><span class="line">    training_op = tf.group(maintain_averages_op)</span><br><span class="line"></span><br><span class="line">...train the model by running training_op...</span><br></pre></td></tr></table></figure>
+<p>There are two ways to use the moving averages for evaluations:</p>
+<p>Build a model that uses the shadow variables instead of the variables. For this, use the average() method which returns the shadow variable for a given variable.<br>Build a model normally but load the checkpoint files to evaluate by using the shadow variable names. For this use the average_name() method. See the Saver class for more information on restoring saved variables.</p>
 
           
         
@@ -380,7 +423,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/04/my/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/22/tf04/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ke Yu">
@@ -399,7 +442,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/04/04/my/" itemprop="url">Untitled</a></h1>
+                <a class="post-title-link" href="/2017/11/22/tf04/" itemprop="url">Tensorflow api整理(4)</a></h1>
         
 
         <div class="post-meta">
@@ -411,8 +454,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-04T11:23:05+08:00">
-                2018-04-04
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-22T15:16:12+08:00">
+                2017-11-22
               </time>
             
 
@@ -421,6 +464,28 @@
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/图像/" itemprop="url" rel="index">
+                    <span itemprop="name">图像</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -451,7 +516,590 @@
       
         
           
-            <p>test something</p>
+            <h4 id="tf-app-run"><a href="#tf-app-run" class="headerlink" title="tf.app.run()"></a>tf.app.run()</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"""Generic entry point script."""</span></span><br><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> absolute_import</span><br><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> division</span><br><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> print_function</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> tensorflow.python.platform <span class="keyword">import</span> flags</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(main=None)</span>:</span></span><br><span class="line">  f = flags.FLAGS</span><br><span class="line">  f._parse_flags() ---&gt;B</span><br><span class="line">  main = main <span class="keyword">or</span> sys.modules[<span class="string">'__main__'</span>].main</span><br><span class="line">  sys.exit(main(sys.argv))</span><br></pre></td></tr></table></figure>
+<p>A:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_parse_flags</span><span class="params">(self)</span>:</span>  </span><br><span class="line">  result, _ = _global_parser.parse_known_args()  </span><br><span class="line">  <span class="keyword">for</span> flag_name, val <span class="keyword">in</span> vars(result).items():  </span><br><span class="line">    self.__dict__[<span class="string">'__flags'</span>][flag_name] = val  </span><br><span class="line">  self.__dict__[<span class="string">'__parsed'</span>] = <span class="keyword">True</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="tf-image-random-crop-image-size-seed-None-name-None"><a href="#tf-image-random-crop-image-size-seed-None-name-None" class="headerlink" title="tf.image.random_crop(image, size, seed=None, name=None)"></a>tf.image.random_crop(image, size, seed=None, name=None)</h4><p>Randomly crops image to size [target_height, target_width].<br>随机裁剪[target_height,target_width]大小的图片.</p>
+<p>The offset of the output within image is uniformly random. image always fully contains the result.</p>
+<p>Args:</p>
+<ul>
+<li>image: 3-D tensor of shape [height, width, channels]<br>图像源.</li>
+<li>size: 1-D tensor with two elements, specifying target [height, width]<br>切割大小.</li>
+<li>seed: A Python integer. Used to create a random seed. See set_random_seed for behavior.</li>
+<li>name: A name for this operation (optional).</li>
+</ul>
+<p>Returns:<br>A cropped 3-D tensor of shape [target_height, target_width, channels].</p>
+<h4 id="tf-image-random-flip-left-right-image-seed-None"><a href="#tf-image-random-flip-left-right-image-seed-None" class="headerlink" title="tf.image.random_flip_left_right(image, seed=None)"></a>tf.image.random_flip_left_right(image, seed=None)</h4><p>Randomly flip an image horizontally (left to right).<br>随机水平裁剪图片。</p>
+<p>With a 1 in 2 chance, outputs the contents of image flipped along the second dimension, which is width. Otherwise output the image as-is.</p>
+<p>Args:</p>
+<ul>
+<li>image: A 3-D tensor of shape [height, width, channels].</li>
+<li>seed: A Python integer. Used to create a random seed. See set_random_seed for behavior.</li>
+</ul>
+<p>Returns:<br>A 3-D tensor of the same type and shape as image.</p>
+<h4 id="tf-image-random-brightness-image-max-delta-seed-None"><a href="#tf-image-random-brightness-image-max-delta-seed-None" class="headerlink" title="tf.image.random_brightness(image, max_delta, seed=None)"></a>tf.image.random_brightness(image, max_delta, seed=None)</h4><p>Adjust the brightness of images by a random factor.<br>调节明亮度。</p>
+<p>Equivalent to adjust_brightness() using a delta randomly picked in the interval [-max_delta, max_delta).</p>
+<p>Note that delta is picked as a float. Because for integer type images, the brightness adjusted result is rounded before casting, integer images may have modifications in the range [-max_delta,max_delta].</p>
+<p>Args:</p>
+<ul>
+<li>image: 3-D tensor of shape [height, width, channels].</li>
+<li>max_delta: float, must be non-negative.</li>
+<li>seed: A Python integer. Used to create a random seed. See set_random_seed for behavior.</li>
+</ul>
+<p>Returns:<br>3-D tensor of images of shape [height, width, channels]</p>
+<h4 id="tf-image-random-contrast-image-lower-upper-seed-None"><a href="#tf-image-random-contrast-image-lower-upper-seed-None" class="headerlink" title="tf.image.random_contrast(image, lower, upper, seed=None)"></a>tf.image.random_contrast(image, lower, upper, seed=None)</h4><p>Adjust the contrase of an image by a random factor.<br>调节对比度。</p>
+<p>Equivalent to adjust_constrast() but uses a contrast_factor randomly picked in the interval [lower, upper].</p>
+<p>Args:</p>
+<ul>
+<li>image: 3-D tensor of shape [height, width, channels].</li>
+<li>lower: float. Lower bound for the random contrast factor.</li>
+<li>upper: float. Upper bound for the random contrast factor.</li>
+<li>seed: A Python integer. Used to create a random seed. See set_random_seed for behavior.</li>
+</ul>
+<p>Returns:<br>3-D tensor of shape [height, width, channels].</p>
+<h4 id="tf-image-per-image-standardization-image"><a href="#tf-image-per-image-standardization-image" class="headerlink" title="tf.image.per_image_standardization(image)"></a>tf.image.per_image_standardization(image)</h4><p>图片的标准化，可以加速神经网络训练。why?<br>包含以下步骤：<br>(x - mean) / adjusted_stddev<br>x 为RGB三通道像素值，mean为RGB三通道像素均值，其中<br>adjusted_stddev = max(stddev, 1.0/sqrt(image.NumElements()))<br>stddev为RGB三通道像素的标准差,image.NumElements为RGB三通道像素的个数</p>
+<h4 id="tf-cast-x-dtype-name-None"><a href="#tf-cast-x-dtype-name-None" class="headerlink" title="tf.cast(x, dtype, name=None)"></a>tf.cast(x, dtype, name=None)</h4><p>Casts a tensor to a new type.<br>将x类型转换为dtype类型。</p>
+<p>The operation casts x (in case of Tensor) or x.values (in case of SparseTensor) to dtype.</p>
+<p>For example:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># tensor `a` is [1.8, 2.2], dtype=tf.float</span><br><span class="line">tf.cast(a, tf.int32) ==&gt; [1, 2]  # dtype=tf.int32</span><br></pre></td></tr></table></figure></p>
+<p>Args:</p>
+<ul>
+<li>x: A Tensor or SparseTensor.</li>
+<li>dtype: The destination type.</li>
+<li>name: A name for the operation (optional).<br>Returns:</li>
+</ul>
+<p>A Tensor or SparseTensor with same shape as x.</p>
+<h4 id="tf-FixedLengthRecordReader-read-queue-name-None"><a href="#tf-FixedLengthRecordReader-read-queue-name-None" class="headerlink" title="tf.FixedLengthRecordReader.read(queue, name=None)"></a>tf.FixedLengthRecordReader.read(queue, name=None)</h4><p>Returns the next record (key, value pair) produced by a reader.</p>
+<p>Will dequeue a work unit from queue if necessary (e.g. when the Reader needs to start reading from a new file since it has finished with the previous file).<br>从队列中读取一个unit，以键值对的形式返回。<br>Args:</p>
+<ul>
+<li>queue: A Queue or a mutable string Tensor representing a handle to a Queue, with string work items.</li>
+<li>name: A name for the operation (optional).</li>
+</ul>
+<p>Returns:<br>A tuple of Tensors (key, value).</p>
+<ul>
+<li>key: A string scalar Tensor.</li>
+<li>value: A string scalar Tensor.</li>
+</ul>
+<h4 id="tf-decode-raw-bytes-out-type-little-endian-None-name-None"><a href="#tf-decode-raw-bytes-out-type-little-endian-None-name-None" class="headerlink" title="tf.decode_raw(bytes, out_type, little_endian=None, name=None)"></a>tf.decode_raw(bytes, out_type, little_endian=None, name=None)</h4><p>Reinterpret the bytes of a string as a vector of numbers.<br>将string重新转换为向量。</p>
+<p>Args:</p>
+<ul>
+<li>bytes: A Tensor of type string. All the elements must have the same length.</li>
+<li>out_type: A tf.DType from: tf.float32, tf.float64, tf.int32, tf.uint8, tf.int16, tf.int8, tf.int64.</li>
+<li>little_endian: An optional bool. Defaults to True. Whether the input bytes are in little-endian order. Ignored for out_types that are stored in a single byte like uint8.</li>
+<li>name: A name for the operation (optional).</li>
+</ul>
+<p>Returns:<br>A Tensor of type out_type. A Tensor with one more dimension than the input bytes. The added dimension will have size equal to the length of the elements of bytes divided by the number of bytes to represent out_type.<br>返回比输入大一维的out_type类型的tensor</p>
+<h4 id="tf-slice-input-begin-size-name-None"><a href="#tf-slice-input-begin-size-name-None" class="headerlink" title="tf.slice(input_, begin, size, name=None)"></a>tf.slice(input_, begin, size, name=None)</h4><p>Extracts a slice from a tensor.</p>
+<p>This operation extracts a slice of size size from a tensor input starting at the location specified by begin. The slice size is represented as a tensor shape, where size[i] is the number of elements of the ‘i’th dimension of input that you want to slice. </p>
+<p>在输入的tensor中从位置begin[i]起提出长度为size[i]的片段，size使用tesnsor shape表示，size[i]代表输入的第i维的元素个数.<br>这个函数稍微有点抽象，可以首先从二维开始想：<br>input is :<br>[[1,2,3], [4,5,6], [7,8,9]]<br>如果begin = [1,1]<br>size = [2,2]<br>那么就从[1,1]位置开始，即5的位置开始，截取2行2列的片段，也就是：<br>[[5,6],[8,9]]</p>
+<p>同理在三维情况下，看看这个官方例子：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 'input' is [[[1, 1, 1], [2, 2, 2]],</span></span><br><span class="line"><span class="comment">#             [[3, 3, 3], [4, 4, 4]],</span></span><br><span class="line"><span class="comment">#             [[5, 5, 5], [6, 6, 6]]]</span></span><br><span class="line">tf.slice(input, [1, 0, 0], [1, 1, 3]) ==&gt; [[[3, 3, 3]]]</span><br><span class="line">tf.slice(input, [1, 0, 0], [1, 2, 3]) ==&gt; [[[3, 3, 3],</span><br><span class="line">                                            [<span class="number">4</span>, <span class="number">4</span>, <span class="number">4</span>]]]</span><br><span class="line">tf.slice(input, [1, 0, 0], [2, 1, 3]) ==&gt; [[[3, 3, 3]],</span><br><span class="line">                                           [[<span class="number">5</span>, <span class="number">5</span>, <span class="number">5</span>]]]</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><p>Ex.1 :<br>  以[1,0,0]为起点，划分[1,1,3]的大小，1即[[3, 3, 3], [4, 4, 4]]这个数组A的位置，大小为1,那么就是这个数组A本身；0即[3,3,3]这个数组B的位置,大小为1,那么就是这个数组B的位置，0即第一个3这个位置,大小为3,那么就包含从这个3开始的3个数即3,3,3;所以结果为[[[3,3,3]]]</p>
+</li>
+<li><p>Ex.2 ：<br>  以[1,0,0]为起点，划分[1,2,3]的大小，1即[[3, 3, 3], [4, 4, 4]]这个数组A的位置，大小为1,那么就是这个数组A本身；0即[3,3,3]这个数组B的位置,大小为2,那么就是[3,3,3],[4,4,4]两个数组，0即第一个3和第一个4这个位置,大小为3,那么就包含从这个3(4)开始的3个数即3,3,3(4,4,4);所以结果为[[[3,3,3],[4,4,4]]]</p>
+<p>  同理Ex.3.</p>
+<p>  ​</p>
+<h4 id="tf-merge-all-summaries-key-’summaries’"><a href="#tf-merge-all-summaries-key-’summaries’" class="headerlink" title="tf.merge_all_summaries(key=’summaries’)"></a>tf.merge_all_summaries(key=’summaries’)</h4><p>(tf.summary.merge_all())</p>
+</li>
+</ul>
+<p>Merges all summaries collected in the default graph.<br>收集graph中所有的summaries.</p>
+<p>Args:<br>key: GraphKey used to collect the summaries. Defaults to GraphKeys.SUMMARIES.</p>
+<p>Returns:<br>If no summaries were collected, returns None. Otherwise returns a scalar Tensor of typestring containing the serialized Summary protocol buffer resulting from the merging.</p>
+<h4 id="tf-get-default-graph"><a href="#tf-get-default-graph" class="headerlink" title="tf.get_default_graph()"></a>tf.get_default_graph()</h4><p>获取默认的图。</p>
+<h4 id="tf-Graph-as-graph-def"><a href="#tf-Graph-as-graph-def" class="headerlink" title="tf.Graph.as_graph_def"></a>tf.Graph.as_graph_def</h4><p>(from_version=None, add_shapes=False)<br>返回图的序列化表示。</p>
+<h4 id="tf-summary-FileWriter-FLAGS-eval-dir-graph-def-graph-def"><a href="#tf-summary-FileWriter-FLAGS-eval-dir-graph-def-graph-def" class="headerlink" title="tf.summary.FileWriter(FLAGS.eval_dir,graph_def=graph_def)"></a>tf.summary.FileWriter(FLAGS.eval_dir,graph_def=graph_def)</h4><p>将运行图得到的summary写到磁盘中。</p>
+<h4 id="checkpoint-state"><a href="#checkpoint-state" class="headerlink" title="checkpoint_state"></a>checkpoint_state</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">with tf.Session() as sess:</span><br><span class="line">    ckpt = tf.train.get_checkpoint_state(FLAGS.checkpoint_dir)</span><br><span class="line">    if ckpt and ckpt.model_checkpoint_path:</span><br><span class="line">      # Restores from checkpoint</span><br><span class="line">      saver.restore(sess, ckpt.model_checkpoint_path)</span><br><span class="line">      # Assuming model_checkpoint_path looks something like:</span><br><span class="line">      #   /my-favorite-path/cifar10_train/model.ckpt-0,</span><br><span class="line">      # extract global_step from it.</span><br><span class="line">      global_step = ckpt.model_checkpoint_path.split(&apos;/&apos;)[-1].split(&apos;-&apos;)[-1]</span><br><span class="line">    else:</span><br><span class="line">      print(&apos;No checkpoint file found&apos;)</span><br><span class="line">      return</span><br></pre></td></tr></table></figure>
+<h4 id="tf-get-collection-key-scope-None"><a href="#tf-get-collection-key-scope-None" class="headerlink" title="tf.get_collection(key, scope=None)"></a>tf.get_collection(key, scope=None)</h4><p>Wrapper for Graph.get_collection() using the default graph.<br>从图中取出对应Key的所有list values<br>See Graph.get_collection() for more details.</p>
+<p>Args:</p>
+<ul>
+<li>key: The key for the collection. For example, the GraphKeys class contains many standard names for collections.</li>
+<li>scope: (Optional.) If supplied, the resulting list is filtered to include only items whose name begins with this string.</li>
+</ul>
+<p>Returns:<br>The list of values in the collection with the given name, or an empty list if no value has been added to that collection. The list contains the values in the order under which they were collected.</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/19/tf03/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/19/tf03/" itemprop="url">Tensorflow api整理(3)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-19T15:21:34+08:00">
+                2017-11-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/图像/" itemprop="url" rel="index">
+                    <span itemprop="name">图像</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p> tf.Graph().as_default()：<br>访问默认建好的图。tensorflow中一个运算表示为一个图。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Copyright 2015 Google Inc. All Rights Reserved.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Licensed under the Apache License, Version 2.0 (the "License");</span></span><br><span class="line"><span class="comment"># you may not use this file except in compliance with the License.</span></span><br><span class="line"><span class="comment"># You may obtain a copy of the License at</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment">#     http://www.apache.org/licenses/LICENSE-2.0</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Unless required by applicable law or agreed to in writing, software</span></span><br><span class="line"><span class="comment"># distributed under the License is distributed on an "AS IS" BASIS,</span></span><br><span class="line"><span class="comment"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span></span><br><span class="line"><span class="comment"># See the License for the specific language governing permissions and</span></span><br><span class="line"><span class="comment"># limitations under the License.</span></span><br><span class="line"><span class="comment"># ==============================================================================</span></span><br><span class="line"></span><br><span class="line"><span class="string">"""A binary to train CIFAR-10 using a single GPU.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Accuracy:</span></span><br><span class="line"><span class="string">cifar10_train.py achieves ~86% accuracy after 100K steps (256 epochs of</span></span><br><span class="line"><span class="string">data) as judged by cifar10_eval.py.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Speed: With batch_size 128.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">System        | Step Time (sec/batch)  |     Accuracy</span></span><br><span class="line"><span class="string">------------------------------------------------------------------</span></span><br><span class="line"><span class="string">1 Tesla K20m  | 0.35-0.60              | ~86% at 60K steps  (5 hours)</span></span><br><span class="line"><span class="string">1 Tesla K40m  | 0.25-0.35              | ~86% at 100K steps (4 hours)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Usage:</span></span><br><span class="line"><span class="string">Please see the tutorial and website for how to download the CIFAR-10</span></span><br><span class="line"><span class="string">data set, compile the program and train the model.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">http://tensorflow.org/tutorials/deep_cnn/</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> absolute_import</span><br><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> division</span><br><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> print_function</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line"><span class="keyword">import</span> os.path</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> tensorflow.python.platform</span><br><span class="line"><span class="keyword">from</span> tensorflow.python.platform <span class="keyword">import</span> gfile</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> six.moves <span class="keyword">import</span> xrange  <span class="comment"># pylint: disable=redefined-builtin</span></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> cifar10</span><br><span class="line"></span><br><span class="line">FLAGS = tf.app.flags.FLAGS</span><br><span class="line"></span><br><span class="line">tf.app.flags.DEFINE_string(<span class="string">'train_dir'</span>, <span class="string">'/tmp/cifar10_train'</span>,</span><br><span class="line">                           <span class="string">"""Directory where to write event logs """</span></span><br><span class="line">                           <span class="string">"""and checkpoint."""</span>)</span><br><span class="line">tf.app.flags.DEFINE_integer(<span class="string">'max_steps'</span>, <span class="number">30000</span>,</span><br><span class="line">                            <span class="string">"""Number of batches to run."""</span>)</span><br><span class="line">tf.app.flags.DEFINE_boolean(<span class="string">'log_device_placement'</span>, <span class="keyword">False</span>,</span><br><span class="line">                            <span class="string">"""Whether to log device placement."""</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">train</span><span class="params">()</span>:</span></span><br><span class="line">  <span class="string">"""Train CIFAR-10 for a number of steps."""</span></span><br><span class="line">  <span class="keyword">with</span> tf.Graph().as_default():</span><br><span class="line">    global_step = tf.Variable(<span class="number">0</span>, trainable=<span class="keyword">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Get images and labels for CIFAR-10.</span></span><br><span class="line">    <span class="comment"># distorted_inputs()构造了各种随意变换的输入</span></span><br><span class="line">    images, labels = cifar10.distorted_inputs()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Build a Graph that computes the logits predictions from the</span></span><br><span class="line">    <span class="comment"># inference model.</span></span><br><span class="line">    logits = cifar10.inference(images)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Calculate loss.</span></span><br><span class="line">    loss = cifar10.loss(logits=logits, labels=labels)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Build a Graph that trains the model with one batch of examples and</span></span><br><span class="line">    <span class="comment"># updates the model parameters.</span></span><br><span class="line">    train_op = cifar10.train(loss, global_step)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Create a saver.</span></span><br><span class="line">    saver = tf.train.Saver(tf.all_variables())</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Build the summary operation based on the TF collection of Summaries.</span></span><br><span class="line">    summary_op = tf.summary.merge_all()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Build an initialization operation to run below.</span></span><br><span class="line">    init = tf.initialize_all_variables()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Start running operations on the Graph.</span></span><br><span class="line">    sess = tf.Session(config=tf.ConfigProto(</span><br><span class="line">        log_device_placement=FLAGS.log_device_placement))</span><br><span class="line">    sess.run(init)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Start the queue runners.</span></span><br><span class="line">    tf.train.start_queue_runners(sess=sess)</span><br><span class="line"></span><br><span class="line">    summary_writer = tf.summary.FileWriter(FLAGS.train_dir,</span><br><span class="line">                                            graph_def=sess.graph_def)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> step <span class="keyword">in</span> xrange(FLAGS.max_steps):</span><br><span class="line">      start_time = time.time()</span><br><span class="line">      _, loss_value = sess.run([train_op, loss])</span><br><span class="line">      duration = time.time() - start_time</span><br><span class="line"></span><br><span class="line">      <span class="keyword">assert</span> <span class="keyword">not</span> np.isnan(loss_value), <span class="string">'Model diverged with loss = NaN'</span></span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> step % <span class="number">10</span> == <span class="number">0</span>:</span><br><span class="line">        num_examples_per_step = FLAGS.batch_size</span><br><span class="line">        examples_per_sec = num_examples_per_step / duration</span><br><span class="line">        sec_per_batch = float(duration)</span><br><span class="line"></span><br><span class="line">        format_str = (<span class="string">'%s: step %d, loss = %.2f (%.1f examples/sec; %.3f '</span></span><br><span class="line">                      <span class="string">'sec/batch)'</span>)</span><br><span class="line">        <span class="keyword">print</span> (format_str % (datetime.now(), step, loss_value,</span><br><span class="line">                             examples_per_sec, sec_per_batch))</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> step % <span class="number">100</span> == <span class="number">0</span>:</span><br><span class="line">        summary_str = sess.run(summary_op)</span><br><span class="line">        summary_writer.add_summary(summary_str, step)</span><br><span class="line"></span><br><span class="line">      <span class="comment"># Save the model checkpoint periodically.</span></span><br><span class="line">      <span class="keyword">if</span> step % <span class="number">1000</span> == <span class="number">0</span> <span class="keyword">or</span> (step + <span class="number">1</span>) == FLAGS.max_steps:</span><br><span class="line">        checkpoint_path = os.path.join(FLAGS.train_dir, <span class="string">'model.ckpt'</span>)</span><br><span class="line">        saver.save(sess, checkpoint_path, global_step=step)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">(argv=None)</span>:</span>  <span class="comment"># pylint: disable=unused-argument</span></span><br><span class="line">  cifar10.maybe_download_and_extract()</span><br><span class="line">  <span class="keyword">if</span> gfile.Exists(FLAGS.train_dir):</span><br><span class="line">    gfile.DeleteRecursively(FLAGS.train_dir)</span><br><span class="line">  gfile.MakeDirs(FLAGS.train_dir)</span><br><span class="line">  train()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">  tf.app.run()</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/08/tf02/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/08/tf02/" itemprop="url">Tensorflow api整理(2)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-08T21:31:14+08:00">
+                2017-11-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/图像/" itemprop="url" rel="index">
+                    <span itemprop="name">图像</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>API文档：<br><a href="http://wiki.jikexueyuan.com/project/tensorflow-zh/api_docs/python/index.html" target="_blank" rel="noopener">http://wiki.jikexueyuan.com/project/tensorflow-zh/api_docs/python/index.html</a></p>
+<h6 id="tf-nn-conv2d-input-filter-strides-padding-use-cudnn-on-gpu-None-name-None"><a href="#tf-nn-conv2d-input-filter-strides-padding-use-cudnn-on-gpu-None-name-None" class="headerlink" title="tf.nn.conv2d(input, filter, strides, padding, use_cudnn_on_gpu=None, name=None)"></a>tf.nn.conv2d(input, filter, strides, padding, use_cudnn_on_gpu=None, name=None)</h6><p>Computes a 2-D convolution given 4-D input and filter tensors.</p>
+<ul>
+<li>input: A Tensor. Must be one of the following types: float32, float64.</li>
+<li>filter: A Tensor. Must have the same type as input.<br>input和filter的通道数需要一致。<br>strides: A list of ints. 1-D of length 4. The stride of the sliding window for each dimension of input.<br>滑动窗口的步长，一维向量，strides[0]=strides[3]=1</li>
+<li>padding: A string from: “SAME”, “VALID”. The type of padding algorithm to use.<br>SAME:进行0的补位，左奇右偶。<br>VALID:不进行0的补位，丢弃多余的。</li>
+<li>use_cudnn_on_gpu: An optional bool. Defaults to True.<br>name: A name for the operation (optional).</li>
+</ul>
+<h6 id="tf-truncated-normal-shape-mean-0-0-stddev-1-0-dtype-tf-float32-seed-None-name-None"><a href="#tf-truncated-normal-shape-mean-0-0-stddev-1-0-dtype-tf-float32-seed-None-name-None" class="headerlink" title="tf.truncated_normal(shape, mean=0.0, stddev=1.0, dtype=tf.float32, seed=None, name=None)"></a>tf.truncated_normal(shape, mean=0.0, stddev=1.0, dtype=tf.float32, seed=None, name=None)</h6><p>Outputs random values from a truncated normal distribution.</p>
+<p>Args:</p>
+<ul>
+<li>shape: A 1-D integer Tensor or Python array. The shape of the output tensor.</li>
+<li>mean: A 0-D Tensor or Python value of type dtype. The mean of the truncated normal distribution.</li>
+<li>stddev: A 0-D Tensor or Python value of type dtype. The standard deviation of the truncated normal distribution.</li>
+<li>dtype: The type of the output.</li>
+<li>seed: A Python integer. Used to create a random seed for the distribution. See set_random_seed for behavior.</li>
+<li>name: A name for the operation (optional).<br>Returns:</li>
+</ul>
+<p>A tensor of the specified shape filled with random truncated normal values.</p>
+<h6 id="tf-constant-value-dtype-None-shape-None-name-’Const’"><a href="#tf-constant-value-dtype-None-shape-None-name-’Const’" class="headerlink" title="tf.constant(value, dtype=None, shape=None, name=’Const’)"></a>tf.constant(value, dtype=None, shape=None, name=’Const’)</h6><p>value: A constant value (or list) of output type dtype.</p>
+<p>dtype: The type of the elements of the resulting tensor.</p>
+<p>shape: Optional dimensions of resulting tensor.</p>
+<p>name: Optional name for the tensor.<br>Returns:</p>
+<p>A Constant Tensor.</p>
+<h6 id="tf-nn-max-pool-value-ksize-strides-padding-name-None"><a href="#tf-nn-max-pool-value-ksize-strides-padding-name-None" class="headerlink" title="tf.nn.max_pool(value, ksize, strides, padding, name=None)"></a>tf.nn.max_pool(value, ksize, strides, padding, name=None)</h6><p>Performs the max pooling on the input.<br>找出卷积得到的特征图区域的最大值。缩小了特征图。<br>Args:</p>
+<ul>
+<li>value: <strong><em>A 4-D Tensor with shape [batch, height, width, channels]</em></strong> and type float32, float64, qint8, quint8, qint32.</li>
+<li>ksize: A list of ints that has length &gt;= 4. The size of the window for each dimension of the input tensor.<br>ps：一般取[1, height,width,1]，因为不需要在batch和channels上做池化</li>
+<li>strides: A list of ints that has length &gt;= 4. The stride of the sliding window for each dimension of the input tensor.</li>
+<li>ps:一般取[1, stride,stride, 1]</li>
+<li>padding: A string, either ‘VALID’ or ‘SAME’. The padding algorithm.</li>
+<li>name: Optional name for the operation.<br>Returns:</li>
+</ul>
+<p>A Tensor with the same type as value. The max pooled output tensor.</p>
+<p>参考：<br><a href="https://www.cnblogs.com/wuzhitj/p/6433871.html" target="_blank" rel="noopener">https://www.cnblogs.com/wuzhitj/p/6433871.html</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/08/tf01/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/11/08/tf01/" itemprop="url">Tensorflow api整理(1)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-08T19:23:14+08:00">
+                2017-11-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/图像/" itemprop="url" rel="index">
+                    <span itemprop="name">图像</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>API文档：<br><a href="http://wiki.jikexueyuan.com/project/tensorflow-zh/api_docs/python/index.html" target="_blank" rel="noopener">http://wiki.jikexueyuan.com/project/tensorflow-zh/api_docs/python/index.html</a></p>
+<h6 id="tf-placeholder-dtype-shape-None-name-None"><a href="#tf-placeholder-dtype-shape-None-name-None" class="headerlink" title="tf.placeholder(dtype, shape=None, name=None)"></a>tf.placeholder(dtype, shape=None, name=None)</h6><ul>
+<li>dtype: The type of elements in the tensor to be fed.</li>
+<li>shape: The shape of the tensor to be fed (optional). If the shape is not specified, you can feed a tensor of any shape.</li>
+<li>name: A name for the operation (optional).</li>
+</ul>
+<h6 id="tf-Variable-name"><a href="#tf-Variable-name" class="headerlink" title="tf.Variable(, name=)"></a>tf.Variable(<initial-value>, name=<optional-name>)</optional-name></initial-value></h6><ul>
+<li>赋予它不同的初值定义不同的张量</li>
+</ul>
+<h6 id="tf-nn-softmax-logits-name-None"><a href="#tf-nn-softmax-logits-name-None" class="headerlink" title="tf.nn.softmax(logits, name=None)"></a>tf.nn.softmax(logits, name=None)</h6><p>For each batch i and class j we have</p>
+<blockquote>
+<p>softmax[i, j] = exp(logits[i, j]) / sum(exp(logits[i]))<br>Args:</p>
+</blockquote>
+<ul>
+<li>logits: A Tensor. Must be one of the following types: float32, float64. 2-D with shape [batch_size, num_classes].</li>
+<li>name: A name for the operation (optional).</li>
+</ul>
+<h6 id="tf-matmul-a-b-transpose-a-False-transpose-b-False-a-is-sparse-False-b-is-sparse-False-name-None"><a href="#tf-matmul-a-b-transpose-a-False-transpose-b-False-a-is-sparse-False-b-is-sparse-False-name-None" class="headerlink" title="tf.matmul(a, b, transpose_a=False, transpose_b=False, a_is_sparse=False, b_is_sparse=False, name=None)"></a>tf.matmul(a, b, transpose_a=False, transpose_b=False, a_is_sparse=False, b_is_sparse=False, name=None)</h6><p>Multiplies matrix a by matrix b, producing a * b.</p>
+<ul>
+<li>a: Tensor of type float, double, int32 or complex64.</li>
+<li>b: Tensor with same type as a.</li>
+<li>transpose_a: If True, a is transposed before multiplication.</li>
+<li>transpose_b: If True, b is transposed before multiplication.</li>
+<li>a_is_sparse: If True, a is treated as a sparse matrix.</li>
+<li>b_is_sparse: If True, b is treated as a sparse matrix.</li>
+<li>name: Name for the operation (optional).</li>
+</ul>
 
           
         
@@ -1244,462 +1892,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/24/车辆检测2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ke Yu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Coco">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/10/24/车辆检测2/" itemprop="url">车辆检测论文（2）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-10-24T20:03:13+08:00">
-                2017-10-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/图像/" itemprop="url" rel="index">
-                    <span itemprop="name">图像</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>2017年</p>
-<h4 id="Adaptive-ViBe-background-model-for-vehicle-detection"><a href="#Adaptive-ViBe-background-model-for-vehicle-detection" class="headerlink" title="Adaptive ViBe background model for vehicle detection"></a>Adaptive ViBe background model for vehicle detection</h4><p>BY 东南大学的好几个人</p>
-<p>这和刚才那篇架构，也太像了吧….</p>
-<h4 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h4><p>在实际应用中，光照变化会引起背景的巨大变化，所以需要对这个背景建模算法（ViBe）进行改进。</p>
-<ul>
-<li>一是定义两种车辆检测的误差和误差方程；</li>
-<li>二是根据这两种误差的范围，定义合理的评估环境来调整不合理的阙值（用来保证这个模型的改进之处）；</li>
-<li>三是实际场景下的实验体现了改进的ViBe模型相比高斯模型、codeback模型和固定阙值的ViBe模型有更好的车辆检测准确度；</li>
-</ul>
-<h4 id="文章结构"><a href="#文章结构" class="headerlink" title="文章结构"></a>文章结构</h4><ul>
-<li>一 介绍</li>
-<li>二 ViBe 模型介绍<br>  ViBe 模型的初始化；<br>  车辆检测；<br>  模型改进；</li>
-<li>三 自适应ViBe模型<br>  分析ViBe模型<br>  定义车辆检测误差方程<pre><code>帧差的二值化
-两种误差方程
-</code></pre>  自适应阙值调整</li>
-<li>四 测试结果</li>
-<li>五 结论</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/24/车辆检测1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ke Yu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Coco">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/10/24/车辆检测1/" itemprop="url">车辆检测论文（1）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-10-24T18:15:54+08:00">
-                2017-10-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/图像/" itemprop="url" rel="index">
-                    <span itemprop="name">图像</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="A-vehicle-detection-method-in-tunnel-video-based-on-ViBe-algorithm"><a href="#A-vehicle-detection-method-in-tunnel-video-based-on-ViBe-algorithm" class="headerlink" title="A vehicle detection method in tunnel video based on ViBe algorithm"></a>A vehicle detection method in tunnel video based on ViBe algorithm</h4><p> BY 武大 Zhu Qiming Ma ChengQian</p>
-<h4 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h4><p>在隧道视频中的车辆检测，基于ViBe（Visual Background Extraction 一种目标检测）算法，主要包括三步：</p>
-<ul>
-<li>一是对视频进行直方图均衡化，提高视频图像的质量；</li>
-<li>二是调节ViBe算法根据背景建模并且检测移动的车辆；</li>
-<li>三是用形态滤波器去除检测结果的噪点。</li>
-</ul>
-<h4 id="文章结构"><a href="#文章结构" class="headerlink" title="文章结构"></a>文章结构</h4><ul>
-<li>一 介绍</li>
-<li>二 ViBe建模算法介绍<br>  公式，流程等。</li>
-<li>三 隧道车辆检测方法<br>  按照Abstract中的步骤进行叙述</li>
-<li>四 实验结果</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/24/车辆检测10/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ke Yu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Coco">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/10/24/车辆检测10/" itemprop="url">车辆检测论文（8）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-10-24T15:41:12+08:00">
-                2017-10-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/图像/" itemprop="url" rel="index">
-                    <span itemprop="name">图像</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>Vehicle Detection by a Context-Aware<br>Multichannel Feature Pyramid</p>
-<h4 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h4><p>现有的appearance-based车辆检测方法主要都是运用特征算子进行检测，比如Haar-like,方向梯度直方图，尺度变化特征转换等等。然而，当需要处理光照、缩放、形态变化和复杂的背景时，这些局部特征都有局限性。现在需要一种有辨别性和鲁棒性的特征。为了实习这个目的，本文提出了一个新奇的使用上下文感知多通道特征金字塔的算法。本文主要贡献是提出两种上下文感知的结构描述子，这两种描述子分别被叫做context-aware difference sign transform feature和context-aware difference magnitude transform feature。 图片被置于cell的稠密网格中，每个cell都由局部细节和上下文感知结构描述子描述。这个描述子可以捕捉到这些cells的上下文感知结构信息。该特征金字塔可以为车辆检测提供更高效的特征。使用两个公共交通数据集进行的实验体现这个方法相比state-of-the-art方法有更高的性能。更重要的是，即便是车辆出现了形态变化或者相机视点改变，该实验结果也很令人满意。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1754,7 +1946,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-count">37</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1776,7 +1968,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-count">51</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

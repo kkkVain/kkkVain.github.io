@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="tensorflow,机器学习," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="API文档：http://wiki.jikexueyuan.com/project/tensorflow-zh/api_docs/python/index.html tf.nn.conv2d(input, filter, strides, padding, use_cudnn_on_gpu=None, name=None)Computes a 2-D convolution given 4-D i">
+<meta name="keywords" content="tensorflow,机器学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tensorflow api整理(2)">
+<meta property="og:url" content="http://yoursite.com/2017/11/08/tf02/index.html">
+<meta property="og:site_name" content="Coco">
+<meta property="og:description" content="API文档：http://wiki.jikexueyuan.com/project/tensorflow-zh/api_docs/python/index.html tf.nn.conv2d(input, filter, strides, padding, use_cudnn_on_gpu=None, name=None)Computes a 2-D convolution given 4-D i">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-04-04T06:26:03.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tensorflow api整理(2)">
+<meta name="twitter:description" content="API文档：http://wiki.jikexueyuan.com/project/tensorflow-zh/api_docs/python/index.html tf.nn.conv2d(input, filter, strides, padding, use_cudnn_on_gpu=None, name=None)Computes a 2-D convolution given 4-D i">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/11/08/tf02/"/>
+
+
+
+
+
+  <title>Tensorflow api整理(2) | Coco</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Coco</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Hello world</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/08/tf02/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Tensorflow api整理(2)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-08T21:31:14+08:00">
+                2017-11-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/图像/" itemprop="url" rel="index">
+                    <span itemprop="name">图像</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>API文档：<br><a href="http://wiki.jikexueyuan.com/project/tensorflow-zh/api_docs/python/index.html" target="_blank" rel="noopener">http://wiki.jikexueyuan.com/project/tensorflow-zh/api_docs/python/index.html</a></p>
+<h6 id="tf-nn-conv2d-input-filter-strides-padding-use-cudnn-on-gpu-None-name-None"><a href="#tf-nn-conv2d-input-filter-strides-padding-use-cudnn-on-gpu-None-name-None" class="headerlink" title="tf.nn.conv2d(input, filter, strides, padding, use_cudnn_on_gpu=None, name=None)"></a>tf.nn.conv2d(input, filter, strides, padding, use_cudnn_on_gpu=None, name=None)</h6><p>Computes a 2-D convolution given 4-D input and filter tensors.</p>
+<ul>
+<li>input: A Tensor. Must be one of the following types: float32, float64.</li>
+<li>filter: A Tensor. Must have the same type as input.<br>input和filter的通道数需要一致。<br>strides: A list of ints. 1-D of length 4. The stride of the sliding window for each dimension of input.<br>滑动窗口的步长，一维向量，strides[0]=strides[3]=1</li>
+<li>padding: A string from: “SAME”, “VALID”. The type of padding algorithm to use.<br>SAME:进行0的补位，左奇右偶。<br>VALID:不进行0的补位，丢弃多余的。</li>
+<li>use_cudnn_on_gpu: An optional bool. Defaults to True.<br>name: A name for the operation (optional).</li>
+</ul>
+<h6 id="tf-truncated-normal-shape-mean-0-0-stddev-1-0-dtype-tf-float32-seed-None-name-None"><a href="#tf-truncated-normal-shape-mean-0-0-stddev-1-0-dtype-tf-float32-seed-None-name-None" class="headerlink" title="tf.truncated_normal(shape, mean=0.0, stddev=1.0, dtype=tf.float32, seed=None, name=None)"></a>tf.truncated_normal(shape, mean=0.0, stddev=1.0, dtype=tf.float32, seed=None, name=None)</h6><p>Outputs random values from a truncated normal distribution.</p>
+<p>Args:</p>
+<ul>
+<li>shape: A 1-D integer Tensor or Python array. The shape of the output tensor.</li>
+<li>mean: A 0-D Tensor or Python value of type dtype. The mean of the truncated normal distribution.</li>
+<li>stddev: A 0-D Tensor or Python value of type dtype. The standard deviation of the truncated normal distribution.</li>
+<li>dtype: The type of the output.</li>
+<li>seed: A Python integer. Used to create a random seed for the distribution. See set_random_seed for behavior.</li>
+<li>name: A name for the operation (optional).<br>Returns:</li>
+</ul>
+<p>A tensor of the specified shape filled with random truncated normal values.</p>
+<h6 id="tf-constant-value-dtype-None-shape-None-name-’Const’"><a href="#tf-constant-value-dtype-None-shape-None-name-’Const’" class="headerlink" title="tf.constant(value, dtype=None, shape=None, name=’Const’)"></a>tf.constant(value, dtype=None, shape=None, name=’Const’)</h6><p>value: A constant value (or list) of output type dtype.</p>
+<p>dtype: The type of the elements of the resulting tensor.</p>
+<p>shape: Optional dimensions of resulting tensor.</p>
+<p>name: Optional name for the tensor.<br>Returns:</p>
+<p>A Constant Tensor.</p>
+<h6 id="tf-nn-max-pool-value-ksize-strides-padding-name-None"><a href="#tf-nn-max-pool-value-ksize-strides-padding-name-None" class="headerlink" title="tf.nn.max_pool(value, ksize, strides, padding, name=None)"></a>tf.nn.max_pool(value, ksize, strides, padding, name=None)</h6><p>Performs the max pooling on the input.<br>找出卷积得到的特征图区域的最大值。缩小了特征图。<br>Args:</p>
+<ul>
+<li>value: <strong><em>A 4-D Tensor with shape [batch, height, width, channels]</em></strong> and type float32, float64, qint8, quint8, qint32.</li>
+<li>ksize: A list of ints that has length &gt;= 4. The size of the window for each dimension of the input tensor.<br>ps：一般取[1, height,width,1]，因为不需要在batch和channels上做池化</li>
+<li>strides: A list of ints that has length &gt;= 4. The stride of the sliding window for each dimension of the input tensor.</li>
+<li>ps:一般取[1, stride,stride, 1]</li>
+<li>padding: A string, either ‘VALID’ or ‘SAME’. The padding algorithm.</li>
+<li>name: Optional name for the operation.<br>Returns:</li>
+</ul>
+<p>A Tensor with the same type as value. The max pooled output tensor.</p>
+<p>参考：<br><a href="https://www.cnblogs.com/wuzhitj/p/6433871.html" target="_blank" rel="noopener">https://www.cnblogs.com/wuzhitj/p/6433871.html</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/tensorflow/" rel="tag"># tensorflow</a>
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/08/tf01/" rel="next" title="Tensorflow api整理(1)">
+                <i class="fa fa-chevron-left"></i> Tensorflow api整理(1)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/19/tf03/" rel="prev" title="Tensorflow api整理(3)">
+                Tensorflow api整理(3) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Ke Yu" />
+            
+              <p class="site-author-name" itemprop="name">Ke Yu</p>
+              <p class="site-description motion-element" itemprop="description">Keep moving. Don't settle.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">51</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-6"><a class="nav-link" href="#tf-nn-conv2d-input-filter-strides-padding-use-cudnn-on-gpu-None-name-None"><span class="nav-number">1.</span> <span class="nav-text">tf.nn.conv2d(input, filter, strides, padding, use_cudnn_on_gpu=None, name=None)</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#tf-truncated-normal-shape-mean-0-0-stddev-1-0-dtype-tf-float32-seed-None-name-None"><span class="nav-number">2.</span> <span class="nav-text">tf.truncated_normal(shape, mean=0.0, stddev=1.0, dtype=tf.float32, seed=None, name=None)</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#tf-constant-value-dtype-None-shape-None-name-’Const’"><span class="nav-number">3.</span> <span class="nav-text">tf.constant(value, dtype=None, shape=None, name=’Const’)</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#tf-nn-max-pool-value-ksize-strides-padding-name-None"><span class="nav-number">4.</span> <span class="nav-text">tf.nn.max_pool(value, ksize, strides, padding, name=None)</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ke Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

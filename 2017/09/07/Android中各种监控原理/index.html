@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="try," />
+  <meta name="keywords" content="Android," />
 
 
 
@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="Keep moving. Don&apos;t settle.">
-<meta name="keywords" content="try">
+<meta name="description" content="监测内存* 监测方法 Runtime runtime = Runtime.getRuntime(); 通过runtime可以获得当前虚拟机的总内存、使用中内存。 监测CPU* 监测方法 1）/proc/cpuinfo ： 读取cpu类型、名字等信息 2）/sys/devices/system/cpu/ ：读取cpu频率 3）/proc/stat：读取cpu使用情况（想想学OS时候cpu计算的那些值">
+<meta name="keywords" content="Android">
 <meta property="og:type" content="article">
-<meta property="og:title" content="各种设置">
-<meta property="og:url" content="http://yoursite.com/2017/09/07/各种设置“/index.html">
+<meta property="og:title" content="Android中监测各种数据的方法">
+<meta property="og:url" content="http://yoursite.com/2017/09/07/Android中各种监控原理/index.html">
 <meta property="og:site_name" content="Coco">
-<meta property="og:description" content="Keep moving. Don&apos;t settle.">
+<meta property="og:description" content="监测内存* 监测方法 Runtime runtime = Runtime.getRuntime(); 通过runtime可以获得当前虚拟机的总内存、使用中内存。 监测CPU* 监测方法 1）/proc/cpuinfo ： 读取cpu类型、名字等信息 2）/sys/devices/system/cpu/ ：读取cpu频率 3）/proc/stat：读取cpu使用情况（想想学OS时候cpu计算的那些值">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-04-04T03:23:05.000Z">
+<meta property="og:updated_time" content="2018-04-04T07:47:31.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="各种设置">
-<meta name="twitter:description" content="Keep moving. Don&apos;t settle.">
+<meta name="twitter:title" content="Android中监测各种数据的方法">
+<meta name="twitter:description" content="监测内存* 监测方法 Runtime runtime = Runtime.getRuntime(); 通过runtime可以获得当前虚拟机的总内存、使用中内存。 监测CPU* 监测方法 1）/proc/cpuinfo ： 读取cpu类型、名字等信息 2）/sys/devices/system/cpu/ ：读取cpu频率 3）/proc/stat：读取cpu使用情况（想想学OS时候cpu计算的那些值">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/09/07/各种设置“/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/09/07/Android中各种监控原理/"/>
 
 
 
 
 
-  <title>各种设置 | Coco</title>
+  <title>Android中监测各种数据的方法 | Coco</title>
   
 
 
@@ -253,7 +253,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/07/各种设置“/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/07/Android中各种监控原理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ke Yu">
@@ -270,7 +270,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">各种设置</h1>
+          <h1 class="post-title" itemprop="name headline">Android中监测各种数据的方法</h1>
         
 
         <div class="post-meta">
@@ -282,7 +282,7 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-07T13:22:49+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-07T20:33:24+08:00">
                 2017-09-07
               </time>
             
@@ -342,7 +342,56 @@
       
 
       
-        
+        <h3 id="监测内存"><a href="#监测内存" class="headerlink" title="监测内存"></a>监测内存</h3><pre><code>* 监测方法
+Runtime runtime = Runtime.getRuntime();
+通过runtime可以获得当前虚拟机的总内存、使用中内存。
+</code></pre><h3 id="监测CPU"><a href="#监测CPU" class="headerlink" title="监测CPU"></a>监测CPU</h3><pre><code>* 监测方法
+1）/proc/cpuinfo ： 读取cpu类型、名字等信息
+2）/sys/devices/system/cpu/ ：读取cpu频率
+3）/proc/stat：读取cpu使用情况（想想学OS时候cpu计算的那些值...)
+</code></pre><h3 id="监测FPS"><a href="#监测FPS" class="headerlink" title="监测FPS"></a>监测FPS</h3><h3 id="监测卡顿"><a href="#监测卡顿" class="headerlink" title="监测卡顿"></a>监测卡顿</h3><pre><code>* 主线程执行的内容：
+UI绘制、系统事件、输入事件、程序回调服务等
+
+* 监测方法：
+1）直接通过连续的FPS帧数计算丢帧率。缺点：FPS刷新频率太快，容易发生抖动。
+
+2）检测主线程消息循坏执行的时间。（想想MainLooper）。如果主线程消息循坏执行时间超过某个阙值T，那么就认为是发生了一次卡顿。
+优化：
+方案①：每一次都进行循环超时检测肯定不太现实，可以考虑检测N次循环时间，看是否超过阙值N*T；
+方案②：以一个时间段为标准，每次卡顿阙值为T，卡顿次数阙值为K次，如果一个时间段里面卡顿次数大于K，那么进行上报。
+
+* 如何定位问题：
+1）抓取发生卡顿时的堆栈，有两个问题：
+① 何时抓取，当时是要在卡顿发生时抓取
+② 堆栈怎么归类，和Crash堆栈归类的区别
+</code></pre><h3 id="监测流量"><a href="#监测流量" class="headerlink" title="监测流量"></a>监测流量</h3><pre><code>注意这是客户端的流量监测，而不是服务端的流量监测。为什么有两种？
+a.一些网络请求可能无法到达服务端，无法被服务端监测的; b.网络请求都到达了服务端，但是不一定将流量监测结果成功上报。
+
+* 监测方法
+AOP拦截网络请求API（代码没看懂....)
+
+* 如何定位问题
+1）流量来源，API、H5还是CDN
+对于一个只有API请求的客户端来说，当然可以确定来源，但作为一个框架开发，肯定要考虑各种各样的情景。
+一个简单的方法是通过域名来判断，但如果一个域名又有API服务，又有Web服务怎么办呢？
+“检验返回包的MIMEType&quot; 啥意思。
+
+2）网络类型，WIFI,4G,3G，未知
+</code></pre><h3 id="监测页面加载速度"><a href="#监测页面加载速度" class="headerlink" title="监测页面加载速度"></a>监测页面加载速度</h3><pre><code>* 监测方法
+
+加载时间：
+1）测试UI渲染时间
+2）测试网络数据获取时间
+3）页面最后显示出来花的时间
+怎么获得时间呢？
+方法①：在完成相关操作时进行埋点，明显很低效
+方法②：映射每个页面和对应的api，在api请求的基类中埋点
+猜想：通过api获得Activity，从而埋点。
+方法③：hook关键节点上的api调用，注入埋点代码（hook到底是什么鬼意思....)
+</code></pre><p>​<br>​    </p>
+<p>​    </p>
+<p><a href="https://mp.weixin.qq.com/s/MwgjpHj_5RaG74Z0JjNv5g" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/MwgjpHj_5RaG74Z0JjNv5g</a><br><a href="http://www.jianshu.com/p/d4c3d4f45504" target="_blank" rel="noopener">http://www.jianshu.com/p/d4c3d4f45504</a></p>
+
       
     </div>
     
@@ -359,7 +408,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/try/" rel="tag"># try</a>
+            <a href="/tags/Android/" rel="tag"># Android</a>
           
         </div>
       
@@ -372,8 +421,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/09/06/Android四大组件----Activity（1）/" rel="next" title="Activity(1)">
-                <i class="fa fa-chevron-left"></i> Activity(1)
+              <a href="/2017/09/07/SparseArray/" rel="next" title="SparseArray源码解析">
+                <i class="fa fa-chevron-left"></i> SparseArray源码解析
               </a>
             
           </div>
@@ -382,8 +431,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2017/09/07/volleySourceAny/" rel="prev" title="volly源码解析">
-                volly源码解析 <i class="fa fa-chevron-right"></i>
+              <a href="/2017/09/10/eventBus/" rel="prev" title="EventBus源码解析(1)">
+                EventBus源码解析(1) <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -436,8 +485,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -456,7 +514,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-count">37</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -478,7 +536,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-count">51</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
@@ -501,6 +559,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#监测内存"><span class="nav-number">1.</span> <span class="nav-text">监测内存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#监测CPU"><span class="nav-number">2.</span> <span class="nav-text">监测CPU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#监测FPS"><span class="nav-number">3.</span> <span class="nav-text">监测FPS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#监测卡顿"><span class="nav-number">4.</span> <span class="nav-text">监测卡顿</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#监测流量"><span class="nav-number">5.</span> <span class="nav-text">监测流量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#监测页面加载速度"><span class="nav-number">6.</span> <span class="nav-text">监测页面加载速度</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

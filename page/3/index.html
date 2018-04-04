@@ -252,6 +252,970 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/07/Android中各种监控原理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/09/07/Android中各种监控原理/" itemprop="url">Android中监测各种数据的方法</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-07T20:33:24+08:00">
+                2017-09-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="监测内存"><a href="#监测内存" class="headerlink" title="监测内存"></a>监测内存</h3><pre><code>* 监测方法
+Runtime runtime = Runtime.getRuntime();
+通过runtime可以获得当前虚拟机的总内存、使用中内存。
+</code></pre><h3 id="监测CPU"><a href="#监测CPU" class="headerlink" title="监测CPU"></a>监测CPU</h3><pre><code>* 监测方法
+1）/proc/cpuinfo ： 读取cpu类型、名字等信息
+2）/sys/devices/system/cpu/ ：读取cpu频率
+3）/proc/stat：读取cpu使用情况（想想学OS时候cpu计算的那些值...)
+</code></pre><h3 id="监测FPS"><a href="#监测FPS" class="headerlink" title="监测FPS"></a>监测FPS</h3><h3 id="监测卡顿"><a href="#监测卡顿" class="headerlink" title="监测卡顿"></a>监测卡顿</h3><pre><code>* 主线程执行的内容：
+UI绘制、系统事件、输入事件、程序回调服务等
+
+* 监测方法：
+1）直接通过连续的FPS帧数计算丢帧率。缺点：FPS刷新频率太快，容易发生抖动。
+
+2）检测主线程消息循坏执行的时间。（想想MainLooper）。如果主线程消息循坏执行时间超过某个阙值T，那么就认为是发生了一次卡顿。
+优化：
+方案①：每一次都进行循环超时检测肯定不太现实，可以考虑检测N次循环时间，看是否超过阙值N*T；
+方案②：以一个时间段为标准，每次卡顿阙值为T，卡顿次数阙值为K次，如果一个时间段里面卡顿次数大于K，那么进行上报。
+
+* 如何定位问题：
+1）抓取发生卡顿时的堆栈，有两个问题：
+① 何时抓取，当时是要在卡顿发生时抓取
+② 堆栈怎么归类，和Crash堆栈归类的区别
+</code></pre><h3 id="监测流量"><a href="#监测流量" class="headerlink" title="监测流量"></a>监测流量</h3><pre><code>注意这是客户端的流量监测，而不是服务端的流量监测。为什么有两种？
+a.一些网络请求可能无法到达服务端，无法被服务端监测的; b.网络请求都到达了服务端，但是不一定将流量监测结果成功上报。
+
+* 监测方法
+AOP拦截网络请求API（代码没看懂....)
+
+* 如何定位问题
+1）流量来源，API、H5还是CDN
+对于一个只有API请求的客户端来说，当然可以确定来源，但作为一个框架开发，肯定要考虑各种各样的情景。
+一个简单的方法是通过域名来判断，但如果一个域名又有API服务，又有Web服务怎么办呢？
+“检验返回包的MIMEType&quot; 啥意思。
+
+2）网络类型，WIFI,4G,3G，未知
+</code></pre><h3 id="监测页面加载速度"><a href="#监测页面加载速度" class="headerlink" title="监测页面加载速度"></a>监测页面加载速度</h3><pre><code>* 监测方法
+
+加载时间：
+1）测试UI渲染时间
+2）测试网络数据获取时间
+3）页面最后显示出来花的时间
+怎么获得时间呢？
+方法①：在完成相关操作时进行埋点，明显很低效
+方法②：映射每个页面和对应的api，在api请求的基类中埋点
+猜想：通过api获得Activity，从而埋点。
+方法③：hook关键节点上的api调用，注入埋点代码（hook到底是什么鬼意思....)
+</code></pre><p>​<br>​    </p>
+<p>​    </p>
+<p><a href="https://mp.weixin.qq.com/s/MwgjpHj_5RaG74Z0JjNv5g" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/MwgjpHj_5RaG74Z0JjNv5g</a><br><a href="http://www.jianshu.com/p/d4c3d4f45504" target="_blank" rel="noopener">http://www.jianshu.com/p/d4c3d4f45504</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/07/SparseArray/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/09/07/SparseArray/" itemprop="url">SparseArray源码解析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-07T20:31:14+08:00">
+                2017-09-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a>构造函数</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * Creates a new SparseArray containing no mappings that will not</span><br><span class="line"> * require any additional memory allocation to store the specified</span><br><span class="line"> * number of mappings.  If you supply an initial capacity of 0, the</span><br><span class="line"> * sparse array will be initialized with a light-weight representation</span><br><span class="line"> * not requiring any additional array allocations.</span><br><span class="line"> */</span><br><span class="line">public SparseArray(int initialCapacity) &#123;</span><br><span class="line">    if (initialCapacity == 0) &#123;</span><br><span class="line">        mKeys = EmptyArray.INT;</span><br><span class="line">        mValues = EmptyArray.OBJECT;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        mValues = ArrayUtils.newUnpaddedObjectArray(initialCapacity);</span><br><span class="line">        mKeys = new int[mValues.length];</span><br><span class="line">    &#125;</span><br><span class="line">    mSize = 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查找</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public E get(int key) &#123;</span><br><span class="line">    return get(key, null);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * Gets the Object mapped from the specified key, or the specified Object</span><br><span class="line"> * if no such mapping has been made.</span><br><span class="line"> */</span><br><span class="line">@SuppressWarnings(&quot;unchecked&quot;)</span><br><span class="line">public E get(int key, E valueIfKeyNotFound) &#123;</span><br><span class="line">    int i = ContainerHelpers.binarySearch(mKeys, mSize, key);</span><br><span class="line"></span><br><span class="line">    if (i &lt; 0 || mValues[i] == DELETED) &#123;</span><br><span class="line">        return valueIfKeyNotFound;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        return (E) mValues[i];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>插入</li>
+</ul>
+<p>插入时，参数既要有key又要有value。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">/**  put插入</span><br><span class="line">     * Adds a mapping from the specified key to the specified value,</span><br><span class="line">     * replacing the previous mapping from the specified key if there</span><br><span class="line">     * was one.</span><br><span class="line">     */</span><br><span class="line">    public void put(int key, E value) &#123;</span><br><span class="line">        int i = ContainerHelpers.binarySearch(mKeys, mSize, key);</span><br><span class="line"></span><br><span class="line">        if (i &gt;= 0) &#123;</span><br><span class="line">            mValues[i] = value;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            i = ~i;</span><br><span class="line">            // 空间已经有了,但是被删除了，那么重新赋值</span><br><span class="line">            if (i &lt; mSize &amp;&amp; mValues[i] == DELETED) &#123;</span><br><span class="line">                mKeys[i] = key;</span><br><span class="line">                mValues[i] = value;</span><br><span class="line">                return;</span><br><span class="line">            &#125;</span><br><span class="line">            // 空间超出，先gc一下</span><br><span class="line">            if (mGarbage &amp;&amp; mSize &gt;= mKeys.length) &#123;</span><br><span class="line">                gc();</span><br><span class="line"></span><br><span class="line">                // Search again because indices may have changed.</span><br><span class="line">                i = ~ContainerHelpers.binarySearch(mKeys, mSize, key);</span><br><span class="line">            &#125;</span><br><span class="line">            // 扩展数组</span><br><span class="line">            mKeys = GrowingArrayUtils.insert(mKeys, mSize, i, key);</span><br><span class="line">            mValues = GrowingArrayUtils.insert(mValues, mSize, i, value);</span><br><span class="line">            mSize++; // SparseArray大小增加</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**  append插入</span></span><br><span class="line"><span class="comment">     * Puts a key/value pair into the array, optimizing for the case where</span></span><br><span class="line"><span class="comment">     * the key is greater than all existing keys in the array.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">append</span><span class="params">(<span class="keyword">int</span> key, E value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (mSize != <span class="number">0</span> &amp;&amp; key &lt;= mKeys[mSize - <span class="number">1</span>]) &#123;</span><br><span class="line">            put(key, value);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 优化了key大于数组中所有key的情况，mKeys[mSize-1]是这个数组中最大的一个key</span></span><br><span class="line">        <span class="keyword">if</span> (mGarbage &amp;&amp; mSize &gt;= mKeys.length) &#123;</span><br><span class="line">            gc();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        mKeys = GrowingArrayUtils.append(mKeys, mSize, key);</span><br><span class="line">        mValues = GrowingArrayUtils.append(mValues, mSize, value);</span><br><span class="line">        mSize++;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>整理空间</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">gc</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="comment">// Log.e("SparseArray", "gc start with " + mSize);</span></span><br><span class="line"></span><br><span class="line">      <span class="keyword">int</span> n = mSize;</span><br><span class="line">      <span class="keyword">int</span> o = <span class="number">0</span>;</span><br><span class="line">      <span class="keyword">int</span>[] keys = mKeys;</span><br><span class="line">      Object[] values = mValues;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">          Object val = values[i];</span><br><span class="line"></span><br><span class="line">          <span class="keyword">if</span> (val != DELETED) &#123;</span><br><span class="line">              <span class="keyword">if</span> (i != o) &#123;</span><br><span class="line">                  keys[o] = keys[i];</span><br><span class="line">                  values[o] = val;</span><br><span class="line">                  values[i] = <span class="keyword">null</span>;</span><br><span class="line">              &#125;</span><br><span class="line"></span><br><span class="line">              o++;</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      mGarbage = <span class="keyword">false</span>;</span><br><span class="line">      mSize = o;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// Log.e("SparseArray", "gc end with " + mSize);</span></span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>删除</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * Removes the mapping from the specified key, if there was any.</span><br><span class="line"> */</span><br><span class="line">public void delete(int key) &#123;</span><br><span class="line">    int i = ContainerHelpers.binarySearch(mKeys, mSize, key);</span><br><span class="line"></span><br><span class="line">    if (i &gt;= 0) &#123;</span><br><span class="line">        if (mValues[i] != DELETED) &#123;</span><br><span class="line">            mValues[i] = DELETED;</span><br><span class="line">            mGarbage = true;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>最关键的二分法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">// This is Arrays.binarySearch(), but doesn&apos;t do any argument validation.</span><br><span class="line">static int binarySearch(int[] array, int size, int value) &#123;</span><br><span class="line">    int lo = 0;</span><br><span class="line">    int hi = size - 1;</span><br><span class="line"></span><br><span class="line">    while (lo &lt;= hi) &#123;</span><br><span class="line">        final int mid = (lo + hi) &gt;&gt;&gt; 1;</span><br><span class="line">        final int midVal = array[mid];</span><br><span class="line"></span><br><span class="line">        if (midVal &lt; value) &#123;</span><br><span class="line">            lo = mid + 1;</span><br><span class="line">        &#125; else if (midVal &gt; value) &#123;</span><br><span class="line">            hi = mid - 1;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            return mid;  // value found</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return ~lo;  // value not present</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>可以看出SparseArray里面的元素是按照key从小到大排序的，所以插入、删除、查找的速度都很快</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/07/Android四大组件----Activity（2）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/09/07/Android四大组件----Activity（2）/" itemprop="url">Activity(2)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-07T17:19:20+08:00">
+                2017-09-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Android四大组件—-Activity（2）"><a href="#Android四大组件—-Activity（2）" class="headerlink" title="Android四大组件—-Activity（2）"></a>Android四大组件—-Activity（2）</h1><ul>
+<li><p><a href="#Android四大组件----Activity（2）-基础概念">基础概念</a></p>
+<ul>
+<li><p><a href="#Android四大组件----Activity（2）-通信">通信</a></p>
+<ul>
+<li><p><a href="#Android四大组件----Activity（2）-1.ActivityMa">1.ActivityManagerService</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-2.IApplicati">2.IApplicationThread</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-3.IActivityM">3.IActivityManager</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-4.基本联系">4.基本联系</a></p>
+</li>
+</ul>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-协助">协助</a></p>
+<ul>
+<li><p><a href="#Android四大组件----Activity（2）-1.ActivityRe">1.ActivityRecord</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-2.TaskRecord">2.TaskRecord</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-3.ActivitySt">3.ActivityStack</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-4.ActivityTh">4.ActivityThread</a></p>
+</li>
+</ul>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-5.Instrument">5.Instrumentation</a></p>
+</li>
+</ul>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-基本过程">基本过程</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-一些问题">一些问题</a></p>
+<ul>
+<li><p><a href="#Android四大组件----Activity（2）-问题1">问题1</a></p>
+</li>
+<li><p><a href="#Android四大组件----Activity（2）-问题2">问题2</a></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h3><h4 id="通信"><a href="#通信" class="headerlink" title="通信"></a>通信</h4><h5 id="1-ActivityManagerService"><a href="#1-ActivityManagerService" class="headerlink" title="1.ActivityManagerService"></a>1.ActivityManagerService</h5><p>主要管理应用进程的生命周期以及进程的Activity,Service,Broadcast等等。</p>
+<p>可以分为client端与Server端：</p>
+<ul>
+<li><p>Client端运行在app的各个进程，这些进程实现了具体的activity和service，通过调用系统接口来完成显示。</p>
+</li>
+<li><p>Service端运行在系统进程中，是系统级别的AMS的实现，响应client端的系统调用请求，并且管理client端的各个APP的生命周期。</p>
+</li>
+</ul>
+<h5 id="2-IApplicationThread"><a href="#2-IApplicationThread" class="headerlink" title="2.IApplicationThread"></a>2.IApplicationThread</h5><p>该接口定义了AMS访问App的接口。AMS通过这个接口的实现控制App的进程完成App的响应。</p>
+<p>实现：ApplicationThread。实质上是一个Binder对象，在进程启动，创建ActivityThread时实例化，AMS通过它的代理ApplicationThreadProxy和Activity进行进程间通信。</p>
+<h5 id="3-IActivityManager"><a href="#3-IActivityManager" class="headerlink" title="3.IActivityManager"></a>3.IActivityManager</h5><p>该接口定义了App访问AMS的接口。App通过这个接口的实现对请求AMS完成某些操作。</p>
+<p>实现：ActivityManagerNative。Activity通过代理ActivityManagerProxy将请求送到AMS进行进程间通信。</p>
+<h5 id="4-基本联系"><a href="#4-基本联系" class="headerlink" title="4.基本联系"></a>4.基本联系</h5><ul>
+<li><p>一个进程对应一个ActivityThread实例，这个进程里面所有的activity对应这一个ActivityThread实例</p>
+</li>
+<li><p>一个进程对应一个ApplicationThread对象，此对象是ActivityThread 与<br>ActivityManagerService连接的桥梁。</p>
+</li>
+</ul>
+<h4 id="协助"><a href="#协助" class="headerlink" title="协助"></a>协助</h4><h5 id="1-ActivityRecord"><a href="#1-ActivityRecord" class="headerlink" title="1.ActivityRecord"></a>1.ActivityRecord</h5><ul>
+<li>记录一个Activity的相关信息</li>
+</ul>
+<h5 id="2-TaskRecord"><a href="#2-TaskRecord" class="headerlink" title="2.TaskRecord"></a>2.TaskRecord</h5><ul>
+<li><p>记录当前Task中所有Activity：ArrayList\&lt;ActivityRecord> mActivities</p>
+</li>
+<li><p>ActivityStack成员stack记录Task所在的栈，用于执行ActivityStack的方法</p>
+</li>
+</ul>
+<h5 id="3-ActivityStack"><a href="#3-ActivityStack" class="headerlink" title="3.ActivityStack"></a>3.ActivityStack</h5><p>管理协调ActivityRecord和TaskRecord</p>
+<ul>
+<li><p>记录所有的栈</p>
+</li>
+<li><p>通知WindowManagerService的监听器</p>
+</li>
+</ul>
+<h5 id="4-ActivityThread"><a href="#4-ActivityThread" class="headerlink" title="4.ActivityThread"></a>4.ActivityThread</h5><ul>
+<li><p>应用程序的入口</p>
+</li>
+<li><p>管理【应用程序的主线程】—–它自己不是线程</p>
+</li>
+<li><p>根据AMS的要求，进行Activity的调度</p>
+</li>
+</ul>
+<h4 id="5-Instrumentation"><a href="#5-Instrumentation" class="headerlink" title="5.Instrumentation"></a>5.Instrumentation</h4><ul>
+<li><p>管理监测Android控件的运行</p>
+</li>
+<li><p>根据ActivityThread的要求，完成Activity的生命周期控制</p>
+</li>
+</ul>
+<h3 id="基本过程"><a href="#基本过程" class="headerlink" title="基本过程"></a>基本过程</h3><p>step1：无论是launcher启动，还是activity内部调用startActivity接口来启动新的Activity，都是通过Binder的进程间通信进入到AMS进程中，然后调用ActivityManagerService.startActivity。</p>
+<p>期间主要经历以下过程：</p>
+<p> 1)在Launcher.startActivity中由于.MainActivity在注册文件中设置了intent，所以点击图标时，launcher会将这个activity启动。<br>问题1：intent的信息怎么被Launcher找到？</p>
+<p> 2)在Activity.startActivityForResult中，通过mMainThread（应用的主线程）.getApplicationThread获得了<strong>ApplicationThread</strong>对象，用于AMS和ActivityThread的通信，然后执行了Instrumentation.execStartActivity。</p>
+<p> 3)在Instrumentation.execStartActivity中，通过ActivityManagerNative.getDefault返回ActivityManagerService的远程接口，得到了<strong>ActivityManagerProxy</strong>接口。</p>
+<p> 4)通过<strong>ActivityManagerProxy</strong>接口，向AMS发出请求，也就是执行ActivityManagerService.startActivity。</p>
+<p>step2：AMS.startActivity将操作转发给成员变量mMainStack（ActivityStack类型）的startActivityMayWait函数，来准备要启动的Activity的相关信息。</p>
+<p>之后会经历以下过程：</p>
+<p> 1)在 ActivityStack.startActivityLocked中，可以从传进来的参数中得到调用者的信息，即Laucher应用程序的进程信息。</p>
+<p> 2)在ActivityStack.startActivityUncheckedLocked中，根据当前Activity的启动模式、taskAfiinity属性，设置的intent<br>flags等选择Task。为当前新创建的ActivityRecord找到Task。</p>
+<pre><code>比较复杂，其实是理解启动模式的关键。还是需要结合源码才能理解。
+</code></pre><p> 3)根据启动模式的相关知识，寻找Task还涉及到Task顶端的Activty。这个过程由resumeTopActivityLocked完成，主要就是看我们要启动的Activity是否在栈顶，如果不是的话，需要将当前运行的Activity暂停。这个工作还是由ActivityStack.startPausingLocked()来完成。</p>
+<p>step3：ActivityStack在startPausingLocked中会将需要暂停的Activity暂停，主要经历以下过程：</p>
+<p> 1)通过ApplicationThread.schedulePauseActivity进行通信，告诉ActivityThread执行handlePauseActivity</p>
+<p> 2)ActivityThread接收到通知，于是通过ActivityManager向ActivityManagerService发起activityPaused的请求</p>
+<p> 3) ActivityManagerService接收到请求，把工作交给ActivityStack，它进行了Activity的停止工作</p>
+<p> 4)停止了该停止了Activity，又通过ApplicationThread来告诉系统服务进程要进行真正的Activity启动调度了。这个系统进程就是在step1中发出startActivity请求的Activity对应的进程，比如对于点击程序图标启动，那么就是Launcher所在进程，而对于Activity内部调用startActivity的情景，这个就是这个Activity所在进程。</p>
+<p>step4：ApplicationThread不执行真正的启动操作，它通过ActivityManagerService.activityPause接口进入到AMS进程中，看是否需要创建新的进程来启动Activity。<br>如果是点击应用图标启动的话， ActivityManagerService<br>在这步会调用startProcessLocked来创建一个新的进程，而对于通过在Activty内部调用startActivity来启动新的Activity来说，这步不需要，因为新的activity就在原来的activity所在的进程中启动。</p>
+<p>step5：ActivityManagerService调用ApplicationThread.scheduleLaunchActivity，通知相应的进程执行Activity的操作。<br>ApplicationThread把这个启动Activity的操作转发给ActivityThread，ActivityThread发送msg，接收到消息后进行handleLaunchActivity操作，该操作主要是调用进行PerformLaunchActivity</p>
+<p>主要是以下过程：</p>
+<pre><code>1）ActivityThread
+</code></pre><p>调用Instrumentation的newOnActivity方法，通过ClassLoader导入相应的Activity类</p>
+<p>2）创建Application对象（一个应用只有一个Application），然后通过attach把activity的上下文信息（Context）设置到mainActivity去。</p>
+<p>3）Instrumentation调用callActivityOnCreate()执行Activity的onCreate()方法。</p>
+<h3 id="一些问题"><a href="#一些问题" class="headerlink" title="一些问题"></a>一些问题</h3><h4 id="问题1"><a href="#问题1" class="headerlink" title="问题1"></a>问题1</h4><p>Launcher怎么获得intent信息？</p>
+<ul>
+<li>涉及到PackageManagerService。它负责apk的安装、卸载等，在安装apk时会进行package的解析，把四大组件的相关信息存储下来。解析时，PMS中有相关的操作，对intentFiters查找、添加与匹配。对于一个新安装的应用，PMS找到intent-fileter中action为“android.intent.action.MAIN”并且category为“android.intent.category.LAUNCHER”的Activity，就会为这种应用程序创建桌面图标。</li>
+</ul>
+<h4 id="问题2"><a href="#问题2" class="headerlink" title="问题2"></a>问题2</h4><p>ActivityThread如何管理主线程？</p>
+<ul>
+<li><p>从上述对Activity启动过程的简单介绍中，可以看到ActivityThread会执行handlePauseActivity、PerformLaunchActivity等操作，也就是说ActivityThread控制了Activity的暂停、创建等操作，在ActivityThread的main()函数中可以看到它做了这样的事：</p>
+</li>
+<li><p>1)创建Looper</p>
+</li>
+<li><p>2)创建ActivityThread对象</p>
+</li>
+<li><p>3)创建binder对象ApplicationThread，将它和当前ActivityThread以及Application绑定</p>
+</li>
+<li><p>4)Looper循环，Handler接收消息，然后ActivityThread就可以执行handle方法，通过ActivityManager向ActivityManagerService发出请求</p>
+</li>
+</ul>
+<p>参考资料：</p>
+<p><a href="http://blog.csdn.net/luoshengyang/article/details/6689748" target="_blank" rel="noopener">http://blog.csdn.net/luoshengyang/article/details/6689748</a></p>
+<p><a href="http://blog.csdn.net/luoshengyang/article/details/6685853" target="_blank" rel="noopener">http://blog.csdn.net/luoshengyang/article/details/6685853</a></p>
+<p><a href="http://www.2cto.com/kf/201610/554316.html" target="_blank" rel="noopener">http://www.2cto.com/kf/201610/554316.html</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/07/volleySourceAny/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/09/07/volleySourceAny/" itemprop="url">volly源码解析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-07T14:09:30+08:00">
+                2017-09-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="①Request-java"><a href="#①Request-java" class="headerlink" title="①Request.java"></a>①Request.java</h3><p><strong>实现了</strong> Comparable&lt;Request<t>&gt; 接口</t></p>
+<p>抽象类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Request</span>&lt;<span class="title">T</span>&gt; <span class="keyword">implements</span></span></span><br><span class="line"><span class="class"><span class="title">Comparable</span>&lt;<span class="title">Request</span>&lt;<span class="title">T</span>&gt;&gt; </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>两个构造函数，有一个已经废弃了(所以后面的所有具体实现中，有一个构造函数也是被弃用了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Request</span><span class="params">(<span class="keyword">int</span> method, String url, Response.ErrorListener listener)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>具体分析一下几种request：</p>
+<p>a.StringRequest:</p>
+<p>1）方法、URL、监听器<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">StringRequest</span><span class="params">(<span class="keyword">int</span> method, String url, Listener&lt;String&gt; listener,ErrorListener errorListener)</span></span></span><br></pre></td></tr></table></figure></p>
+<p>2）结束时，调用父类的方法（其实父类中也是置空监听器）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onFinish</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">super</span>.onFinish();</span><br><span class="line">	mListener = <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3）回调接口函数<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">deliverResponse</span><span class="params">(String response)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(mListener != <span class="keyword">null</span>) &#123;</span><br><span class="line">		mListener.onResponse(response);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>4）把接收到的response信息解析，主要是cache分发器和network分发器会用到，response不是像我们一样简单的弄成String，而是专门根据类型存放一个在Response&lt;&gt;对象中<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> Response\&lt;String\&gt; parseNetworkResponse(NetworkResponse response)</span><br><span class="line">&#123;</span><br><span class="line">	String parsed;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		parsed = <span class="keyword">new</span> String(response.data,</span><br><span class="line">		HttpHeaderParser.parseCharset(response.headers));</span><br><span class="line">	&#125; <span class="keyword">catch</span> (UnsupportedEncodingException e) &#123;</span><br><span class="line">		parsed = <span class="keyword">new</span> String(response.data);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> Response.success(parsed,</span><br><span class="line">	HttpHeaderParser.parseCacheHeaders(response)); --&gt; 这个函数其实是response构造</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>b.JsonRequest</p>
+<p>1)构造函数<br>参数：方法、url、requestBody、监听器<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">JsonRequest</span><span class="params">(<span class="keyword">int</span> method, String url, String requestBody,</span></span></span><br><span class="line"><span class="function"><span class="params">	Listener&lt;T&gt; listener,ErrorListener errorListener)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">super</span>(method, url, errorListener);</span><br><span class="line">	mListener = listener;</span><br><span class="line">	mRequestBody = requestBody;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2）onFinish（）和diliverResponse（）与上面一样。</p>
+<p>3）交给JsonArrayRequest和JsonObjectRequest去实现<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">protected</span> Response&lt;T&gt; <span class="title">parseNetworkResponse</span><span class="params">(NetworkResponse response)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>4）<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">getBodyContentType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> PROTOCOL_CONTENT_TYPE; <span class="comment">// utf-8</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>5）把请求体的内容转为bytes[]类型（String的方法 getBytes）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">byte</span>[] getBody() &#123;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> mRequestBody == <span class="keyword">null</span> ? <span class="keyword">null</span> : mRequestBody.getBytes(PROTOCOL_CHARSET);</span><br><span class="line">	&#125; <span class="keyword">catch</span> (UnsupportedEncodingException uee) &#123;</span><br><span class="line">		VolleyLog.wtf(<span class="string">"Unsupported Encoding while trying to get the bytes of %s</span></span><br><span class="line"><span class="string">		using %s"</span>,mRequestBody, PROTOCOL_CHARSET);</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>c.ImageRequest（这种方法过时了）</p>
+<p>1)构造函数<br>在加载图片时如果图片超过期望的最大宽度和高度则会进行压缩。注意两个类型：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//@param scaleType The ImageViews ScaleType used to calculate the needed image size.</span></span><br><span class="line"><span class="comment">//@param decodeConfig Format to decode the bitmap to</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ImageRequest</span><span class="params">(String url, Response.Listener&lt;Bitmap&gt; listener,</span></span></span><br><span class="line"><span class="function"><span class="params"><span class="keyword">int</span> maxWidth, <span class="keyword">int</span> maxHeight, ScaleType scaleType, Config decodeConfig, Response.ErrorListener errorListener)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">super</span>(Method.GET, url, errorListener);</span><br><span class="line">	setRetryPolicy(<span class="keyword">new</span> DefaultRetryPolicy(IMAGE_TIMEOUT_MS, IMAGE_MAX_RETRIES,IMAGE_BACKOFF_MULT));</span><br><span class="line">	mListener = listener;</span><br><span class="line">	mDecodeConfig = decodeConfig;</span><br><span class="line">	mMaxWidth = maxWidth;</span><br><span class="line">	mMaxHeight = maxHeight;</span><br><span class="line">	mScaleType = scaleType;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>2)同样的，要对response进行解析：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> Response&lt;Bitmap&gt; <span class="title">parseNetworkResponse</span><span class="params">(NetworkResponse response)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">// Serialize all decode on a global lock to reduce concurrent heap usage.*</span></span><br><span class="line">	<span class="keyword">synchronized</span> (sDecodeLock) &#123;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> doParse(response);</span><br><span class="line">		&#125; <span class="keyword">catch</span> (OutOfMemoryError e) &#123;</span><br><span class="line">			VolleyLog.e(<span class="string">"Caught OOM for %d byte image, url=%s"</span>,</span><br><span class="line">			response.data.length, getUrl());</span><br><span class="line">			<span class="keyword">return</span> Response.error(<span class="keyword">new</span> ParseError(e));</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3）解析函数</p>
+<p>和最近写图片压缩方法一样，但是，desiredWidth 和desiredHeight ， 到底是什么鬼？ =<br>= 没看懂，仔细看传值，maxPrimary 和 secondPrimary 主维和二维..就是图片的宽高…</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Response&lt;Bitmap&gt; <span class="title">doParse</span><span class="params">(NetworkResponse response)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">byte</span>[] data = response.data;</span><br><span class="line">	BitmapFactory.Options decodeOptions = <span class="keyword">new</span> BitmapFactory.Options();</span><br><span class="line">	Bitmap bitmap = <span class="keyword">null</span>;</span><br><span class="line">	<span class="keyword">if</span> (mMaxWidth == <span class="number">0</span> &amp;&amp; mMaxHeight == <span class="number">0</span>) &#123;</span><br><span class="line">		decodeOptions.inPreferredConfig = mDecodeConfig;</span><br><span class="line">		bitmap = BitmapFactory.decodeByteArray(data, <span class="number">0</span>, data.length,</span><br><span class="line">		decodeOptions);</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="comment">// If we have to resize this image, first get the natural bounds.</span></span><br><span class="line">		decodeOptions.inJustDecodeBounds = <span class="keyword">true</span>;</span><br><span class="line">		BitmapFactory.decodeByteArray(data, <span class="number">0</span>, data.length, decodeOptions);</span><br><span class="line">		<span class="keyword">int</span> actualWidth = decodeOptions.outWidth;</span><br><span class="line">		<span class="keyword">int</span> actualHeight = decodeOptions.outHeight;</span><br><span class="line">		<span class="comment">// Then compute the dimensions we would ideally like to decode to.</span></span><br><span class="line">		<span class="keyword">int</span> desiredWidth = getResizedDimension(mMaxWidth, mMaxHeight,</span><br><span class="line">		actualWidth, actualHeight, mScaleType);</span><br><span class="line">		<span class="keyword">int</span> desiredHeight = getResizedDimension(mMaxHeight, mMaxWidth,</span><br><span class="line">		actualHeight, actualWidth, mScaleType);</span><br><span class="line">		<span class="comment">// Decode to the nearest power of two scaling factor.</span></span><br><span class="line">		decodeOptions.inJustDecodeBounds = <span class="keyword">false</span>;</span><br><span class="line">		<span class="comment">// TODO(ficus): Do we need this or is it okay since API 8 doesn't support it?</span></span><br><span class="line">		<span class="comment">// decodeOptions.inPreferQualityOverSpeed = PREFER_QUALITY_OVER_SPEED;</span></span><br><span class="line">		decodeOptions.inSampleSize =</span><br><span class="line">		findBestSampleSize(actualWidth, actualHeight, desiredWidth, desiredHeight);</span><br><span class="line">		Bitmap tempBitmap =</span><br><span class="line">		BitmapFactory.decodeByteArray(data, <span class="number">0</span>, data.length, decodeOptions);</span><br><span class="line">		<span class="comment">// If necessary, scale down to the maximal acceptable size.</span></span><br><span class="line">		<span class="keyword">if</span> (tempBitmap != <span class="keyword">null</span> &amp;&amp; (tempBitmap.getWidth() &gt; desiredWidth ||</span><br><span class="line">		tempBitmap.getHeight() &gt; desiredHeight)) &#123;</span><br><span class="line">		<span class="comment">// 可以根据原来的位图创建一个新的位图。= =有点无语，那之前为什么要有inSamplesize?</span></span><br><span class="line">		<span class="comment">// 因为上面是图片内存的压缩= =</span></span><br><span class="line">		由于要考虑samplesize，所以可能达不到desired，这里就 重新来一遍？</span><br><span class="line">		bitmap = Bitmap.createScaledBitmap(tempBitmap,</span><br><span class="line">		desiredWidth, desiredHeight, <span class="keyword">true</span>);</span><br><span class="line">		tempBitmap.recycle();</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		bitmap = tempBitmap;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (bitmap == <span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> Response.error(<span class="keyword">new</span> ParseError(response));</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> Response.success(bitmap,</span><br><span class="line">		HttpHeaderParser.parseCacheHeaders*(response));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>5）<br>这个函数用来计算desiredWidth和desiredHeight，计算出来这两个值，再用他们来计算samplesize，这其实就是自己写 图片压缩 时候的reqWidth,和 reqHeight， 感觉这里处理得比较巧妙。<br>自己实现的时候，就在想reqWidth和reqHeight要赋值什么- - ，<br>这里让用户设置可以接收的maxWidth和maxHeight（也可以不设置），然后根据规则再计算req的宽高。<br>计算desiredHeight的时候，主维就是mMaxHeight。<br>没懂这个规则= =暂时跳过了…</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">getResizedDimension</span><span class="params">(<span class="keyword">int</span> maxPrimary, <span class="keyword">int</span></span></span></span><br><span class="line"><span class="function"><span class="params">maxSecondary, <span class="keyword">int</span> actualPrimary,<span class="keyword">int</span> actualSecondary, ScaleType scaleType)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// If no dominant value at all, just return the actual.</span></span><br><span class="line">	<span class="keyword">if</span> ((maxPrimary == <span class="number">0</span>) &amp;&amp; (maxSecondary == <span class="number">0</span>)) &#123;</span><br><span class="line">		<span class="keyword">return</span> actualPrimary;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// If ScaleType.FIT_XY fill the whole rectangle, ignore ratio.*</span></span><br><span class="line">	<span class="comment">// 填充整个矩形</span></span><br><span class="line">	<span class="keyword">if</span> (scaleType == ScaleType.FIT_XY) &#123;</span><br><span class="line">		<span class="keyword">if</span> (maxPrimary == <span class="number">0</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> actualPrimary;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> maxPrimary;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// If primary is unspecified, scale primary to match secondary's scaling</span></span><br><span class="line">	ratio.</span><br><span class="line">	<span class="keyword">if</span> (maxPrimary == <span class="number">0</span>) &#123;</span><br><span class="line">		<span class="keyword">double</span> ratio = (<span class="keyword">double</span>) maxSecondary / (<span class="keyword">double</span>) actualSecondary;</span><br><span class="line">		<span class="keyword">return</span> (<span class="keyword">int</span>) (actualPrimary \ ratio);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (maxSecondary == <span class="number">0</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> maxPrimary;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">double</span> ratio = (<span class="keyword">double</span>) actualSecondary / (<span class="keyword">double</span>) actualPrimary;</span><br><span class="line">	<span class="keyword">int</span> resized = maxPrimary;</span><br><span class="line">	<span class="comment">// If ScaleType.CENTER_CROP fill the whole rectangle, preserve aspect ratio.</span></span><br><span class="line">	<span class="keyword">if</span> (scaleType == ScaleType.CENTER_CROP) &#123;</span><br><span class="line">		<span class="keyword">if</span> ((resized * ratio) &lt; maxSecondary) &#123;</span><br><span class="line">			resized = (<span class="keyword">int</span>) (maxSecondary / ratio);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> resized;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> ((resized * ratio) &gt; maxSecondary) &#123;</span><br><span class="line">		resized = (<span class="keyword">int</span>) (maxSecondary / ratio);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> resized;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>d.ImageLoader（太长了…在代码里写注释了 = = 不在这里写了…</p>
+<p>1）构造函数<br>有七个成员变量，两个涉及构造函数：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ImageLoader</span><span class="params">(RequestQueue queue, ImageCache imageCache)</span> </span>&#123;</span><br><span class="line">	mRequestQueue = queue;</span><br><span class="line">	mCache = imageCache;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2）内部类，请求的holder，记录该种请求，对应的key,对应的bitmap,以及监听器。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ImageContainer</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3）内部类<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">BatchedImageRequest</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>②RequestQueue.java<br>涉及到的数据结构：</p>
+<p>0）<br>用于请求队列的递增序号 ， 也即记录了请求的数量<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> AtomicInteger mSequenceGenerator = <span class="keyword">new</span> AtomicInteger();</span><br></pre></td></tr></table></figure></p>
+<p><strong>1）用于查找是否有相同cachekey的重复请求（get(cachekey）为null说明没有</strong></p>
+<p><strong>key是string,value是一个请求队列！等待中的请求集合，也就是没有被分给cache也没被分给network</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, Queue&lt;Request&lt;?&gt;&gt;&gt; mWaitingRequests =</span><br><span class="line"><span class="keyword">new</span> HashMap&lt;String, Queue&lt;Request&lt;?&gt;&gt;&gt;();</span><br></pre></td></tr></table></figure>
+<p>2）当前正在处理的请求</p>
+<p>如果请求正在任意一个queue中wating，或者正在由任意一个分发函数处理，就会在这个set中<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Set&lt;Request&lt;?&gt;&gt; mCurrentRequests = <span class="keyword">new</span> HashSet&lt;Request&lt;?&gt;&gt;();</span><br></pre></td></tr></table></figure></p>
+<p>3）cache类的请求</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> PriorityBlockingQueue&lt;Request&lt;?&gt;&gt; mCacheQueue = <span class="keyword">new</span> PriorityBlockingQueue&lt;Request&lt;?&gt;&gt;();</span><br></pre></td></tr></table></figure>
+<p>4）network类的请求</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> PriorityBlockingQueue&lt;Request&lt;?&gt;&gt; mNetworkQueue =</span><br><span class="line"><span class="keyword">new</span> PriorityBlockingQueue&lt;Request&lt;?&gt;&gt;();</span><br></pre></td></tr></table></figure>
+<p>5）网络请求最大线程数目：4<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> DEFAULT_NETWORK_THREAD_POOL_SIZE = <span class="number">4</span>;</span><br></pre></td></tr></table></figure></p>
+<p>6）完成请求后的回调接口：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">\\ Callback <span class="class"><span class="keyword">interface</span> <span class="title">for</span> <span class="title">completed</span> <span class="title">requests</span>. </span></span><br><span class="line"><span class="class">// 完成请求后的回调接口*</span></span><br><span class="line"><span class="class"><span class="title">public</span> <span class="title">static</span> <span class="title">interface</span>** <span class="title">RequestFinishedListener</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">\\ Called when a request has finished processing. </span><br><span class="line"><span class="comment">// 请求事务结束后会回调</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onRequestFinished</span><span class="params">(Request&lt;T&gt; request)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>7）任务完成后的监听器队列<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> List&lt;RequestFinishedListener&gt; mFinishedListeners = <span class="keyword">new</span> ArrayList&lt;RequestFinishedListener&gt;();</span><br></pre></td></tr></table></figure></p>
+<p>8）三个构造函数：cache,network参数是必须。其余两个分别是线程池默认大小4以及<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> ExecutorDelivery(<span class="keyword">new</span> Handler(Looper.getMainLooper())。</span><br></pre></td></tr></table></figure></p>
+<p>最终归于这个：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">RequestQueue</span><span class="params">(Cache cache, Network network, <span class="keyword">int</span> threadPoolSize, ResponseDelivery delivery)</span> </span>&#123;</span><br><span class="line">	mCache = cache;</span><br><span class="line">	mNetwork = network;</span><br><span class="line">	mDispatchers = <span class="keyword">new</span> NetworkDispatcher[threadPoolSize];</span><br><span class="line">	mDelivery = delivery;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>delivery其实是是来自这里，= =<br>读完了response回到这里，发现这个局早在requestQueue里面就布好了…厉害…<br>一开始就把UI线程的handler传给了ExecutorDelivery，这样在cache分发线程的mDelivery.postResponse（）才能很好的调用= =。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">RequestQueue</span><span class="params">(Cache cache, Network network, <span class="keyword">int</span> threadPoolSize)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">this</span>(cache, network, threadPoolSize,</span><br><span class="line">	<span class="keyword">new</span> ExecutorDelivery(<span class="keyword">new</span> Handler(Looper.getMainLooper())));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>9）过滤器接口<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">RequestFilter</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">apply</span><span class="params">(Request\&lt;?\&gt; request)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>10）两个cancelAll的方法，一个是通过过滤器，一个是通过Object tag</p>
+<p>其实tag的方法中，也是靠定义一个 request.getTag()==tag的过滤器实现的。</p>
+<p><strong>11） 把请求添加到分发队列中 , add</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;T&gt; <span class="function">Request&lt;T&gt; <span class="title">add</span><span class="params">(Request&lt;T&gt; request)</span> ；</span></span><br><span class="line"><span class="function">首先request.<span class="title">setRequestQueue</span><span class="params">(<span class="keyword">this</span>)</span></span>; 将这个请求标记为属于这个队列</span><br><span class="line">然后<span class="keyword">synchronized</span> (mCurrentRequests) &#123;</span><br><span class="line">	mCurrentRequests.add(request);</span><br><span class="line">&#125;在当前请求队列中加上这个请求</span><br><span class="line">再request.setSequence(getSequenceNumber()); 设置这个请求的序列号</span><br><span class="line">并加上标记。</span><br><span class="line">接着</span><br><span class="line"><span class="keyword">if</span> (!request.shouldCache()) &#123;</span><br><span class="line">	mNetworkQueue.add(request);</span><br><span class="line">	<span class="keyword">return</span> request;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//如果该请求不要求缓存， 将请求加到newtwork队列中，返回请求。</span></span><br><span class="line">request.shouldCache()</span><br><span class="line"><span class="comment">//是一个返回boolean的函数，可知有一个boolean为每个请求设置了是否需要缓存的标志。</span></span><br><span class="line"><span class="comment">//如果要求缓存，继续下一步：</span></span><br><span class="line"><span class="comment">//判断mWaitingRequests中是否存在相同key的请求队列，也就是是否有相同key的请求在等待，在该结构中，一个string对应了一个队列，其实是一个链表吧...linkedlist</span></span><br><span class="line">Queue&lt;Request&lt;?&gt;&gt; stagedRequests = mWaitingRequests.get(cacheKey);</span><br><span class="line"><span class="comment">//如果有的话，取出这个请求队列（Queue&lt;Request&lt;?&gt;&gt; ） 为空的话:</span></span><br><span class="line"><span class="keyword">if</span> (stagedRequests == <span class="keyword">null</span>) &#123;</span><br><span class="line">	stagedRequests = <span class="keyword">new</span> LinkedList&lt;Request&lt;?&gt;&gt;();</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//然后把请求加到这个链表中。再把&lt;Key,链表&gt;存入到 mWaitingRequests 中。</span></span><br><span class="line"><span class="comment">//如果不存在的话，将&lt;key,null&gt;存入到这 mWaitingRequests</span></span><br><span class="line"><span class="comment">//中，然后给cacheQueue加上请求。也就是：</span></span><br><span class="line">mWaitingRequests.put(cacheKey, <span class="keyword">null</span>);</span><br><span class="line">mCacheQueue.add(request);</span><br></pre></td></tr></table></figure>
+<p>思考：为什么含有key时，stagedRequests可能为空，并且如果为空也要新建一个实例后才把&lt;key,链表&gt;插入<br>而没有key时，直接&lt;key,null&gt; 插入？？<br>JAVA基础啊 = = hashmap.remove(key)之后，再用key去get，得到的是null。<br>因为，含有key时，说明有相同请求正在执行（有可能调用了remove(key），所以导致这个key对应的队列为null)（甚至可能还有在等待的相同请求，所以需要先把当前请求用一个<br>LinkedList封装起来，再放到等待队列中，当然了，如果相同key中除了正在执行的，还有在等待的，那么stageRequest不会为空，直接把request放进去就可以了。<br>而没有key的话，这个请求会mCacheQueue.add(request);<br>也就是丢给cache处理，所以它此时正在被处理，那么自然是把&lt;key,null&gt;存到mWaitingRequests中了。</p>
+<p>最后finish:</p>
+<p>这个finish可能在request的finish中被调用：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (mRequestQueue != <span class="keyword">null</span>) &#123; <span class="comment">// 这是这个reuquest对应的queue</span></span><br><span class="line">	<span class="comment">// 如果请求队列不为空，结束当前请求</span></span><br><span class="line">	<span class="comment">// 让当前请求处于onFinish（）</span></span><br><span class="line">	mRequestQueue.finish(<span class="keyword">this</span>);</span><br><span class="line">	onFinish();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>注意这个finish是requestQueue的finish，不是request的finish！两者是有区别的。</p>
+<p>思考：为什么还有相同key的请求时，把这些所有请求都一下加入到cacheQueue中呢？<br>别人解释：<br>第二步就是判断这个请求有没有要求缓存，如果有（waitingRequests不为null）：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Queue&lt;Request&lt;?&gt;&gt; waitingRequests = mWaitingRequests.remove(cacheKey);</span><br></pre></td></tr></table></figure></p>
+<p>注意这个remove(key)，虽然说把key对应的value从map中清理了，但是返回了这个key对应的value（删除前的value）。<br>于是要将mWaitingQueue中相同CacheKey的所有requests放入cacheQueue中，<br>因为前面我们不知道相同CacheKey的那个请求到底在缓存中有没有，如果没有，它需要去网络中获取，那就等到它从网络中获取之后，<strong>放到缓存中后，它结束了，并且已经缓存了（意思就是到这步时，这个key的response已经放到cache中了）</strong>，这个时候，我们就可以保证后面那堆相同CacheKey的请求可以在缓存中去取到数据了，而不需要再去网络中获取了。</p>
+<h3 id="②DiskCacheBased-java"><a href="#②DiskCacheBased-java" class="headerlink" title="②DiskCacheBased.java"></a>②DiskCacheBased.java</h3><p>1)inputSteam的三种read:</p>
+<p><strong>a.read() : 对流一个字节一个字节读，返回的int就是这个byte的int表示方式。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">InputStream in = Test.class.getResourceAsStream(<span class="string">"/tt.txt"</span>);</span><br><span class="line"><span class="keyword">byte</span>[]tt=<span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">15</span>];<span class="comment">//测试用的事前知道有15个字节码</span></span><br><span class="line"><span class="keyword">while</span>(in.available()!=<span class="number">0</span>)&#123;</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i\&lt;<span class="number">15</span>;i++)&#123; tt[i]=(<span class="keyword">byte</span>)in.read();&#125;</span><br><span class="line">&#125;</span><br><span class="line">String ttttt=<span class="keyword">new</span> String(tt,<span class="string">"utf-8"</span>);</span><br><span class="line">System.out.println(ttttt);</span><br><span class="line">in.close();</span><br></pre></td></tr></table></figure>
+<p><strong>b.read(byte[] b):规定一个数组长度，把流中的字节缓冲到数组b中去，返回真实的字节个数</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">in = Test.class.getResourceAsStream(<span class="string">"/tt.txt"</span>);</span><br><span class="line"><span class="keyword">byte</span> [] tt=<span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span>];</span><br><span class="line"><span class="keyword">int</span> b;</span><br><span class="line"><span class="keyword">while</span>((b=in.read(tt))!=-<span class="number">1</span>)&#123; System.out.println(b); &#125;</span><br><span class="line">String tzt=<span class="keyword">new</span> String(tt,<span class="string">"utf-8"</span>);</span><br><span class="line">System.out.println(tzt);</span><br></pre></td></tr></table></figure></p>
+<p>读取的字节先存到b[0] 再存到b[1]…..</p>
+<p><strong>c.read(byte[] b, int off, int len) ：从输入流中读取len个字节到数组b中，off是在数组b中写入数据的偏移。</strong></p>
+<p>2.)cache有，cacheHader没有的：<br>byte[] data ; isExpired() ; refreshNeeded()</p>
+<p>cache没有，cacheHeader有的：<br>string key</p>
+<p>3)<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">clear</span><span class="params">()</span> ；</span></span><br></pre></td></tr></table></figure></p>
+<p>把根目录的所有file取到数组中，不为空，则将数组里的file清空。</p>
+<p>4）<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> Entry <span class="title">get</span><span class="params">(String key)</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>先通过key取出CacheHeader entry,如果entry不为空，根据key取出根目录中对应的文件。把这个文件转为CountingIS,接着<br>CacheHeader.readHeader（cis);<br>静态类，直接用类名调用函数！！根据cis获取头部数据，并把流cis转为byte[]类型，把byte[]数据通过entry.toCacheEntry(data)存到entry中。</p>
+<p>5）<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">initialize</span><span class="params">()</span> ；</span></span><br></pre></td></tr></table></figure></p>
+<p>根据根目录下的文件，初始化cache。把文件全部用BIS保存为流，再通过<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CacheHeader entry = CacheHeader.*readHeader*(fis);</span><br></pre></td></tr></table></figure></p>
+<p>转化为cacheheader的实例再通过putEntry(entry.key, entry);把他放入mEntries这个cache的MAP集合里面。</p>
+<p>6）<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">putEntry</span><span class="params">(String key, CacheHeader entry)</span></span></span><br></pre></td></tr></table></figure></p>
+<p>把&lt;key,cacheHeader&gt;放到map集合里面</p>
+<h3 id="③CacheDispatcher-java"><a href="#③CacheDispatcher-java" class="headerlink" title="③CacheDispatcher.java"></a>③CacheDispatcher.java</h3><p>1)主要成员变量，构造函数需要的四个：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> BlockingQueue\&lt;Request\&lt;?\&gt;\&gt; **mCacheQueue**;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> BlockingQueue\&lt;Request\&lt;?\&gt;\&gt; **mNetworkQueue**;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Cache **mCache**;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> ResponseDelivery **mDelivery**;</span><br></pre></td></tr></table></figure></p>
+<p>2）<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">quit</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	mQuit = <span class="keyword">true</span>;</span><br><span class="line">	interrupt();</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//停止cache的分发处理，调用thread的interrupt()</span></span><br></pre></td></tr></table></figure></p>
+<p>3)<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>用request = mCacheQueue.take();取得队列中的请求。</p>
+<p>然后有几种情况：<br>a.请求取消了，request.isCanceled()为真，调用r.finish<br>然后此次循环结束，去处理下一个请求。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cache.Entry entry = **mCache**.get(request.getCacheKey());</span><br></pre></td></tr></table></figure></p>
+<p>b.通过r.getKey取得的key判断mCache中是否有这个entry，没有，交给Network</p>
+<p>c.有这个key，但过期了,设置这个request的cacheEntry为entry ，并且交给net，结束循环</p>
+<p>d.有key，且cache没过期，把entry里的数据解析了赋值给response</p>
+<p>e.如果entry不需要更新，把response用deliver发送回去</p>
+<p>f.要更新(Soft-expired cache hit)，response.intermediate = true;<br>意味着这个未更新的响应发回后，还有第二个更新过的响应要发回去。<br>由于还需要更新后的响应，所以这个请求还是要交给net。</p>
+<h3 id="④HttpStack"><a href="#④HttpStack" class="headerlink" title="④HttpStack"></a>④HttpStack</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">HttpStack</span> </span>&#123; <span class="keyword">public</span> HttpResponse performRequest ....&#125;</span><br></pre></td></tr></table></figure>
+<p>这个接口被HurlStack.java实现了。</p>
+<p><strong>HurlStack.java</strong></p>
+<p>1)三个构造函数。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">**<span class="keyword">public</span>** HurlStack(UrlRewriter urlRewriter, SSLSocketFactory sslSocketFactory)</span><br></pre></td></tr></table></figure>
+<p>参数列表可为空。</p>
+<p><strong>2）重写接口中唯一的一个方法（重要，用Httpurlconnection进行请求，并处理响应的函数）</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> HttpResponse <span class="title">performRequest</span><span class="params">(Request&lt;?&gt; request, Map&lt;String,</span></span></span><br><span class="line"><span class="function"><span class="params">String&gt; additionalHeaders)</span></span></span><br><span class="line"><span class="function">先使用</span></span><br><span class="line"><span class="function">HashMap&lt;String, String&gt; map </span>= <span class="keyword">new</span> HashMap&lt;String, String&gt;();</span><br><span class="line">map.putAll(request.getHeaders());</span><br><span class="line">map.putAll(additionalHeaders);</span><br><span class="line">把请求头部的&lt;headerName,对应内容&gt;存到一个map中。</span><br><span class="line">用</span><br><span class="line">String url = request.getUrl();取得url，然后mUrlRewriter.rewriteUrl(url);取得一个新的url（没找到这个函数的实现...</span><br><span class="line">然后创建一个新的httpurlconnection, 遍历map，把所有的header加入conn的porperty中。</span><br><span class="line"></span><br><span class="line">然后：</span><br><span class="line"><span class="comment">//给conn设置请求的方法</span></span><br><span class="line">setConnectionParametersForRequest(connection, request);</span><br><span class="line">接着从这步开始都是处理响应了：</span><br><span class="line"><span class="comment">// 调用了getResponseCode()就会自动connect，不用明文调用.connect</span></span><br><span class="line"><span class="keyword">int</span> responseCode = connection.getResponseCode();</span><br></pre></td></tr></table></figure></p>
+<p>首先判断响应码是不是符合要求，如果符合要求：<br>a.用函数C将connection得到的响应转化为实体</p>
+<p>b.通过connection.getHeaderFields()，得到所有的响应头列表，foreach遍历这个结合，把每一条通过key单独取出来，做成header，加入到response的headers集合中。</p>
+<p>2）<br><strong>C</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> HttpEntity <span class="title">entityFromConnection</span><span class="params">(HttpURLConnection</span></span></span><br><span class="line"><span class="function"><span class="params">connection)</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>根据connection返回的信息，建立实体。</p>
+<p>实体主要包括四个信息：content,contentLength,contentEncoding,contentType</p>
+<p>使用volley时，新建一个queue（请求队列）,再将多个request放入queue中，之后发送queue</p>
+<p>这时候处理queue的线程是异步，queue中也有调度，保证若干个request异步处理</p>
+<p><strong>④BasickNetwork.java（实现了netWork的接口</strong><br><strong>缓存与重试策略的重点！！</strong><br><strong>原来上次看到这儿就停止了= = 难怪没有看到重试策略</strong><br><strong>而这个重要的函数，就是接口函数中的重写！</strong><br><strong>先复习一下有关缓存的这些变量：</strong></p>
+<p><strong>1.request:</strong></p>
+<ul>
+<li>Cache-Control: max-age=0 以秒为单位</li>
+<li>If-Modified-Since: Mon, 19 Nov 2012 08:38:01 GMT 缓存文件的最后修改时间。</li>
+<li>If-None-Match: “0693f67a67cc1:0” 缓存文件的Etag值</li>
+<li>Cache-Control: no-cache 不使用缓存</li>
+<li>Pragma: no-cache 不使用缓存</li>
+</ul>
+<p><strong>2.response:</strong></p>
+<ul>
+<li>Cache-Control: public 响应被缓存，并且在多用户间共享</li>
+<li>Cache-Control: private 响应只能作为私有缓存，不能在用户之间共享</li>
+<li>Cache-Control:no-cache 提醒浏览器要从服务器提取文档进行验证</li>
+<li>Cache-Control:no-store 绝对禁止缓存（用于机密，敏感文件）</li>
+<li>Cache-Control: max-age=60 60秒之后缓存过期（相对时间）</li>
+<li>Date: Mon, 19 Nov 2012 08:39:00 GMT 当前response发送的时间</li>
+<li>Expires: Mon, 19 Nov 2012 08:40:01 GMT 缓存过期的时间（绝对时间）</li>
+<li>Last-Modified: Mon, 19 Nov 2012 08:38:01 GMT 服务器端文件的最后修改时间</li>
+<li>ETag: “20b1add7ec1cd1:0”<br>服务器端文件的Etag值，客户端收到后再次请求时用if-none-match返回，如<br>果etag状态没变，则返回状态304然后不返回</li>
+</ul>
+<p>x-cache-lookup项指专门查看代理服务器中<strong>是否有</strong>某个网页缓存。有就返回HIT,没有返回MISS。而x-cache项指浏览器从何处、是在哪个代理缓存载入的网页文件。服务器名后的3128指服务器端口。<br>X-Cache :HIT from proxy.domain.tld, MISS from proxy.local<br>X-Cache: 表示你的 http request 是由 proxy server 回的 .</p>
+<p>MISS 表 proxy无资料,代理动作, HIT 表 proxy 直接回应</p>
+<p><strong>1）</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> NetworkResponse <span class="title">performRequest</span><span class="params">(Request\&lt;?\&gt; request)</span> **<span class="keyword">throws</span>**</span></span><br><span class="line"><span class="function">VolleyError </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>方法是执行网络请求的方法，那么理所当然的要进行请求重试也是在这里进行。如何进行请求重试，注意在<strong>方法的内部是用while(true)括起来的</strong>，也就是说如果该方法正常执行完毕或者抛出异常时，必然就跳出循环了，但是如果<strong>请求失败没有return并且在catch内也没有超过重试策略限定条件时</strong>，必然会while(true)下重新请求一次，这样就达到了重试的目的。</p>
+<p><strong>这个函数比较长，分为几部分来说：</strong></p>
+<p><strong>a.</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Gather headers.</span></span><br><span class="line"></span><br><span class="line">Map&lt;String, String&gt; headers = <span class="keyword">new</span> HashMap&lt;String, String&gt;();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 向headers这个集合中添加cache entry</span></span><br><span class="line">addCacheHeaders(headers, request.getCacheEntry());---&gt;B</span><br><span class="line"></span><br><span class="line"><span class="comment">// mHttpStack (httpStack接口，有hurlStack类实现）</span></span><br><span class="line"><span class="comment">// 真正进行httpurlconnection 连接和处理 响应的地方，发送了连接请求，并且进行了响应的处理（主要是响应头的处理）</span></span><br><span class="line"></span><br><span class="line">httpResponse = mHttpStack.performRequest(request, headers);</span><br><span class="line">StatusLine statusLine = httpResponse.getStatusLine();</span><br><span class="line"><span class="keyword">int</span> statusCode = statusLine.getStatusCode(); <span class="comment">// 得到响应码</span></span><br><span class="line">responseHeaders = convertHeaders(httpResponse.getAllHeaders());</span><br></pre></td></tr></table></figure></p>
+<p>然后通过statusCode判断是否缓存：<br>a.如果是304，那么就是not_modified：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 尝试获得request的entry</span></span><br><span class="line">Entry entry = request.getCacheEntry();</span><br></pre></td></tr></table></figure></p>
+<p>如果entry为空，就用networkResponse根据之前的响应头构建响应并返回。<br>否则，就把刚才得到的响应头存到entry的响应头中，然后用新响应头构建响应并返回。</p>
+<p>b.如果是301（永久搬迁）或者302（暂时搬迁）<br>那么需要重定向,request根据返回的重定向地址进行设置重定向url<br>String newUrl = responseHeaders.get(“Location”);<br>request.setRedirectUrl(newUrl);</p>
+<p>c.可能没有响应体：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">responseContents = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">0</span>];</span><br><span class="line"><span class="comment">//有的话转为bytes:</span></span><br><span class="line"><span class="comment">//这里面就用到了bytespool了，似乎加快了内存的利用？但是也导致了无法存储太多东西？？</span></span><br><span class="line">responseContents = entityToBytes(httpResponse.getEntity());---&gt;D</span><br></pre></td></tr></table></figure></p>
+<p>d.还可以打印请求花费的时间：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// requestLifetime 代表这个请求已经消耗的时间，可以用Log打印出来。*</span></span><br><span class="line"><span class="keyword">long</span> requestLifetime = SystemClock.elapsedRealtime() - requestStart;</span><br><span class="line">logSlowRequests(requestLifetime, request, responseContents, statusLine);</span><br></pre></td></tr></table></figure></p>
+<p>e.如果状态码小于200超过299，直接抛出异常。</p>
+<p>最后就是到return了，如果没有continue,异常等的抛出，就可以返回通过network得到的响应了。</p>
+<p>3)<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">D.<span class="keyword">private</span> <span class="keyword">byte</span>[] entityToBytes(HttpEntity entity) <span class="keyword">throws</span> IOException,</span><br><span class="line">ServerError &#123;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>终于用到了bytespool。<br>首先构造实体长度的一个bytearrayoutputStream: <strong>mPool就是这个basicNetwork的全局变量，byte池。</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">PoolingByteArrayOutputStream bytes = <span class="keyword">new</span> PoolingByteArrayOutputStream(mPool, (<span class="keyword">int</span>) entity.getContentLength());</span><br><span class="line"><span class="keyword">byte</span>[] buffer = <span class="keyword">null</span>;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">	InputStream in = entity.getContent();</span><br><span class="line">	<span class="keyword">if</span> (in == <span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> ServerError();</span><br><span class="line">	&#125;</span><br><span class="line"><span class="comment">//以下，从pool里面遍历mBuffersBySize，</span></span><br><span class="line"><span class="comment">//找到还有多余1024容量的bytes[],从这个数组中取走1024长度的内存，在pool的这个bytes[]中记得把取走的容量减去</span></span><br><span class="line">buffer = mPool.getBuf(<span class="number">1024</span>); ----&gt; byteArrayPool的函数</span><br><span class="line"><span class="keyword">int</span> count;</span><br><span class="line"><span class="comment">// 把inputstream的内容读到buffer中，又把buffer的内容写到函数开始创建的 流bytes中</span></span><br><span class="line"><span class="keyword">while</span> ((count = in.read(buffer)) != -<span class="number">1</span>) &#123;</span><br><span class="line">	bytes.write(buffer, <span class="number">0</span>, count);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> bytes.toByteArray();</span><br></pre></td></tr></table></figure></p>
+<p>2）<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">B.</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">addCacheHeaders</span><span class="params">(Map&lt;String, String&gt; headers, Cache.Entry entry)</span> </span>&#123;</span><br><span class="line"><span class="comment">// If there's no cache entry, we're done.</span></span><br><span class="line"><span class="keyword">if</span> (entry == <span class="keyword">null</span>) &#123;</span><br><span class="line">	<span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (entry.etag != <span class="keyword">null</span>) &#123;</span><br><span class="line">	headers.put(<span class="string">"If-None-Match"</span>, entry.etag);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (entry.lastModified &gt; <span class="number">0</span>) &#123;</span><br><span class="line"><span class="comment">// 原来这个地方是entry.serverDate，现在已经改过来了...</span></span><br><span class="line">	Date refTime = <span class="keyword">new</span> Date(entry.lastModified);</span><br><span class="line">		headers.put(<span class="string">"If-Modified-Since"</span>, DateUtils.formatDate(refTime));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>大神解释：<br>Date代表了响应产生的时间，正常情况下Date时间在Last-Modified时间之后,即Date比较晚，也就是Date&gt;=Last-Modified。<br>通过以上原理，既然Date&gt;=Last-Modified。那么我利用Date构建，也是完全正确的。<br>可能的问题出在服务端的 Http 实现上，如果服务端完全遵守 Http语义，采用时间比较的方式来验证If-Modified-Since，判断服务器资源文件修改时间是不是在If-Modified-Since之后。那么使用Date完全正确。<br>我：比如服务端LastModified在8点，Date时间在8点5秒，而客户端传来的If-Modified-Since是在7点，很明显无论如何I-M-S肯定小于L-M和Date,使用服务端的Date来和我们自己的request Entry的L-M-S比较也没关系。<br>可是有的服务端实现不是比较时间，而是直接的判断服务器资源文件修改时间，是否和If-Modified-Since所传时间相等。这样使用Date就不能实现正确的再验证，因为Date的时间总不会和服务器资源文件修改时间相等。<br>我：可以比较相等是因为客户端接收到这次资源的I-M-S等于服务端的L-M。所以如果服务端资源不变，那么L-M不变，还是等于客户端那边的I-M-S</p>
+<h3 id="⑤-ExecutorDelivery-java-实现了-ResponseDelivery-，用于把response传送出去"><a href="#⑤-ExecutorDelivery-java-实现了-ResponseDelivery-，用于把response传送出去" class="headerlink" title="⑤ ExecutorDelivery.java 实现了 ResponseDelivery ，用于把response传送出去"></a>⑤ ExecutorDelivery.java 实现了 ResponseDelivery ，用于把response传送出去</h3><p>有一个Excutor成员。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Executor mResponsePoster;</span><br></pre></td></tr></table></figure></p>
+<p>1）<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ExecutorDelivery</span><span class="params">(<span class="keyword">final</span> Handler handler)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// Make an Executor that just wraps the handler.</span></span><br><span class="line">	mResponsePoster = <span class="keyword">new</span> Executor() &#123;</span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(Runnable command)</span> </span>&#123;</span><br><span class="line">			handler.post(command);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2）对于接口的重要实现（重要方法，在cache和net调度线程里用来传送响应的<br>最终其实是用excutor执行runnble:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">postResponse</span><span class="params">(Request&lt;?&gt; request, Response&lt;?&gt; response)</span> </span>&#123; </span><br><span class="line">	postResponse(request, response, <span class="keyword">null</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">postResponse</span><span class="params">(Request&lt;?&gt; request, Response&lt;?&gt; response,Runnable runnable)</span> </span>&#123;</span><br><span class="line">	request.markDelivered();</span><br><span class="line">	request.addMarker(<span class="string">"post-response"</span>);</span><br><span class="line">	mResponsePoster.execute(<span class="keyword">new</span> ResponseDeliveryRunnable(request, response, runnable));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> ResponseDeliveryRunnable(request, response, runnable)</span><br></pre></td></tr></table></figure>
+<p>很明显是一个runnble，Excutor接口的execute函数在这个类的构造函数<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ExecutorDelivery</span><span class="params">(<span class="keyword">final</span> Handler handler)</span> </span>&#123;&#125;中实现。</span><br></pre></td></tr></table></figure></p>
+<h3 id="⑥PoolingByteArrayOutputStream"><a href="#⑥PoolingByteArrayOutputStream" class="headerlink" title="⑥PoolingByteArrayOutputStream"></a>⑥PoolingByteArrayOutputStream</h3><p>继承自ByteArrayOutputStream 。不表。</p>
+<h3 id="⑦btyeArrayPool"><a href="#⑦btyeArrayPool" class="headerlink" title="⑦btyeArrayPool"></a>⑦btyeArrayPool</h3><p>byte[]的缓存池，主要就是为了提高用户频繁进行数据请求时的性能，如果用户频繁进行数据请求，对象在很快的时间内创建又被丢弃，明显降低了性能，这里提供了一个一直存在的缓存池，提高了获取堆内存的性能。</p>
+<p>两个集合：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> List&lt;<span class="keyword">byte</span>[]&gt; mBuffersByLastUse = <span class="keyword">new</span> LinkedList &lt;<span class="keyword">byte</span>[]&gt;();</span><br><span class="line"><span class="keyword">private</span> List&lt;<span class="keyword">byte</span>[]&gt; mBuffersBySize = <span class="keyword">new</span> ArrayList&lt;<span class="keyword">byte</span>[]&gt;(<span class="number">64</span>);</span><br></pre></td></tr></table></figure></p>
+<p>第一个是按照使用顺序存储的byte[]集合，第二个是按照大小存储的byte[]集合。<br>需要用到byte[]时，从这个pool里面取，用完了又归还，提高了性能。</p>
+<p>关于优缺点：<br>问题一、为什么不适合下载大文件，只适合数据量小的频繁请求？<br>1）存储时，从btyeArrayPool中取出一块已经分配的内存，这样不用每次都进行内存分配，而是先查找缓冲池中有没有合适的内存区域，有的话可以直接使用，减少了内存分配的次数。<br>如果数据量过大，byteArrayPool这个存储空间就会溢出。</p>
+<p>2）线程池大小默认为4，如果上传数据大或者下载数据大，浪费比较长的时间，占用了线程，其余请求就会阻塞。</p>
+<p>问题二、缓存机制（BasicNetwork.java)<br>只使用了Date来进行缓存验证（原来是这样，现在改了）<br>在BasicNetwork.java中：</p>
+<h3 id="⑧-HttpHeaderParser-java"><a href="#⑧-HttpHeaderParser-java" class="headerlink" title="⑧ HttpHeaderParser.java"></a>⑧ HttpHeaderParser.java</h3><p><strong>(你亲自读过的呀… 注意重点是复习…复习，理解！！ ）</strong><br><strong>通过解析服务器返回的响应头部，构建保存的缓存请求的头部（ Cache.Entry）</strong>，比如<br>解析http头部的方法，有三个。</p>
+<p>1）<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> Cache.<span class="function">Entry <span class="title">parseCacheHeaders</span><span class="params">(NetworkResponse response)</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>首先，“DATE”，</strong>用parseDateAsEpoch（）把时间解析成EPOCH格式，响应生成时间。于是得到serverDate。</p>
+<p><strong>第二，”Cache-Control”：</strong>有这个值，意味着hasCacheControl = true;，那么判断完头部，还要去设置<br>softExpire和finalExpire这两个值。</p>
+<p>a.如果是no-cache或者no-store，就不缓存结果。前者是要从服务器提取文档进行验证。后者是绝对禁止缓存，用于机密文件2333</p>
+<p>b.max-age开头：得到max-age。相对时间，多少秒之后过期。<br>比如max-age = 60，那么60秒之后缓存过期。</p>
+<p>c.stale-while-revalidate 开头：得到stale-while-revalidate.RFC文档解释：<br>When present in an HTTP response, the stale-while-revalidate Cache- Control<br>extension indicates that caches MAY serve the response in which it appears after<br>it becomes stale, up to the indicated number of seconds.<br>也就是说，到达给定的时间后，服务器可能会返回新的内容。（也就是这个时间过后这个响应就陈旧了，所以会发新的过来）</p>
+<p>d.如果是must-revalidate, 作用与no-cache相同，但更严格，强制意味更明显。但这只是理论上的描述。或者是proxy-revalidate，都是强制刷新。<br>于是mustRevalidate = true;</p>
+<p><strong>第三，“Expires”，</strong>用parseDateAsEpoch（）把的时间解析成EPOCH格式。于是得到serverExpires。<strong>缓存过期的绝对时间，</strong>所以要取缓存时用到的isExpired()函数是这样写的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 如果缓存过期，返回true</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isExpired</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.ttl &lt; System.currentTimeMillis();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>第四，“Last-Modified“，</strong>用parseDateAsEpoch（）把的时间解析成EPOCH格式。于是得到lastModified。（<strong>客户端用if-not-modified返回</strong>，如果服务端文件在这个时间之后都没修改，那么返回304）</p>
+<p><strong>第五，”ETag”，</strong>得到serverEtag（如果客户端用if-none-match加上etag的内容发回，服务端etag没变的话，返回状态304，内容不更新）</p>
+<p>然后要看有没有cachecontrol的控制：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Cache-Control takes precedence over an Expires header, even if both exist and Expires is more restrictive.过期时间， Cache-Control比Expires优先级高。*/</span></span><br><span class="line"><span class="keyword">if</span> (hasCacheControl) &#123;</span><br><span class="line">	softExpire = now + maxAge * <span class="number">1000</span>; <span class="comment">//新鲜度时间，maxAge是秒为单位，但是开发时是毫秒为单位</span></span><br><span class="line">	finalExpire = mustRevalidate ? softExpire : softExpire + staleWhileRevalidate * <span class="number">1000</span>; <span class="comment">// 过期时间</span></span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (serverDate &gt; <span class="number">0</span> &amp;&amp; serverExpires &gt;= serverDate) &#123;</span><br><span class="line">	<span class="comment">//没有cacheControl</span></span><br><span class="line">	<span class="comment">//Default semantic for Expire header in HTTP specification is softExpire.</span></span><br><span class="line">	softExpire = now + (serverExpires - serverDate); </span><br><span class="line">	<span class="comment">//现在时间+过期的绝对时间-生成文件的时间，因为serverExpires - serverDate代表从发送时的时间到过期时间还有多少时间T，这段时间过后就是过期了。</span></span><br><span class="line">	<span class="comment">//这是软过期时间，意味着从接受到响应开始（now),一定还可以保存T那么长的时间。</span></span><br><span class="line">	finalExpire = softExpire;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 各个值终于算好了，全部赋值给cache.entry，这样就用entry保存了这个request对应的cache</span></span><br></pre></td></tr></table></figure>
+<p>印象最深的地方：</p>
+<p>1）接口的使用很厉害(读到最后才明白这个妙处）<br>比如新建一个requsertQueue的时候，cache和network在volley.java的newRequestQueue里面是一定要有的，通常来说 ResponseDelivery delivery这个参数是可以不自己定义的，那么它就是这个值：</p>
+<p>A.<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">RequestQueue</span><span class="params">(Cache cache, Network network, <span class="keyword">int</span> threadPoolSize)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>(cache, network, threadPoolSize,</span><br><span class="line">            <span class="keyword">new</span> ExecutorDelivery(<span class="keyword">new</span> Handler(Looper.getMainLooper())));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>将ExcutorDelivery和UI线程的handler绑定起来，</p>
+<p>所以在ExDel的构造函数中，实现了Excutror接口中的函数excute，这个函数就是调用主线程的handler去处理Runn.<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ExecutorDelivery</span><span class="params">(<span class="keyword">final</span> Handler handler)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Make an Executor that just wraps the handler.</span></span><br><span class="line">    <span class="comment">// 新建实例的时候重写接口方法，但是也是要.excute才会运行的...不是说实例建了就开始运行...</span></span><br><span class="line">    mResponsePoster = <span class="keyword">new</span> Executor() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(Runnable command)</span> </span>&#123;</span><br><span class="line">            handler.post(command);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>当然了，这只是构造函数中，那么这个excute何时被调用呢….？？我们读到response的时候就会解开谜底。去到B！</p>
+<p>这个ExcutorDel本身也是 接口的实现！！重载了这个函数：</p>
+<p>可以看到，runnble经过了一点改造，在</p>
+<p>private class ResponseDeliveryRunnable implements Runnable {}<br>中，除了本身的runnalbe要被run外，还有增加了：</p>
+<p>C.<br>对runnable进行了一点改造，用来<strong>在request的类的delResponse函数中调用我们的回调接口！</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (mResponse.isSuccess()) &#123;</span><br><span class="line">	mRequest.deliverResponse(mResponse.result);</span><br></pre></td></tr></table></figure></p>
+<p>有了这一句，才会在<strong>各个xxxRequest类中，重载request类的deliverResponse函数</strong>，onResponse是什么呢。。。就是调用了我们自己设置的onResponse函数，这样就可以干我们想做的事了….所以其实最后的response的回调显示也是在各个request中完成的。</p>
+<p>在每个xxxRequest中都重写了这个函数：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">deliverResponse</span><span class="params">(String response)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (mListener != <span class="keyword">null</span>) &#123;</span><br><span class="line">        mListener.onResponse(response);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>B.在A中（Request的时候）构造好了，最终postResponse的时候才会用。比如在networdDispatch这个线程中，终于从网络取到了线程，<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mDelivery.postResponse(request, response);</span><br></pre></td></tr></table></figure></p>
+<p>这个mDelivery就是每个request的response的传送者~<br>mDelivery 是一个ResponseDelivery，而我们刚才提到的ExcutorDelivery是这个抽象类的实现。<br>所以mDelivery.postResponse其实是调用了ExcutorDelivery里面的postResponse.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">postResponse</span><span class="params">(Request&lt;?&gt; request, Response&lt;?&gt; response, Runnable runnable)</span> </span>&#123;</span><br><span class="line">    request.markDelivered();</span><br><span class="line">    request.addMarker(<span class="string">"post-response"</span>);</span><br><span class="line">    mResponsePoster.execute(<span class="keyword">new</span> ResponseDeliveryRunnable(request, response, runnable));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>而这个postResponse做了什么呢？它终于，调用了ExcutorDelivery。构造函数里面的Excutor接口实现的excute函数，刚才我们分析得知，这个excute会把传入的runnable用handler去执行里面的run（），而这个runnable其实被暗自改造了~~我们刚才刚才分析过了。</p>
+<p>在cacheDispatcher这个线程的run中，得到response后，结果就是通过postResponse返回去的！这个设计真的很精妙= =！！</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">mDelivery.postResponse(request, response, <span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            mNetworkQueue.put(finalRequest);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            <span class="comment">// Not much we can do about this.</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>还有就是各个xxxRequest，除了传入url外，实现了response类中的两个回调接口<br>Listener<t> 和ErrorListener，request和response的结合，一开始就想好了最后 - -很巧妙啊。（其实刚才哪一篇叙述已经讲到了）</t></p>
+<p>重试机制：<br>volley的重试策略是在request构造函数里面确定的：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Request</span><span class="params">(<span class="keyword">int</span> method, String url, Response.ErrorListener listener)</span> </span>&#123;</span><br><span class="line">    mMethod = method;</span><br><span class="line">    mUrl = url;</span><br><span class="line">    mIdentifier = createIdentifier(method, url);</span><br><span class="line">    mErrorListener = listener;</span><br><span class="line">    setRetryPolicy(<span class="keyword">new</span> DefaultRetryPolicy());</span><br><span class="line">    mDefaultTrafficStatsTag = findDefaultTrafficStatsTag(url);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>首先new出来的东西是一个DefaultRetryPolicy：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DefaultRetryPolicy</span> <span class="keyword">implements</span> <span class="title">RetryPolicy</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这个类有什么呢，它其实不是执行重试操作，只是更新有关重试的两个变量。</p>
+<p>成员变量：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The current timeout in milliseconds. 当前超时时间 </span></span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">int</span> mCurrentTimeoutMs;  </span><br><span class="line"></span><br><span class="line">      <span class="comment">// The current retry count. 当前重试次数  </span></span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">int</span> mCurrentRetryCount;  </span><br><span class="line"></span><br><span class="line">      <span class="comment">// The maximum number of attempts. 最大重试次数 </span></span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> mMaxNumRetries;  </span><br><span class="line"></span><br><span class="line">      <span class="comment">// The backoff multiplier for for the policy. 表示每次重试之前的 timeout 该乘以的因子，每重试一次，超时时间就变化一次</span></span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">float</span> mBackoffMultiplier;  </span><br><span class="line"></span><br><span class="line">      <span class="comment">// The default socket timeout in milliseconds 默认超时时间</span></span><br><span class="line">      <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> DEFAULT_TIMEOUT_MS = <span class="number">5000</span>;  </span><br><span class="line"></span><br><span class="line">      <span class="comment">// The default number of retries  默认最大重试次数</span></span><br><span class="line">      <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> DEFAULT_MAX_RETRIES = <span class="number">1</span>;</span><br></pre></td></tr></table></figure></p>
+<p>除此之外只有两个函数：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">更新当前请求重试次数，并且更新当前超时时间</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">retry</span><span class="params">(VolleyError error)</span> <span class="keyword">throws</span> VolleyError </span>&#123;</span><br><span class="line">	mCurrentRetryCount++;</span><br><span class="line">	mCurrentTimeoutMs += (**mCurrentTimeoutMs * mBackoffMultiplier);</span><br><span class="line">	<span class="keyword">if</span> (!hasAttemptRemaining()) &#123;</span><br><span class="line">		<span class="keyword">throw</span> error;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>而以下函数是判断当前重试次数是否超过最大请求数：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">hasAttemptRemaining</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> mCurrentRetryCount &lt;= mMaxNumRetries;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>set函数里，只是设置了重试策略：mRetryPolicy = 构造的这个retryPolicy对象。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/06/Android四大组件----Activity（1）/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1927,724 +2891,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/07/EF3_8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ke Yu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Coco">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/07/07/EF3_8/" itemprop="url">Effective Java 读书笔记（3.8）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-07T22:43:32+08:00">
-                2017-07-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>第三章 对于所有对象都通用的方法</p>
-<p>Object类的所有非final方法（equals，hashcode，toString，clone和finalize）都有明确的通用约定，因为这些方法是被设计成要被覆盖的，所以覆盖时需要遵循这些通用的约定。否则依赖这些约定的类（hashset,hashmap）等，就无法正常工作。</p>
-<p>这一章主要是讨论何时以及如何覆盖这些非final的Object方法</p>
-<p><strong>第8条 覆盖equals时请遵守通用约定</strong></p>
-<h3 id="何时应该覆盖Object-equals？"><a href="#何时应该覆盖Object-equals？" class="headerlink" title="何时应该覆盖Object.equals？"></a>何时应该覆盖Object.equals？</h3><ul>
-<li>①类具有自己特有的“逻辑相等”概念（<strong>不是对象等同</strong>），并且超类没有符号equals以实现期望的行为。<br>“值类”一般就属于这种，也就是仅仅表示值的类，比如Integer或者Date。<br>我们在使用equals方法时，希望知道他们逻辑上是否相等，而不是想知道他们是否指向同一个对象。</li>
-</ul>
-<p>要满足这种期望，不但要重写equals方法，还要使这个类的实例可以被map或者set用作key。</p>
-<p>但是有一些“值类”不需要覆盖equals方法：比如用实例受控（第一条）来确保“每个值至多只存在一个对象”的类。枚举类型就属于这种类。对于这种类，逻辑相同和对象等同是一回事，所以Object的equals方法等同于逻辑意义上的equals方法。</p>
-<p>覆盖equals方法时候，要遵守以下通用约定：<br>1）自反性。对于任何非null的引用值x，x.equals(x)必须返回true<br>2）对称性。对于任何非null的引用值x和y，x.equals(y)是等价的y.equals(x）</p>
-<p>以下代码可能会违反这个特性：</p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF81.png" alt="clipboard.png"></p>
-<p>这个比较是不区分大小写的，并且试图完成与普通String的互操作，但是</p>
-<p>对于：</p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF82.png" alt="clipboard.png"></p>
-<p>cis.equasl(s)会返回true，s.equals(cis)却会返回false，因为String的equal是区分大小写的</p>
-<p>要想保持特性需要重构这个方法：</p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF83.png" alt="clipboard.png"></p>
-<p><strong>感觉这个代码不对啊,,,, 如果是CIS了… 就不用转换了。但为什么还是&amp;&amp;？</strong></p>
-<p><strong>这时，针对是同一个类的不同实例之间的比较，不再是不同类的不同实例的比较了。</strong></p>
-<p>3）传递性。对于任何非null的引用值x,y和z，如果x.equals(y)并且y.equals(z)那么y.equals(z)</p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF84.png" alt="clipboard.png"></p>
-<p>如果打算扩展这个类，增加颜色信息：</p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF85.png" alt="clipboard.png"></p>
-<p>很明显，如果不重写equals，那么作equals操作时，颜色信息就会被忽略掉。</p>
-<p>如果这样重写：</p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF86.png" alt="clipboard.png"></p>
-<p>如果O只是一个普通Point，那么需要忽略颜色进行比较。</p>
-<p><strong>问题：为什么不用super.equals(o)而用o.equals(this);</strong><br>如果O是一个有色Point，那么调用父类的equals比较位置，并且比较颜色。<br>由于进行A.equals(B)时，调用了子类的equals，说明A是有色Point，那么构造它肯定会首先构造父类（super(x,y)），所以在调用equals时，super.equals(o)意味着用A构造的父类对象和O进行位置的比较，再单独比较颜色。<br>但是假设：</p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF87.png" alt="clipboard.png"></p>
-<p>那么p.equals(cp)，直接调用了普通Point的equals。首先cp instanceof<br>Point是真，那么就接着判断位置，相同的，所以返回true；</p>
-<p>cp.equals(p)，调用的是有色Point的equals。首先p instanceof<br>ColorPoint是假，所以返回false。</p>
-<p><strong>这样就丧失了对称性！</strong></p>
-<p><strong>所以需要进行修改：</strong></p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF88.png" alt="clipboard.png"></p>
-<p>先判断是不是Point，如果是的话，判断是不是colorPoint，不是的话说明它仅仅是普通点，那么调用o.equals(this),这样的话调用的就是父类的equal了。</p>
-<p>否则当然就是有色点，先调用父类的equals，再比较color。</p>
-<p><strong>这样虽然保留了对称性，但是丧失了传递性！</strong></p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF89.png" alt="clipboard.png"></p>
-<p>p1.equals(p2)返回true,p2.equals(p3)也返回true，但是p1.equals(p3)却不能返回true。</p>
-<p><strong>这是面向对象中关于等价关系的一个基本问题，我们无法在扩展可实例化的类的同时，既增加新的值组件，同时又保留equals约定。</strong></p>
-<p><strong>如果使用getClass()代替instanceof测试，可以扩展可实例化的类和增加新的值组件，同时保留equals约定。</strong></p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF810.png" alt="clipboard.png"></p>
-<p>但是<strong>这违反了里氏替换原则。</strong>此时只有当对象具有相同的实现时，才能使对象等同。这样不算糟糕，但是the<br>consequences are unacceptable</p>
-<p><strong>为什么说违反了里氏替换原则？？</strong></p>
-<p><strong>假设有一个方法，用来检验某个整值点是否处在单位圆中：</strong></p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF811.png" alt="clipboard.png"></p>
-<p>加入我们扩展point但是不增加值组件，只是让构造器记录创建了多少个实例：</p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF812.png" alt="clipboard.png"></p>
-<p>里氏替换原则表示：一个类型的任何重要属性也将适用于它的子类型。所以为该类型编写的任何方法，在它的子类型上也应该同样运行得很好。</p>
-<p>但是如果我们使用getClass的equals方法，那么我们把CounterPoint实例传入，onUnitCircle方法都会返回false。</p>
-<p>也就是说，我们很难找到一个很好的办法，既扩展不可实例化的类，又增加值组件。</p>
-<p>有一种方法可以作为权宜之计：复合由于继承。（有点像适配器…..）</p>
-<p>比如我们不让ColorPoint扩展Point，而是在ColorPoint中加入一个私有的Point域，以及一个共有的view方法。</p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF813.png" alt="clipboard.png"></p>
-<p>4）一致性。对于任何非null的引用值x,y，只要equals操作用到的object的信息没有修改，那么对于多次调用，会一致返回true或者false.<br>如果x.equals(y)并且y.equals(z)那么y.equals(z)</p>
-<p>可变对象在不同的时候可以与不同的对象相等，不可变对象则不会这样。</p>
-<p>在写类的时候，就应该考虑是否应该不可变。如果是的话，那么要保持这样的限制条件：<strong>相等的对象永远相等，不相等的对象永远不相等。</strong></p>
-<p>但是无论类是否可变，都不要使equals方法依赖于不可靠的资源比如java.net.URL的equals方法依赖于对URL中主机IP地址的比较。<br>很明显主机名转变为的IP地址具有不稳定性。</p>
-<p>5）非空性。对于任何非null的引用值x，x.equals(null)一定返回false。</p>
-<p>一些类在equals中首先使用:</p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF814.png" alt="clipboard.png"></p>
-<p>其实没什么必要。通常来说是直接使用instanceof判断类型。</p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF815.png" alt="clipboard.png"></p>
-<p>如果漏掉了这一步的类型检查，并且传递给equals方法的参数又是错误的类型，那么equals方法会抛出ClassCastException异常。</p>
-<p>所以综合以上要求，实现高质量equals方法的技巧：</p>
-<p><strong>①使用“==”检查“参数是否为这个对象的引用”</strong>，如果返回真，那么equals也可以返回true。特别是equals操作比较昂贵时，可以使用这种方法提高性能。</p>
-<p><strong>②使用instanceof操作符检查“参数是否为正确的类型”</strong>。如果返回假，那么equals直接防护假。</p>
-<p>如果类实现的接口改进了equals约定，允许在实现了该接口的类之间进行比较，那么</p>
-<p><strong>③把参数转换成正确的类型。</strong>由于进行了第②步，所以这步一定会成功。</p>
-<p><strong>④对于该类中的每个“关键”域，检查参数中的域是否与该对象中对应的域想匹配。</strong></p>
-<p><strong>比如为了避免NullPointerException：</strong></p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF816.png" alt="clipboard.png"></p>
-<p>但是如果field和o.field常常是相同的对象引用，那么可以使用下面的做法：</p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF817.png" alt="clipboard.png"></p>
-<p>为了获得最佳的性能，应该最先比较最有可能不一致的域。</p>
-<p>⑤编写完了equals方法之后，有三个问题需要注意：是否是对称的；是否第传递的；是否是一致的。</p>
-<p>自反性和非空性通常会自动满足。</p>
-<p>总结：</p>
-<p>①覆盖equals总要覆盖hashCode</p>
-<p>②不要企图让equals方法过于智能</p>
-<p>③不要将equals声明中的Object对象替换为其他的类型</p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF818.png" alt="clipboard.png"></p>
-<p>这种方法不是重写了equals而是重载了Object</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/06/EF2_7/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ke Yu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Coco">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/07/06/EF2_7/" itemprop="url">Effective Java 读书笔记（2.5）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-06T22:23:42+08:00">
-                2017-07-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>第二章 创建和销毁对象</p>
-<p><strong>第七条 避免使用终结（finalizer）方法</strong></p>
-<h3 id="终结方法的缺点"><a href="#终结方法的缺点" class="headerlink" title="终结方法的缺点"></a><strong>终结方法的缺点</strong></h3><ul>
-<li><p>①<strong>不能保证会被及时地执行，升职不能保证它会执行。</strong>从一个对象不可达开始，到它的终结方法被执行，所花费的这段时间是任意长的。</p>
-<p>  比如，用终结方法来关闭已经打开的文件是不对的，因为打开文件的描述符是一种有限的资源。由于JVM会延迟执行终结方法，所以大量的文件会保留在打开的状态，当一个程序再不能打开文件的时候，可能会运行失败。</p>
-<p>  <strong>及时执行终结方法是垃圾回收算法的一个主要功能，这种算法在不同的JVM实现中会大相径庭。</strong></p>
-<p>  在一些情况下，为类提供终结方法，可能会随意地延迟其实例的回收过程。</p>
-<p>  <strong>结论：不应该依赖终结方法来更新重要的持久状态。比如依赖终结方法释放共享资源（比如数据库）上的永久锁。</strong></p>
-<p>  System.gc和System.runFinalization增加了终结方法被执行的机会，但不保证终结方法一定会被执行。唯一保证终结方法执行的方法是：System.runFinalizersOnExit和它臭名昭著的孪生兄弟：Runtime.runFinalizersOnExit.<br>  这两个方法都被废弃了。</p>
-</li>
-<li><p>②如果未被捕获的异常在终结过程中被抛出，那么这种异常会被忽略，并且该对象的终结过程也会被终止。这会使对象处于破坏的状态，如果有另一个线程企图使用这种被破坏的对象，会产生意想不到的结果。<strong>发生在终结方法中的异常不会打印出stack<br>trace.</strong></p>
-</li>
-<li><p><strong>③使用终结方法会有严重的性能损失。</strong></p>
-<p>  <strong>如果类对象的资源（文件或者线程等）需要终止的话，怎么做才能不用编写终结方法呢？</strong></p>
-<p>  <strong>提供显式的终止方法。</strong><br>  并要求该类的客户端在每个实例不再有用的时候调用这个方法。但是，<strong>实例必须记录下自己是否已经被终止了，需要在一个私域中记录下“该对象不再有效”，如果这些方法是在对象已经终止之后被调用，其他的方法就必须检查这个域，如果检查到这个域已经不再有效，就会抛出异常。</strong></p>
-<p>  使用显式调用的终止方法的几个例子：<br>  a.InputStream；<br>  b.OutputStream<br>  c.java.sql.Connection 上的close方法<br>  d.java.util.Timer的cancel方法</p>
-<p>  用法：</p>
-<p>  <img src="http://ovwunej09.bkt.clouddn.com/EF71.png" alt="clipboard.png"></p>
-<p>  在finally中显式地调用终止方法，即使try中有异常抛出，也会执行finally中的方法。</p>
-</li>
-</ul>
-<h3 id="终结方法的优点"><a href="#终结方法的优点" class="headerlink" title="终结方法的优点"></a>终结方法的优点</h3><ul>
-<li><p>①当对象的所有者<strong>忘记调用显式的终止方法时，终结方法可以充当“安全网”</strong>，虽然这个方法不会及时被调用，但如果客户端无法通过调用显式的终止方法来正常结束操作，那么迟一点释放资源总比不释放资源好。如果<strong>终结方法发现资源还未终止，则应该在日志中记录一条警告。这表示客户端中有bug。</strong></p>
-<p>  刚才列举的显示调用终止方法的四个类，都有终结方法。终止方法未被调用的时候，终结方法会充当安全网。</p>
-</li>
-<li><p>②与对象的本地对等体（native peer）有关。本地对等体是一个本地对象（native object），<br>普通方法通过本地方法（native method）委托给一个本地对象，因为本地对等体不是一个普通对象，所以垃圾回收器不会知道它。它的JAVA对等体被回收的时候，它不会被回收。如果本地对等体拥有必须被及时终止的资源，那么该类就应该具有一个显式的终止方法。<strong>终止方法应该完成所有必要的工作以便释放关键的资源。</strong></p>
-<p>  <strong>终止方法可以是本地方法，或者它也可以调用本地方法。</strong></p>
-<p>  “终结方法链”并不会被自动执行。如果类有终结方法，并且子类覆盖了终结方法，子类的终结方法就必须手工调用超类的终结方法。<strong>可以在try块中终结子类，并在相应的finally块中调用超类的终结方法。<br>这样即使子类的终结过程抛出异常，超类的终结方法也会执行。反之亦然。</strong></p>
-<p>  <strong>如果子类覆盖了超类的终结方法，但忘记手工调用超类supe的终结方法，怎么避免这种粗心或者恶意？？</strong></p>
-<p>  <strong>为每个要被终结的对象（外围实例Foo）创建一个附加的对象，把终结方法放到匿名类中，这个匿名类（下图的finalizerGuardian）的作用就是终结它的外围实例。这个匿名类的单个实例被称为终结方法守卫者（finallzer guardian）</strong></p>
-<p>  <img src="http://ovwunej09.bkt.clouddn.com/EF72.png" alt="clipboard.png"></p>
-<p>  外围类的每个实例都会创建这样一个守卫者，<strong>外围实例在它的私有实例域中保存着一个对其终结方法守卫者的唯一引用</strong>，所以终结方法守卫者和外围实例可以同时启动终结过程。</p>
-<p>  <strong>守卫者被终结的时候，它执行外围实例所期望的终结行为</strong>，就好像它的终结方法是外围对象上的一个方法一样。</p>
-<p>  这个例子中的Foo没有终结方法，它的子类所以是否调用super.finalize并不重要。</p>
-<p>  <strong>但是对于带有finalize的非final公有类，都应该考虑使用守卫者的这种方法以确保子类不调用super.finalize时也能执行终结方法。</strong></p>
-<p>  所以，只有需要以上两种用途的时候，需要使用终结方法，其他时候，最好都不要使用。</p>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/04/EF2_6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ke Yu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Coco">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/07/04/EF2_6/" itemprop="url">Effective Java 读书笔记（2.1）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-04T23:53:42+08:00">
-                2017-07-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>第二章 创建和销毁对象</p>
-<p><strong>第6条.消除过期的对象引用</strong></p>
-<h3 id="内存泄漏的一个原因—-过期的对象引用"><a href="#内存泄漏的一个原因—-过期的对象引用" class="headerlink" title="内存泄漏的一个原因—-过期的对象引用"></a>内存泄漏的一个原因—-过期的对象引用</h3><p><img src="http://ovwunej09.bkt.clouddn.com/EF61.png" alt="clipboard.png"></p>
-<p>pop()后，从栈中弹出的对象不会被当做垃圾回收，（这些对象只是不能再从栈中取到而已），下标大于等于size的部分，属于对象的过期引用（永远不会被解除的引用），这就造成了内存泄漏。</p>
-<h4 id="修复方法"><a href="#修复方法" class="headerlink" title="修复方法"></a>修复方法</h4><p>只要对象引用过期，就清空这些引用，pop()像这样修改：</p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF62.png" alt="clipboard.png"></p>
-<p>这样就清除了过期引用，并且如果以后又被错误地解除引用，程序还会抛出nullPointerException异常。<br>但<strong>清除对象引用只是一种例外，不是一种规范工作。清除过期引用的最好方法是让包含该引用的变量结束其生命周期。</strong></p>
-<p><strong>何时应该清除引用？</strong><br>在<strong>需要自己管理内存的时候需要格外注意</strong>。比如我们举例的Stack类。存储池中包含了elements数组，垃圾回收期不知道哪些是活动的，哪些是非活动的，所以程序员需要在数组元素变成非活动部分的一部分的时候，手工清空这些数组元素。</p>
-<h3 id="缓存造成的内存泄漏"><a href="#缓存造成的内存泄漏" class="headerlink" title="缓存造成的内存泄漏"></a>缓存造成的内存泄漏</h3><p>对象引用放到缓存中后，很容易被遗忘掉。</p>
-<h4 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h4><p>只要缓存之外有对某个项的<strong>键</strong>的引用，该项就有意义，可以使用WeakHashMap。缓存中的项过期后，他们会被自动删除。</p>
-<p>但是 缓存项的生命周期是否有意义<br>并不是很容易确定，随着时间推移，其中的项会变得越来越没有价值，所以缓存应该时不时清楚掉没用的项，可以使用后台线程（如timer或者scheduledThreadPoolExcutor）来完成。</p>
-<h3 id="监听器和其他回调"><a href="#监听器和其他回调" class="headerlink" title="监听器和其他回调"></a>监听器和其他回调</h3><p>比如在一个API中注册回调，但没有显式的取消注册。</p>
-<h4 id="解决方案："><a href="#解决方案：" class="headerlink" title="解决方案："></a>解决方案：</h4><p>确保回调立即被当作垃圾回收的最佳方法是只保存他们的弱引用，比如，只将他们保存成WeakHashMap中的键。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/03/EF2_5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Ke Yu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Coco">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/07/03/EF2_5/" itemprop="url">Effective Java 读书笔记（2.5）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-03T22:23:42+08:00">
-                2017-07-03
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>第二章 创建和销毁对象</p>
-<p><strong>第五条.避免创建不必要的对象</strong></p>
-<h3 id="①"><a href="#①" class="headerlink" title="①"></a>①</h3><p><img src="http://ovwunej09.bkt.clouddn.com/EF50.png" alt="clipboard.png"></p>
-<p>传进去的参数“stringette”本身就是一个实例，然后又用new新建一个实例。很明显创建了不必要的实例。</p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF51.png" alt="clipboard.png"></p>
-<p>这种方法，就只会创建一个实例。</p>
-<h3 id="②"><a href="#②" class="headerlink" title="②"></a><strong>②</strong></h3><p><img src="http://ovwunej09.bkt.clouddn.com/EF52.png" alt="clipboard.png"></p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF53.png" alt="clipboard.png"></p>
-<p>TimeZone tz1 = timeZone.getTimeZone(“GMT”); // 指定时区<br>Calendar cal1 = Calendar.getInstance(tz1); // 使用指定的时区和当前语言环境的日历<br>每次isbabyboomer()被调用的时候，都会创建一个calendar，一个timezone和两个date。<br>改进：将两个Date声明为static<br>final，把他们的初始化和Calendar的声明定义一起放到static代码块中。</p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/ef54.png" alt="clipboard.png"></p>
-<p>这种方法只在类初始化时创建Date，Calendar，TimeZone一次。不会在每次调用isBabyBoomer()的时候创建这些实例，那么<strong>万一isBabyBoomer()永远不被调用</strong>，不是浪费了BoomStart和BoomEND吗？可以采用延迟初始化的方法进行，也就是第一次调用isBabyBoomer()的时候进行初始化。但书上不建议这么做，认为这会使方法变得更复杂，并且无法带来太大的性能提高。</p>
-<h3 id="③考虑适配器，也被叫做视图。"><a href="#③考虑适配器，也被叫做视图。" class="headerlink" title="③考虑适配器，也被叫做视图。"></a>③考虑适配器，也被叫做视图。</h3><p>Map接口的keySet()返回Map对象的Set视图，视图中包含Map中所以的key。每次调用keySet()返回的都是同样的Set实例。所以当对其中一个返回Set实例进行更改时，其他的Set实例也会被改变。</p>
-<p>④JAVA5开始，有一种<strong>创建多余对象的新方法，也就是自动装箱。</strong>基本类型和装箱类型混用，按需要自动装箱或者拆箱，他们的差别变得模糊，但还是有区别。比如以下这个例子：</p>
-<p><img src="http://ovwunej09.bkt.clouddn.com/EF55.png" alt="clipboard.png"></p>
-<p>这样程序会构造2\^31个多余的Long实例，在for循环中，每次增加long时，i都会被转为Long实例。如果把sum的声明从Long改成long，会显著提高性能。</p>
-<p>建议：<strong>优先使用基本类型而不是装箱基本类型，</strong>以防止无意识的自动装箱。</p>
-<p>但是这个条目并不是说要避免创建对象，一些小对象的创建和回收动作是很廉价的，所以通过创建附加的对象，可以提升程序的清晰性、简洁性和功能性。<br>维护自己的对象池反而不是一种好做法。除非其中的对象非常重量级。（比如android中的bitmap）。维护对象池会增加内存的占用，损害性能，所以进行不要使用轻量级对象池。</p>
-<p>对象池的典型用法：数据库连接池。<br>建立数据库连接代价很昂贵，所以重用对象很有意义。</p>
-<p>这个条目讲的是<strong>，应该重用现有对象的时候，不要创建新的对象。</strong></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2699,7 +2945,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-count">37</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -2721,7 +2967,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-count">51</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

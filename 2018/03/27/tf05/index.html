@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="读书笔记,设计模式,源码," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="tf.train.exponential_decay(learning_rate, global_step, decay_steps, decay_rate, staircase=False, name=None)Applies exponential decay to the learning rate.When training a model, it is often recommended">
+<meta name="keywords" content="读书笔记,设计模式,源码">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tensorflow api整理(5)">
+<meta property="og:url" content="http://yoursite.com/2018/03/27/tf05/index.html">
+<meta property="og:site_name" content="Coco">
+<meta property="og:description" content="tf.train.exponential_decay(learning_rate, global_step, decay_steps, decay_rate, staircase=False, name=None)Applies exponential decay to the learning rate.When training a model, it is often recommended">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-04-04T06:26:36.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tensorflow api整理(5)">
+<meta name="twitter:description" content="tf.train.exponential_decay(learning_rate, global_step, decay_steps, decay_rate, staircase=False, name=None)Applies exponential decay to the learning rate.When training a model, it is often recommended">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/27/tf05/"/>
+
+
+
+
+
+  <title>Tensorflow api整理(5) | Coco</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Coco</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Hello world</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/27/tf05/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Tensorflow api整理(5)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-27T16:11:32+08:00">
+                2018-03-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="tf-train-exponential-decay-learning-rate-global-step-decay-steps-decay-rate-staircase-False-name-None"><a href="#tf-train-exponential-decay-learning-rate-global-step-decay-steps-decay-rate-staircase-False-name-None" class="headerlink" title="tf.train.exponential_decay(learning_rate, global_step, decay_steps, decay_rate, staircase=False, name=None)"></a>tf.train.exponential_decay(learning_rate, global_step, decay_steps, decay_rate, staircase=False, name=None)</h4><p>Applies exponential decay to the learning rate.<br>When training a model, it is often recommended to <strong><em>lower the learning rate as the training progresses</em></strong>. This function applies an exponential decay function to a provided initial learning rate. It requires <strong><em>a global_step value to compute the decayed learning rate</em></strong>. You can just pass a TensorFlow variable that you increment at each training step.</p>
+<p>The function returns the decayed learning rate. It is computed as:</p>
+<blockquote>
+<p>decayed_learning_rate = learning_rate *<br>                      decay_rate ^ (global_step / decay_steps)</p>
+</blockquote>
+<p>If the argument staircase is True, then global_step /decay_steps is an integer division and the decayed learning rate follows a staircase function.</p>
+<h5 id="Example-decay-every-100000-steps-with-a-base-of-0-96"><a href="#Example-decay-every-100000-steps-with-a-base-of-0-96" class="headerlink" title="Example: decay every 100000 steps with a base of 0.96"></a>Example: decay every 100000 steps with a base of 0.96</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">global_step = tf.Variable(<span class="number">0</span>, trainable=<span class="keyword">False</span>)</span><br><span class="line">starter_learning_rate = <span class="number">0.1</span></span><br><span class="line">learning_rate = tf.exponential_decay(starter_learning_rate, global_step,</span><br><span class="line">                                     <span class="number">100000</span>, <span class="number">0.96</span>, staircase=<span class="keyword">True</span>)</span><br><span class="line">optimizer = tf.GradientDescent(learning_rate)</span><br><span class="line"><span class="comment"># Passing global_step to minimize() will increment it at each step.</span></span><br><span class="line">optimizer.minimize(...my loss..., global_step=global_step)</span><br></pre></td></tr></table></figure>
+<p>Args:</p>
+<ul>
+<li>learning_rate: A scalar float32 or float64 Tensor or a Python number. The initial learning rate.</li>
+<li>global_step: A scalar int32 or int64 Tensor or a Python number. Global step to use for the decay computation. Must not be negative.</li>
+<li>decay_steps: A scalar int32 or int64 Tensor or a Python number. Must be positive. See the decay computation above.</li>
+<li>decay_rate: A scalar float32 or float64 Tensor or a Python number. The decay rate.</li>
+<li>staircase: Boolean. It True decay the learning rate at discrete intervals.</li>
+<li>name: string. Optional name of the operation. Defaults to ‘ExponentialDecay’</li>
+</ul>
+<p>Returns:<br>A scalar Tensor of the same type as learning_rate. <strong><em>The decayed learning rate</em></strong>.</p>
+<h4 id="class-tf-train-ExponentialMovingAverage"><a href="#class-tf-train-ExponentialMovingAverage" class="headerlink" title="class tf.train.ExponentialMovingAverage"></a>class tf.train.ExponentialMovingAverage</h4><p>Some training algorithms, such as <strong><em>GradientDescent and Momentum often benefit from maintaining a moving average of variables during optimization</em></strong>. Using the moving averages for evaluations often improve results significantly.</p>
+<p>Maintains moving averages of variables by employing and exponential decay.</p>
+<p>When training a model, it is often beneficial to maintain moving averages of the trained parameters. Evaluations that use averaged parameters sometimes produce significantly better results than the final trained values.</p>
+<p>The apply() method adds shadow copies of trained variables and add ops that maintain a moving average of the trained variables in their shadow copies. It is used when building the training model. The ops that maintain moving averages are typically run after each training step. The average() and average_name() methods give access to the shadow variables and their names. They are useful when building an evaluation model, or when restoring a model from a checkpoint file. They help use the moving averages in place of the last trained values for evaluations.</p>
+<p>The moving averages are computed using exponential decay. You specify the decay value when creating the ExponentialMovingAverage object. The shadow variables are initialized with the same initial values as the trained variables. When you run the ops to maintain the moving averages, each shadow variable is updated with the formula:</p>
+<p>shadow_variable -= (1 - decay) * (shadow_variable - variable)</p>
+<p>This is mathematically equivalent to the classic formula below, but the use of an assign_sub op (the “-=” in the formula) allows concurrent lockless updates to the variables:</p>
+<p>shadow_variable = decay <em> shadow_variable + (1 - decay) </em> variable</p>
+<p>Reasonable values for decay are close to 1.0, typically in the multiple-nines range: 0.999, 0.9999, etc.</p>
+<p>Example usage when creating a training model:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Create variables.</span></span><br><span class="line">var0 = tf.Variable(...)</span><br><span class="line">var1 = tf.Variable(...)</span><br><span class="line"><span class="comment"># ... use the variables to build a training model...</span></span><br><span class="line">...</span><br><span class="line"><span class="comment"># Create an op that applies the optimizer.  This is what we usually</span></span><br><span class="line"><span class="comment"># would use as a training op.</span></span><br><span class="line">opt_op = opt.minimize(my_loss, [var0, var1])</span><br><span class="line"></span><br><span class="line"><span class="comment"># Create an ExponentialMovingAverage object</span></span><br><span class="line">ema = tf.train.ExponentialMovingAverage(decay=<span class="number">0.9999</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Create the shadow variables, and add ops to maintain moving averages</span></span><br><span class="line"><span class="comment"># of var0 and var1.</span></span><br><span class="line">maintain_averages_op = ema.apply([var0, var1])</span><br><span class="line"></span><br><span class="line"><span class="comment"># Create an op that will update the moving averages after each training</span></span><br><span class="line"><span class="comment"># step.  This is what we will use in place of the usuall trainig op.</span></span><br><span class="line"><span class="keyword">with</span> tf.control_dependencies([opt_op]):</span><br><span class="line">    training_op = tf.group(maintain_averages_op)</span><br><span class="line"></span><br><span class="line">...train the model by running training_op...</span><br></pre></td></tr></table></figure>
+<p>There are two ways to use the moving averages for evaluations:</p>
+<p>Build a model that uses the shadow variables instead of the variables. For this, use the average() method which returns the shadow variable for a given variable.<br>Build a model normally but load the checkpoint files to evaluate by using the shadow variable names. For this use the average_name() method. See the Saver class for more information on restoring saved variables.</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/读书笔记/" rel="tag"># 读书笔记</a>
+          
+            <a href="/tags/设计模式/" rel="tag"># 设计模式</a>
+          
+            <a href="/tags/源码/" rel="tag"># 源码</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/22/tf04/" rel="next" title="Tensorflow api整理(4)">
+                <i class="fa fa-chevron-left"></i> Tensorflow api整理(4)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Ke Yu" />
+            
+              <p class="site-author-name" itemprop="name">Ke Yu</p>
+              <p class="site-description motion-element" itemprop="description">Keep moving. Don't settle.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">51</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#tf-train-exponential-decay-learning-rate-global-step-decay-steps-decay-rate-staircase-False-name-None"><span class="nav-number">1.</span> <span class="nav-text">tf.train.exponential_decay(learning_rate, global_step, decay_steps, decay_rate, staircase=False, name=None)</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Example-decay-every-100000-steps-with-a-base-of-0-96"><span class="nav-number">1.1.</span> <span class="nav-text">Example: decay every 100000 steps with a base of 0.96</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#class-tf-train-ExponentialMovingAverage"><span class="nav-number">2.</span> <span class="nav-text">class tf.train.ExponentialMovingAverage</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ke Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

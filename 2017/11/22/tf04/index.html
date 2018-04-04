@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="tensorflow,机器学习," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="tf.app.run()123456789101112131415&quot;&quot;&quot;Generic entry point script.&quot;&quot;&quot;from __future__ import absolute_importfrom __future__ import divisionfrom __future__ import print_functionimport sysfrom tensorflow.py">
+<meta name="keywords" content="tensorflow,机器学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tensorflow api整理(4)">
+<meta property="og:url" content="http://yoursite.com/2017/11/22/tf04/index.html">
+<meta property="og:site_name" content="Coco">
+<meta property="og:description" content="tf.app.run()123456789101112131415&quot;&quot;&quot;Generic entry point script.&quot;&quot;&quot;from __future__ import absolute_importfrom __future__ import divisionfrom __future__ import print_functionimport sysfrom tensorflow.py">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-04-04T06:26:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tensorflow api整理(4)">
+<meta name="twitter:description" content="tf.app.run()123456789101112131415&quot;&quot;&quot;Generic entry point script.&quot;&quot;&quot;from __future__ import absolute_importfrom __future__ import divisionfrom __future__ import print_functionimport sysfrom tensorflow.py">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/11/22/tf04/"/>
+
+
+
+
+
+  <title>Tensorflow api整理(4) | Coco</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Coco</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Hello world</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/22/tf04/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Tensorflow api整理(4)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-22T15:16:12+08:00">
+                2017-11-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/图像/" itemprop="url" rel="index">
+                    <span itemprop="name">图像</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="tf-app-run"><a href="#tf-app-run" class="headerlink" title="tf.app.run()"></a>tf.app.run()</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"""Generic entry point script."""</span></span><br><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> absolute_import</span><br><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> division</span><br><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> print_function</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> tensorflow.python.platform <span class="keyword">import</span> flags</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(main=None)</span>:</span></span><br><span class="line">  f = flags.FLAGS</span><br><span class="line">  f._parse_flags() ---&gt;B</span><br><span class="line">  main = main <span class="keyword">or</span> sys.modules[<span class="string">'__main__'</span>].main</span><br><span class="line">  sys.exit(main(sys.argv))</span><br></pre></td></tr></table></figure>
+<p>A:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_parse_flags</span><span class="params">(self)</span>:</span>  </span><br><span class="line">  result, _ = _global_parser.parse_known_args()  </span><br><span class="line">  <span class="keyword">for</span> flag_name, val <span class="keyword">in</span> vars(result).items():  </span><br><span class="line">    self.__dict__[<span class="string">'__flags'</span>][flag_name] = val  </span><br><span class="line">  self.__dict__[<span class="string">'__parsed'</span>] = <span class="keyword">True</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="tf-image-random-crop-image-size-seed-None-name-None"><a href="#tf-image-random-crop-image-size-seed-None-name-None" class="headerlink" title="tf.image.random_crop(image, size, seed=None, name=None)"></a>tf.image.random_crop(image, size, seed=None, name=None)</h4><p>Randomly crops image to size [target_height, target_width].<br>随机裁剪[target_height,target_width]大小的图片.</p>
+<p>The offset of the output within image is uniformly random. image always fully contains the result.</p>
+<p>Args:</p>
+<ul>
+<li>image: 3-D tensor of shape [height, width, channels]<br>图像源.</li>
+<li>size: 1-D tensor with two elements, specifying target [height, width]<br>切割大小.</li>
+<li>seed: A Python integer. Used to create a random seed. See set_random_seed for behavior.</li>
+<li>name: A name for this operation (optional).</li>
+</ul>
+<p>Returns:<br>A cropped 3-D tensor of shape [target_height, target_width, channels].</p>
+<h4 id="tf-image-random-flip-left-right-image-seed-None"><a href="#tf-image-random-flip-left-right-image-seed-None" class="headerlink" title="tf.image.random_flip_left_right(image, seed=None)"></a>tf.image.random_flip_left_right(image, seed=None)</h4><p>Randomly flip an image horizontally (left to right).<br>随机水平裁剪图片。</p>
+<p>With a 1 in 2 chance, outputs the contents of image flipped along the second dimension, which is width. Otherwise output the image as-is.</p>
+<p>Args:</p>
+<ul>
+<li>image: A 3-D tensor of shape [height, width, channels].</li>
+<li>seed: A Python integer. Used to create a random seed. See set_random_seed for behavior.</li>
+</ul>
+<p>Returns:<br>A 3-D tensor of the same type and shape as image.</p>
+<h4 id="tf-image-random-brightness-image-max-delta-seed-None"><a href="#tf-image-random-brightness-image-max-delta-seed-None" class="headerlink" title="tf.image.random_brightness(image, max_delta, seed=None)"></a>tf.image.random_brightness(image, max_delta, seed=None)</h4><p>Adjust the brightness of images by a random factor.<br>调节明亮度。</p>
+<p>Equivalent to adjust_brightness() using a delta randomly picked in the interval [-max_delta, max_delta).</p>
+<p>Note that delta is picked as a float. Because for integer type images, the brightness adjusted result is rounded before casting, integer images may have modifications in the range [-max_delta,max_delta].</p>
+<p>Args:</p>
+<ul>
+<li>image: 3-D tensor of shape [height, width, channels].</li>
+<li>max_delta: float, must be non-negative.</li>
+<li>seed: A Python integer. Used to create a random seed. See set_random_seed for behavior.</li>
+</ul>
+<p>Returns:<br>3-D tensor of images of shape [height, width, channels]</p>
+<h4 id="tf-image-random-contrast-image-lower-upper-seed-None"><a href="#tf-image-random-contrast-image-lower-upper-seed-None" class="headerlink" title="tf.image.random_contrast(image, lower, upper, seed=None)"></a>tf.image.random_contrast(image, lower, upper, seed=None)</h4><p>Adjust the contrase of an image by a random factor.<br>调节对比度。</p>
+<p>Equivalent to adjust_constrast() but uses a contrast_factor randomly picked in the interval [lower, upper].</p>
+<p>Args:</p>
+<ul>
+<li>image: 3-D tensor of shape [height, width, channels].</li>
+<li>lower: float. Lower bound for the random contrast factor.</li>
+<li>upper: float. Upper bound for the random contrast factor.</li>
+<li>seed: A Python integer. Used to create a random seed. See set_random_seed for behavior.</li>
+</ul>
+<p>Returns:<br>3-D tensor of shape [height, width, channels].</p>
+<h4 id="tf-image-per-image-standardization-image"><a href="#tf-image-per-image-standardization-image" class="headerlink" title="tf.image.per_image_standardization(image)"></a>tf.image.per_image_standardization(image)</h4><p>图片的标准化，可以加速神经网络训练。why?<br>包含以下步骤：<br>(x - mean) / adjusted_stddev<br>x 为RGB三通道像素值，mean为RGB三通道像素均值，其中<br>adjusted_stddev = max(stddev, 1.0/sqrt(image.NumElements()))<br>stddev为RGB三通道像素的标准差,image.NumElements为RGB三通道像素的个数</p>
+<h4 id="tf-cast-x-dtype-name-None"><a href="#tf-cast-x-dtype-name-None" class="headerlink" title="tf.cast(x, dtype, name=None)"></a>tf.cast(x, dtype, name=None)</h4><p>Casts a tensor to a new type.<br>将x类型转换为dtype类型。</p>
+<p>The operation casts x (in case of Tensor) or x.values (in case of SparseTensor) to dtype.</p>
+<p>For example:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># tensor `a` is [1.8, 2.2], dtype=tf.float</span><br><span class="line">tf.cast(a, tf.int32) ==&gt; [1, 2]  # dtype=tf.int32</span><br></pre></td></tr></table></figure></p>
+<p>Args:</p>
+<ul>
+<li>x: A Tensor or SparseTensor.</li>
+<li>dtype: The destination type.</li>
+<li>name: A name for the operation (optional).<br>Returns:</li>
+</ul>
+<p>A Tensor or SparseTensor with same shape as x.</p>
+<h4 id="tf-FixedLengthRecordReader-read-queue-name-None"><a href="#tf-FixedLengthRecordReader-read-queue-name-None" class="headerlink" title="tf.FixedLengthRecordReader.read(queue, name=None)"></a>tf.FixedLengthRecordReader.read(queue, name=None)</h4><p>Returns the next record (key, value pair) produced by a reader.</p>
+<p>Will dequeue a work unit from queue if necessary (e.g. when the Reader needs to start reading from a new file since it has finished with the previous file).<br>从队列中读取一个unit，以键值对的形式返回。<br>Args:</p>
+<ul>
+<li>queue: A Queue or a mutable string Tensor representing a handle to a Queue, with string work items.</li>
+<li>name: A name for the operation (optional).</li>
+</ul>
+<p>Returns:<br>A tuple of Tensors (key, value).</p>
+<ul>
+<li>key: A string scalar Tensor.</li>
+<li>value: A string scalar Tensor.</li>
+</ul>
+<h4 id="tf-decode-raw-bytes-out-type-little-endian-None-name-None"><a href="#tf-decode-raw-bytes-out-type-little-endian-None-name-None" class="headerlink" title="tf.decode_raw(bytes, out_type, little_endian=None, name=None)"></a>tf.decode_raw(bytes, out_type, little_endian=None, name=None)</h4><p>Reinterpret the bytes of a string as a vector of numbers.<br>将string重新转换为向量。</p>
+<p>Args:</p>
+<ul>
+<li>bytes: A Tensor of type string. All the elements must have the same length.</li>
+<li>out_type: A tf.DType from: tf.float32, tf.float64, tf.int32, tf.uint8, tf.int16, tf.int8, tf.int64.</li>
+<li>little_endian: An optional bool. Defaults to True. Whether the input bytes are in little-endian order. Ignored for out_types that are stored in a single byte like uint8.</li>
+<li>name: A name for the operation (optional).</li>
+</ul>
+<p>Returns:<br>A Tensor of type out_type. A Tensor with one more dimension than the input bytes. The added dimension will have size equal to the length of the elements of bytes divided by the number of bytes to represent out_type.<br>返回比输入大一维的out_type类型的tensor</p>
+<h4 id="tf-slice-input-begin-size-name-None"><a href="#tf-slice-input-begin-size-name-None" class="headerlink" title="tf.slice(input_, begin, size, name=None)"></a>tf.slice(input_, begin, size, name=None)</h4><p>Extracts a slice from a tensor.</p>
+<p>This operation extracts a slice of size size from a tensor input starting at the location specified by begin. The slice size is represented as a tensor shape, where size[i] is the number of elements of the ‘i’th dimension of input that you want to slice. </p>
+<p>在输入的tensor中从位置begin[i]起提出长度为size[i]的片段，size使用tesnsor shape表示，size[i]代表输入的第i维的元素个数.<br>这个函数稍微有点抽象，可以首先从二维开始想：<br>input is :<br>[[1,2,3], [4,5,6], [7,8,9]]<br>如果begin = [1,1]<br>size = [2,2]<br>那么就从[1,1]位置开始，即5的位置开始，截取2行2列的片段，也就是：<br>[[5,6],[8,9]]</p>
+<p>同理在三维情况下，看看这个官方例子：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 'input' is [[[1, 1, 1], [2, 2, 2]],</span></span><br><span class="line"><span class="comment">#             [[3, 3, 3], [4, 4, 4]],</span></span><br><span class="line"><span class="comment">#             [[5, 5, 5], [6, 6, 6]]]</span></span><br><span class="line">tf.slice(input, [1, 0, 0], [1, 1, 3]) ==&gt; [[[3, 3, 3]]]</span><br><span class="line">tf.slice(input, [1, 0, 0], [1, 2, 3]) ==&gt; [[[3, 3, 3],</span><br><span class="line">                                            [<span class="number">4</span>, <span class="number">4</span>, <span class="number">4</span>]]]</span><br><span class="line">tf.slice(input, [1, 0, 0], [2, 1, 3]) ==&gt; [[[3, 3, 3]],</span><br><span class="line">                                           [[<span class="number">5</span>, <span class="number">5</span>, <span class="number">5</span>]]]</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><p>Ex.1 :<br>  以[1,0,0]为起点，划分[1,1,3]的大小，1即[[3, 3, 3], [4, 4, 4]]这个数组A的位置，大小为1,那么就是这个数组A本身；0即[3,3,3]这个数组B的位置,大小为1,那么就是这个数组B的位置，0即第一个3这个位置,大小为3,那么就包含从这个3开始的3个数即3,3,3;所以结果为[[[3,3,3]]]</p>
+</li>
+<li><p>Ex.2 ：<br>  以[1,0,0]为起点，划分[1,2,3]的大小，1即[[3, 3, 3], [4, 4, 4]]这个数组A的位置，大小为1,那么就是这个数组A本身；0即[3,3,3]这个数组B的位置,大小为2,那么就是[3,3,3],[4,4,4]两个数组，0即第一个3和第一个4这个位置,大小为3,那么就包含从这个3(4)开始的3个数即3,3,3(4,4,4);所以结果为[[[3,3,3],[4,4,4]]]</p>
+<p>  同理Ex.3.</p>
+<p>  ​</p>
+<h4 id="tf-merge-all-summaries-key-’summaries’"><a href="#tf-merge-all-summaries-key-’summaries’" class="headerlink" title="tf.merge_all_summaries(key=’summaries’)"></a>tf.merge_all_summaries(key=’summaries’)</h4><p>(tf.summary.merge_all())</p>
+</li>
+</ul>
+<p>Merges all summaries collected in the default graph.<br>收集graph中所有的summaries.</p>
+<p>Args:<br>key: GraphKey used to collect the summaries. Defaults to GraphKeys.SUMMARIES.</p>
+<p>Returns:<br>If no summaries were collected, returns None. Otherwise returns a scalar Tensor of typestring containing the serialized Summary protocol buffer resulting from the merging.</p>
+<h4 id="tf-get-default-graph"><a href="#tf-get-default-graph" class="headerlink" title="tf.get_default_graph()"></a>tf.get_default_graph()</h4><p>获取默认的图。</p>
+<h4 id="tf-Graph-as-graph-def"><a href="#tf-Graph-as-graph-def" class="headerlink" title="tf.Graph.as_graph_def"></a>tf.Graph.as_graph_def</h4><p>(from_version=None, add_shapes=False)<br>返回图的序列化表示。</p>
+<h4 id="tf-summary-FileWriter-FLAGS-eval-dir-graph-def-graph-def"><a href="#tf-summary-FileWriter-FLAGS-eval-dir-graph-def-graph-def" class="headerlink" title="tf.summary.FileWriter(FLAGS.eval_dir,graph_def=graph_def)"></a>tf.summary.FileWriter(FLAGS.eval_dir,graph_def=graph_def)</h4><p>将运行图得到的summary写到磁盘中。</p>
+<h4 id="checkpoint-state"><a href="#checkpoint-state" class="headerlink" title="checkpoint_state"></a>checkpoint_state</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">with tf.Session() as sess:</span><br><span class="line">    ckpt = tf.train.get_checkpoint_state(FLAGS.checkpoint_dir)</span><br><span class="line">    if ckpt and ckpt.model_checkpoint_path:</span><br><span class="line">      # Restores from checkpoint</span><br><span class="line">      saver.restore(sess, ckpt.model_checkpoint_path)</span><br><span class="line">      # Assuming model_checkpoint_path looks something like:</span><br><span class="line">      #   /my-favorite-path/cifar10_train/model.ckpt-0,</span><br><span class="line">      # extract global_step from it.</span><br><span class="line">      global_step = ckpt.model_checkpoint_path.split(&apos;/&apos;)[-1].split(&apos;-&apos;)[-1]</span><br><span class="line">    else:</span><br><span class="line">      print(&apos;No checkpoint file found&apos;)</span><br><span class="line">      return</span><br></pre></td></tr></table></figure>
+<h4 id="tf-get-collection-key-scope-None"><a href="#tf-get-collection-key-scope-None" class="headerlink" title="tf.get_collection(key, scope=None)"></a>tf.get_collection(key, scope=None)</h4><p>Wrapper for Graph.get_collection() using the default graph.<br>从图中取出对应Key的所有list values<br>See Graph.get_collection() for more details.</p>
+<p>Args:</p>
+<ul>
+<li>key: The key for the collection. For example, the GraphKeys class contains many standard names for collections.</li>
+<li>scope: (Optional.) If supplied, the resulting list is filtered to include only items whose name begins with this string.</li>
+</ul>
+<p>Returns:<br>The list of values in the collection with the given name, or an empty list if no value has been added to that collection. The list contains the values in the order under which they were collected.</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/tensorflow/" rel="tag"># tensorflow</a>
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/19/tf03/" rel="next" title="Tensorflow api整理(3)">
+                <i class="fa fa-chevron-left"></i> Tensorflow api整理(3)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/27/tf05/" rel="prev" title="Tensorflow api整理(5)">
+                Tensorflow api整理(5) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Ke Yu" />
+            
+              <p class="site-author-name" itemprop="name">Ke Yu</p>
+              <p class="site-description motion-element" itemprop="description">Keep moving. Don't settle.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">51</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#tf-app-run"><span class="nav-number">1.</span> <span class="nav-text">tf.app.run()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tf-image-random-crop-image-size-seed-None-name-None"><span class="nav-number">2.</span> <span class="nav-text">tf.image.random_crop(image, size, seed=None, name=None)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tf-image-random-flip-left-right-image-seed-None"><span class="nav-number">3.</span> <span class="nav-text">tf.image.random_flip_left_right(image, seed=None)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tf-image-random-brightness-image-max-delta-seed-None"><span class="nav-number">4.</span> <span class="nav-text">tf.image.random_brightness(image, max_delta, seed=None)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tf-image-random-contrast-image-lower-upper-seed-None"><span class="nav-number">5.</span> <span class="nav-text">tf.image.random_contrast(image, lower, upper, seed=None)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tf-image-per-image-standardization-image"><span class="nav-number">6.</span> <span class="nav-text">tf.image.per_image_standardization(image)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tf-cast-x-dtype-name-None"><span class="nav-number">7.</span> <span class="nav-text">tf.cast(x, dtype, name=None)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tf-FixedLengthRecordReader-read-queue-name-None"><span class="nav-number">8.</span> <span class="nav-text">tf.FixedLengthRecordReader.read(queue, name=None)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tf-decode-raw-bytes-out-type-little-endian-None-name-None"><span class="nav-number">9.</span> <span class="nav-text">tf.decode_raw(bytes, out_type, little_endian=None, name=None)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tf-slice-input-begin-size-name-None"><span class="nav-number">10.</span> <span class="nav-text">tf.slice(input_, begin, size, name=None)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tf-merge-all-summaries-key-’summaries’"><span class="nav-number">11.</span> <span class="nav-text">tf.merge_all_summaries(key=’summaries’)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tf-get-default-graph"><span class="nav-number">12.</span> <span class="nav-text">tf.get_default_graph()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tf-Graph-as-graph-def"><span class="nav-number">13.</span> <span class="nav-text">tf.Graph.as_graph_def</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tf-summary-FileWriter-FLAGS-eval-dir-graph-def-graph-def"><span class="nav-number">14.</span> <span class="nav-text">tf.summary.FileWriter(FLAGS.eval_dir,graph_def=graph_def)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#checkpoint-state"><span class="nav-number">15.</span> <span class="nav-text">checkpoint_state</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tf-get-collection-key-scope-None"><span class="nav-number">16.</span> <span class="nav-text">tf.get_collection(key, scope=None)</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ke Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

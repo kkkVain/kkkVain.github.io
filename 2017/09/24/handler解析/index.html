@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="源码,Java,Android," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="主要为了解决不能在UI线程更新控件的问题。 由于Handler运行在主线程中(UI线程中)，  它与子线程可以通过Message对象来传递数据， 这个时候，Handler就承担着接受子线程传过来的(子线程用sendMessage()方法传递Message对象，里面包含数据)  ， 把这些消息放入主线程队列中，配合主线程进行更新UI。 作用handler可以分发Message对象和Runnable对">
+<meta name="keywords" content="源码,Java,Android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Handler解析">
+<meta property="og:url" content="http://yoursite.com/2017/09/24/handler解析/index.html">
+<meta property="og:site_name" content="Coco">
+<meta property="og:description" content="主要为了解决不能在UI线程更新控件的问题。 由于Handler运行在主线程中(UI线程中)，  它与子线程可以通过Message对象来传递数据， 这个时候，Handler就承担着接受子线程传过来的(子线程用sendMessage()方法传递Message对象，里面包含数据)  ， 把这些消息放入主线程队列中，配合主线程进行更新UI。 作用handler可以分发Message对象和Runnable对">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/2017/09/24/handler解析/handler">
+<meta property="og:updated_time" content="2018-04-04T07:33:07.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Handler解析">
+<meta name="twitter:description" content="主要为了解决不能在UI线程更新控件的问题。 由于Handler运行在主线程中(UI线程中)，  它与子线程可以通过Message对象来传递数据， 这个时候，Handler就承担着接受子线程传过来的(子线程用sendMessage()方法传递Message对象，里面包含数据)  ， 把这些消息放入主线程队列中，配合主线程进行更新UI。 作用handler可以分发Message对象和Runnable对">
+<meta name="twitter:image" content="http://yoursite.com/2017/09/24/handler解析/handler">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/09/24/handler解析/"/>
+
+
+
+
+
+  <title>Handler解析 | Coco</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Coco</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Hello world</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/24/handler解析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Handler解析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-24T15:23:42+08:00">
+                2017-09-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>主要为了解决不能在UI线程更新控件的问题。</p>
+<p>由于Handler运行在主线程中(UI线程中)，  它与子线程可以通过Message对象来传递数据， 这个时候，Handler就承担着接受子线程传过来的(子线程用sendMessage()方法传递Message对象，里面包含数据)  ， 把这些消息放入主线程队列中，配合主线程进行更新UI。</p>
+<h3 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h3><p>handler可以分发Message对象和Runnable对象到主线程中， 每个Handler实例，都会绑定到创建他的线程中(一般是位于主线程)，它有两个作用：</p>
+<p>(1)安排消息或Runnable在某个主线程中某个地方执行；</p>
+<p>post类方法允许你排列一个Runnable对象到主线程队列中</p>
+<p>sendMessage类方法， 允许你安排一个带数据的Message对象到队列中，等待更新。</p>
+<p>(2）将一个任务放入队列，以便它可以在另外的线程中执行。</p>
+<p><img src="handler" alt="http://ovwunej09.bkt.clouddn.com/handler.png"></p>
+<h3 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h3><h6 id="A-Handler"><a href="#A-Handler" class="headerlink" title="A.Handler"></a>A.Handler</h6><p>1）几个构造函数，最终主要是两个：</p>
+<p>a.使用传入的looper</p>
+<p>public Handler(Looper looper, Callback callback, boolean async) {</p>
+<p>​    mLooper = looper;//指定该handler实例所绑定的looper实例</p>
+<p>​    mQueue = looper.mQueue;</p>
+<p>​    mCallback = callback; //给定回调接口进行消息处理。</p>
+<p>​    mAsynchronous = async;</p>
+<p>}</p>
+<p><strong><strong>思考：looper遍历queue中的Msg ，用msg的target handler进行处理，这是looper 关联handler，那么handler关联looper是什么情况？</strong></strong></p>
+<p>b.使用默认的looper. Handler最终的构造函数：（async默认是false）</p>
+<p>public Handler(Callback callback, boolean async) {</p>
+<p>​    if (FIND_POTENTIAL_LEAKS) {</p>
+<p>​        final Class&lt;? extends Handler&gt; klass = getClass();</p>
+<p>​        if ((klass.isAnonymousClass() || klass.isMemberClass() || klass.isLocalClass()) &amp;&amp;</p>
+<p>​                (klass.getModifiers() &amp; Modifier.STATIC) == 0) {</p>
+<p>​            Log.w(TAG, “The following Handler class should be static or leaks might occur: “ +</p>
+<p>​                klass.getCanonicalName());</p>
+<p>​        }</p>
+<p>​    }</p>
+<p>​    mLooper = Looper.myLooper(); //静态函数，从sThreadLocal中取出变量</p>
+<p>​    if (mLooper == null) {</p>
+<p>​        throw new RuntimeException(</p>
+<p>​            “Can’t create handler inside thread that has not called Looper.prepare()”);</p>
+<p>​    }</p>
+<p>​    mQueue = mLooper.mQueue;</p>
+<p>​    mCallback = callback;</p>
+<p>​    mAsynchronous = async;</p>
+<p>}</p>
+<p>mLooper的默认值是什么？只有Looper调用了prepare()才会有！</p>
+<p>// sThreadLocal.get() will return null unless you’ve called prepare().</p>
+<p>static final ThreadLocal<looper> sThreadLocal = new ThreadLocal<looper>();</looper></looper></p>
+<p>也就是说，handler在构造前，要先在这个线程中执行Looper.prepare()，使Looper.myLooper()能成功返回当前线程threadLocal的looper！</p>
+<p>也就是说handler关联looper，是一开始在构造函数中就关联起来的了，handler构造时，要么传入一个存在了的looper（looper.prepare()创造），要么当前线程已经调用looper.prepare()</p>
+<p>终究就是要先有Looper.prepare()</p>
+<p>2）所有的常用的send和post方法，最终调用的都是sendMessageAtTime(Message, long) 这个方法（如果传入的参数是runnable的话，会先调用getPostMessage(Runnable) 或getPostMessage(Runnable, Object)方法获取消息）</p>
+<p>假设看看postDelayed：</p>
+<p>A.public final boolean postDelayed(Runnable r, long delayMillis)</p>
+<p>{</p>
+<p>​    return sendMessageDelayed(getPostMessage(r), delayMillis);—&gt;B</p>
+<p>}</p>
+<p>其中get函数用来设置runnable依附的message</p>
+<p>private static Message getPostMessage(Runnable r) {</p>
+<p>​    Message m = Message.obtain();</p>
+<p>​    m.callback = r;</p>
+<p>​    return m;</p>
+<p>}</p>
+<p>B.public final boolean sendMessageDelayed(Message msg, long delayMillis)</p>
+<p>{</p>
+<p>​    if (delayMillis &lt; 0) {</p>
+<p>​        delayMillis = 0;</p>
+<p>​    }</p>
+<p>​    return sendMessageAtTime(msg, SystemClock.uptimeMillis() + delayMillis);—&gt;C</p>
+<p>}</p>
+<p>重点函数：</p>
+<p>// 将message入队，并在指定时间到之前将该消息放在所有挂起的消息之后。</p>
+<p>C.public boolean sendMessageAtTime(Message msg, long uptimeMillis) {</p>
+<p>​        MessageQueue queue = mQueue;</p>
+<p>​        if (queue == null) {</p>
+<p>​            RuntimeException e = new RuntimeException(</p>
+<p>​                    this + “ sendMessageAtTime() called with no mQueue”);</p>
+<p>​            Log.w(“Looper”, e.getMessage(), e);</p>
+<p>​            return false;</p>
+<p>​        }</p>
+<p>​        return enqueueMessage(queue, msg, uptimeMillis);</p>
+<p>​    }</p>
+<p>private boolean enqueueMessage(MessageQueue queue, Message msg, long uptimeMillis) {</p>
+<p>​    msg.target = this; //为message指定target为该handler实例（精髓）</p>
+<p>​    if (mAsynchronous) {</p>
+<p>​        msg.setAsynchronous(true);</p>
+<p>​    }</p>
+<p>​    return queue.enqueueMessage(msg, uptimeMillis);</p>
+<p>}</p>
+<p>PS: 发现了两个强行插队，让runnable在message 的下一个Loop直接执行的函数：</p>
+<p>其实就是把delaymills置为0= =</p>
+<p>public final boolean postAtFrontOfQueue(Runnable r)</p>
+<p>{</p>
+<p>​    return sendMessageAtFrontOfQueue(getPostMessage(r));</p>
+<p>}</p>
+<p>public final boolean sendMessageAtFrontOfQueue(Message msg) {</p>
+<p>​    MessageQueue queue = mQueue;</p>
+<p>​    if (queue == null) {</p>
+<p>​        RuntimeException e = new RuntimeException(</p>
+<p>​            this + “ sendMessageAtTime() called with no mQueue”);</p>
+<p>​        Log.w(“Looper”, e.getMessage(), e);</p>
+<p>​        return false;</p>
+<p>​    }</p>
+<p>​    return enqueueMessage(queue, msg, 0);</p>
+<p>}</p>
+<p>D. loop()函数中，msg.target调用的函数：</p>
+<p>执行优先级：1)msg中含有callback（用post方法时），用message的这个callback方法处理msg；2）构造这个handler时传入了callback，同样用callback处理Msg；3）直接用handler的重载函数handleMessage处理msg</p>
+<p>/**</p>
+<p> * Handle system messages here.</p>
+<p> */</p>
+<p>public void dispatchMessage(Message msg) {</p>
+<p>​    if (msg.callback != null) {</p>
+<p>​        handleCallback(msg);</p>
+<p>​    } else {</p>
+<p>​        if (mCallback != null) {</p>
+<p>​            if (mCallback.handleMessage(msg)) {</p>
+<p>​                return;</p>
+<p>​            }</p>
+<p>​        }</p>
+<p>​        handleMessage(msg);</p>
+<p>​    }</p>
+<p>}</p>
+<p>######B.Message</p>
+<p>extends Object</p>
+<p>implements Parcelable</p>
+<p>一个message对象包含一个自身的描述信息和一个可以发给handler的任意数据对象。</p>
+<p>虽然Message的构造方法是public的，但实例化Message的最好方法是调用Message.obtain() 或 Handler.obtainMessage() ，因为这两个方法是从一个可回收利用的message对象回收池中获取Message实例（实际上最终调用的仍然是Message.obtain()）。该回收池用于将每次交给handler处理的message对象进行回收。 </p>
+<h5 id="C-MessageQueue"><a href="#C-MessageQueue" class="headerlink" title="C.MessageQueue"></a>C.MessageQueue</h5><p>MessageQueue是用来存放Message的集合，并由Looper实例来分发里面的Message对象。同时，message并不是直接加入到MessageQueue中的, 而是通过与Looper对象相关联的MessageQueue.IdleHandler 对象来完成的。我们可以通过Looper.myQueue() 方法来获得当前线程的MessageQueue。 </p>
+<p>MQ实际上没有采用队列，而是采用单链表的数据结构来存储消息列表。</p>
+<h5 id="D-Looper"><a href="#D-Looper" class="headerlink" title="D.Looper"></a>D.Looper</h5><p>Looper是线程用来运行消息循环(message loop)的类。默认情况下，线程并没有与之关联的Looper，可以通过在线程中调用Looper.prepare() 方法来获取，用来执行loop，并通过Looper.loop() 无限循环地获取并分发MessageQueue中的消息，直到所有消息全部处理。</p>
+<p>* </p><p>This is a typical example of the implementation of a Looper thread,</p>
+<p>* using the separation of {@link #prepare} and {@link #loop} to create an</p>
+<p>* initial Handler to communicate with the Looper.</p>
+<p>*</p>
+<p>* <pre></pre></p>
+<p>*  class LooperThread extends Thread {</p>
+<p>*      public Handler mHandler;</p>
+<p>*</p>
+<p>*      public void run() {</p>
+<p>*          Looper.prepare(); // 创建一个looper，来循坏获取处理MessageQueue里面的消息</p>
+<p>*</p>
+<p>*          mHandler = new Handler() { // 那么这个handler，就不是在主线程处理msg了，而是在looperThread上处理</p>
+<p>*              public void handleMessage(Message msg) {</p>
+<p>*                  // process incoming messages here</p>
+<p>*              }</p>
+<p>*          };</p>
+<p>*</p>
+<p>*          Looper.loop();  // 处理messagequeue的关键函数</p>
+<p>*      }</p>
+<p>*  }</p>
+<p>1）public static void prepare() {</p>
+<p>​    prepare(true);</p>
+<p>}</p>
+<p>private static void prepare(boolean quitAllowed) { // quitAllowed：是否允许调用quit()函数</p>
+<p>​    if (sThreadLocal.get() != null) {</p>
+<p>​        throw new RuntimeException(“Only one Looper may be created per thread”);</p>
+<p>​    }</p>
+<p>​    sThreadLocal.set(new Looper(quitAllowed));</p>
+<p>}</p>
+<p>可以看到，调用prepare()方法时，会执行prepare(boolean quitAllowed) 方法，其中得先判断sThreadLocal是否为空，不为空才将新建的Looper实例放进sThreadLocal对象中。那么这个sThreadLocal是什么呢？它是一个本地线程存储类，所有线程共享这个对象，但是这个对象对每一个线程而言却具有不同的值，且每个线程对这个对象的访问或修改都不会影响到其他线程，即它的值对于每个线程来说都是独立的。 不同线程的Looper相互独立，之所以能做到这一点，就是借助ThreadLocal来实现的。</p>
+<p>sThreadLocal.set(new Looper(quitAllowed))则是把一个新建的Looper实例放进sThreadLocal对象中，而Looper的构造函数内部实现如下,创建一个新的MessageQueue对象并绑定当前线程:</p>
+<p>private Looper(boolean quitAllowed) {</p>
+<p>​    mQueue = new MessageQueue(quitAllowed);</p>
+<p>​    mThread = Thread.currentThread();// 这个mThread在Looper类中毫无用处….</p>
+<p>}</p>
+<p>2）public static void loop() {}代码很长</p>
+<p>public static void loop() {</p>
+<p>​    final Looper me = myLooper(); —-&gt;  A. 从threadLocal.get()取looper</p>
+<p>​    if (me == null) {</p>
+<p>​        throw new RuntimeException(“No Looper; Looper.prepare() wasn’t called on this thread.”);</p>
+<p>​    }</p>
+<p>​    final MessageQueue queue = me.mQueue;</p>
+<p>​    // Make sure the identity of this thread is that of the local process,</p>
+<p>​    // and keep track of what that identity token actually is.</p>
+<p>​    Binder.clearCallingIdentity();</p>
+<p>​    final long ident = Binder.clearCallingIdentity();</p>
+<p>​    for (;;) {</p>
+<p>​        Message msg = queue.next(); // might block</p>
+<p>​        if (msg == null) {</p>
+<p>​            // No message indicates that the message queue is quitting.</p>
+<p>​            return;</p>
+<p>​        }</p>
+<p>​        // This must be in a local variable, in case a UI event sets the logger</p>
+<p>​        final Printer logging = me.mLogging;</p>
+<p>​        if (logging != null) {</p>
+<p>​            logging.println(“&gt;&gt;&gt;&gt;&gt; Dispatching to “ + msg.target + “ “ +</p>
+<p>​                    msg.callback + “: “ + msg.what);</p>
+<p>​        }</p>
+<p>​        final long traceTag = me.mTraceTag;</p>
+<p>​        if (traceTag != 0 &amp;&amp; Trace.isTagEnabled(traceTag)) {</p>
+<p>​            Trace.traceBegin(traceTag, msg.target.getTraceName(msg));</p>
+<p>​        }</p>
+<p>​        try {</p>
+<p>​            msg.target.dispatchMessage(msg); // handler不断把msg入队，这里从队列取出msg，然后用msg的handler进行消息处理</p>
+<p>​        } finally {</p>
+<p>​            if (traceTag != 0) {</p>
+<p>​                Trace.traceEnd(traceTag);</p>
+<p>​            }</p>
+<p>​        }</p>
+<p>​        if (logging != null) {</p>
+<p>​            logging.println(“&lt;&lt;&lt;&lt;&lt; Finished to “ + msg.target + “ “ + msg.callback);</p>
+<p>​        }</p>
+<p>​        // Make sure that during the course of dispatching the</p>
+<p>​        // identity of the thread wasn’t corrupted.</p>
+<p>​        final long newIdent = Binder.clearCallingIdentity();</p>
+<p>​        if (ident != newIdent) {</p>
+<p>​            Log.wtf(TAG, “Thread identity changed from 0x”</p>
+<p>​                    + Long.toHexString(ident) + “ to 0x”</p>
+<p>​                    + Long.toHexString(newIdent) + “ while dispatching to “</p>
+<p>​                    + msg.target.getClass().getName() + “ “</p>
+<p>​                    + msg.callback + “ what=” + msg.what);</p>
+<p>​        }</p>
+<p>​        msg.recycleUnchecked();</p>
+<p>​    }</p>
+<p>}</p>
+<p>这个方法，主要是通过myLooper()获取当前线程的Looper实例，如果这个实例存在，就取出这个looper的MQ，然后通过一个死循环，不断的调用queue.next();取出message，如果msg没有target（想想enqueueMessage里面为msg指定了target），就退出循环。</p>
+<p>如果有target:msg.target.dispatchMessage(msg);</p>
+<p>把真正的处理工作交给msg的target，即对应的handler，直到队列为空。</p>
+<p>该函数在每次msg的循环的最后都会调用msg.recycle();回收msg资源。</p>
+<p>A.public static @Nullable Looper myLooper() {</p>
+<p>​    return sThreadLocal.get();</p>
+<p>}</p>
+<p>3）Message next() {} 代码也很长，不贴了。</p>
+<p>主要功能就是：取出单链表的头节点，对相应指针进行操作，最后返回这个头节点。</p>
+<h3 id="灵魂拷问"><a href="#灵魂拷问" class="headerlink" title="灵魂拷问"></a>灵魂拷问</h3><p><strong>思考一：loop() 这里采用的是无限循环，该循环会不会特别消耗CPU资源？？</strong></p>
+<p>其实并不会，如果MQ里面有消息，next（）自然能不停的取到msg去交给handler进行处理，如果取不到，那么在nex()的nativePollOnce(ptr, nextPollTimeoutMillis);  就会阻塞该线程，主线程会释放CPU资源进入休眠状态，当有下一个工作到来时，才通过往pipe管道写端写入数据来唤醒主线程工作。这里涉及到的是Linux的pipe/epoll机制，epoll机制是一种IO多路复用机制，可以同时监控多个描述符，当某个描述符就绪(读或写就绪)，则立刻通知相应程序进行读或写操作，本质同步I/O，即读写是阻塞的。所以说，主线程大多数时候都是处于休眠状态，并不会消耗大量CPU资源。</p>
+<p>4）public void dispatchMessage(Message msg) {</p>
+<p>​    if (msg.callback != null) {</p>
+<p>​        handleCallback(msg); ①</p>
+<p>​    } else {</p>
+<p>​        if (mCallback != null) {</p>
+<p>​            if (mCallback.handleMessage(msg)) {②</p>
+<p>​                return;</p>
+<p>​            }</p>
+<p>​        }</p>
+<p>​        handleMessage(msg);③</p>
+<p>​    }</p>
+<p>}</p>
+<p>…</p>
+<p>① private static void handleCallback(Message message) {</p>
+<p>​    message.callback.run();</p>
+<p>}</p>
+<p>这里我们可以看到，在分发消息时三个方法的优先级分别如下：</p>
+<p>①Message的回调方法优先级最高，即message.callback.run()；</p>
+<p>②Handler的回调方法优先级次之，即Handler.mCallback.handleMessage(msg)；</p>
+<p>③Handler的默认方法优先级最低，即Handler.handleMessage(msg)</p>
+<p><strong>思考二、为什么looper.loop()要使用死循环？</strong></p>
+<p>对于线程既然是一段可执行的代码，当可执行代码执行完成后，线程生命周期便该终止了，线程退出。而对于主线程，我们是绝不希望会被运行一段时间，自己就退出，那么如何保证能一直存活呢？简单做法就是可执行代码是能一直执行下去的，死循环便能保证不会被退出，例如，binder线程也是采用死循环的方法，通过循环方式不同与Binder驱动进行读写操作，当然并非简单地死循环，无消息时会休眠。但这里可能又引发了另一个问题，既然是死循环又如何去处理其他事务呢？通过创建新线程的方式。</p>
+<p><strong>思考三、哪里为Looper.loop（)创建了新线程？</strong></p>
+<p>在代码ActivityThread.main()中：</p>
+<p>public static void main(String[] args) {</p>
+<p>​    Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, “ActivityThreadMain”);</p>
+<p>​    SamplingProfilerIntegration.start();</p>
+<p>​    // CloseGuard defaults to true and can be quite spammy.  We</p>
+<p>​    // disable it here, but selectively enable it later (via</p>
+<p>​    // StrictMode) on debug builds, but using DropBox, not logs.</p>
+<p>​    CloseGuard.setEnabled(false);</p>
+<p>​    Environment.initForCurrentUser();</p>
+<p>​    // Set the reporter for event logging in libcore</p>
+<p>​    EventLogger.setReporter(new EventLoggingReporter());</p>
+<p>​    // Make sure TrustedCertificateStore looks in the right place for CA certificates</p>
+<p>​    final File configDir = Environment.getUserConfigDirectory(UserHandle.myUserId());</p>
+<p>​    TrustedCertificateStore.setDefaultUserDirectory(configDir);</p>
+<p>​    Process.setArgV0(“<pre-initialized>“);</pre-initialized></p>
+<p>​    //创建Looper和MessageQueue对象，用于处理主线程的消息</p>
+<p>​    Looper.prepareMainLooper();—–&gt;A</p>
+<p>​    // 创建ActivityThread对象</p>
+<p>​    ActivityThread thread = new ActivityThread();</p>
+<p>​    //建立Binder通道 (创建新线程)</p>
+<p>​    thread.attach(false);</p>
+<p>​    if (sMainThreadHandler == null) {</p>
+<p>​        sMainThreadHandler = thread.getHandler();</p>
+<p>​    }</p>
+<p>​    if (false) {</p>
+<p>​        Looper.myLooper().setMessageLogging(new</p>
+<p>​                LogPrinter(Log.DEBUG, “ActivityThread”));</p>
+<p>​    }</p>
+<p>​    // End of event ActivityThreadMain.</p>
+<p>​    Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</p>
+<p>​    Looper.loop();</p>
+<p>​    throw new RuntimeException(“Main thread loop unexpectedly exited”);</p>
+<p>}</p>
+<p>A.我们自己不能调用这个function，如果调用了的话- -会 怎么样呢 ？？</p>
+<p>/**</p>
+<p> * Initialize the current thread as a looper, marking it as an</p>
+<p> * application’s main looper. The main looper for your application</p>
+<p> * is created by the Android environment, so you should never need</p>
+<p> * to call this function yourself.  See also: {@link #prepare()}</p>
+<p> */</p>
+<p>public static void prepareMainLooper() {</p>
+<p>​    prepare(false);</p>
+<p>​    synchronized (Looper.class) {</p>
+<p>​        if (sMainLooper != null) {</p>
+<p>​            throw new IllegalStateException(“The main Looper has already been prepared.”);</p>
+<p>​        }</p>
+<p>​        sMainLooper = myLooper();</p>
+<p>​    }</p>
+<p>}</p>
+<p>thread.attach(false)；便会创建一个Binder线程（具体是指ApplicationThread，Binder的服务端，用于接收系统服务AMS发送来的事件），该Binder线程通过Handler将Message发送给主线程。</p>
+<p>ActivityThread实际上并非线程，不像HandlerThread类，ActivityThread并没有真正继承Thread类，只是往往运行在主线程，该人以线程的感觉，其实承载ActivityThread的主线程就是由Zygote fork而创建的进程。</p>
+<p><strong>思考四、最后，扩展到Activity的生命周期。Activity的生命周期是怎么实现在死循环体外能够执行起来的？</strong></p>
+<p>ActivityThread的内部类H继承于Handler，通过handler消息机制，简单说Handler机制用于同一个进程的线程间通信。Activity的生命周期都是依靠主线程的Looper.loop，当收到不同Message时则采用相应措施：</p>
+<p>在H.handleMessage(msg)方法中，根据接收到不同的msg，执行相应的生命周期。</p>
+<p>比如收到msg=H.LAUNCH_ACTIVITY，则调用ActivityThread.handleLaunchActivity()方法，最终会通过反射机制，创建Activity实例，然后再执行Activity.onCreate()等方法；  </p>
+<p>再比如收到msg=H.PAUSE_ACTIVITY，则调用ActivityThread.handlePauseActivity()方法，最终会执行Activity.onPause()等方法。</p>
+<p>主线程的消息又是哪来的呢？当然是App进程中的其他线程通过Handler发送给主线程，</p>
+<p><strong>思考五、handler怎么进行线程切换的？</strong></p>
+<p>Handler类的介绍写了：在自己的子线程中，调用post或者sendMessage函数，最后都是调用sendMessageAtTime函数，反正就是把message（post的runnalble 会经过包装，成为message）放到queue中让looper循环获取。</p>
+<p>You can create your own threads, and communicate back with</p>
+<p>* the main application thread through a Handler.  This is done by calling</p>
+<p>* the same <em>post</em> or <em>sendMessage</em> methods as before, but from</p>
+<p>* your new thread. </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/源码/" rel="tag"># 源码</a>
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/11/RxJava/" rel="next" title="RxJAVA初步理解(1)">
+                <i class="fa fa-chevron-left"></i> RxJAVA初步理解(1)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/24/Android源码设计模式解析与实战----状态模式/" rel="prev" title="Android源码设计模式解析与实战----状态模式">
+                Android源码设计模式解析与实战----状态模式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Ke Yu" />
+            
+              <p class="site-author-name" itemprop="name">Ke Yu</p>
+              <p class="site-description motion-element" itemprop="description">Keep moving. Don't settle.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">51</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#作用"><span class="nav-number">1.</span> <span class="nav-text">作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#源码分析"><span class="nav-number">2.</span> <span class="nav-text">源码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#A-Handler"><span class="nav-number">2.0.0.1.</span> <span class="nav-text">A.Handler</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#C-MessageQueue"><span class="nav-number">2.0.1.</span> <span class="nav-text">C.MessageQueue</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#D-Looper"><span class="nav-number">2.0.2.</span> <span class="nav-text">D.Looper</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#灵魂拷问"><span class="nav-number">3.</span> <span class="nav-text">灵魂拷问</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ke Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
