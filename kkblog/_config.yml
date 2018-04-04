@@ -5,10 +5,11 @@
 # Site
 title: Coco
 subtitle: Hello world
-description: Keep moving.Don't settle.  
+description: Keep moving. Don't settle.  
 author: Ke Yu
 language: en
 timezone:
+avatar: /images/avatar.jpg
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
