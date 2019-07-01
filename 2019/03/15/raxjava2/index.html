@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android,源码,RxJava," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1.observable.subscribe(observer)后发生了什么：先调用了observer.onSubscribe(disposable)方法（应用层重写的）（observer.onSubscribe(parent);） observer和parent其实都是observer，只是obersever被wrap了一下（CreateEmitter parent = new CreateEm">
+<meta name="keywords" content="Android,源码,RxJava">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RxJAVA初步理解(2)">
+<meta property="og:url" content="http://yoursite.com/2019/03/15/raxjava2/index.html">
+<meta property="og:site_name" content="Coco">
+<meta property="og:description" content="1.observable.subscribe(observer)后发生了什么：先调用了observer.onSubscribe(disposable)方法（应用层重写的）（observer.onSubscribe(parent);） observer和parent其实都是observer，只是obersever被wrap了一下（CreateEmitter parent = new CreateEm">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2019-07-01T08:16:49.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RxJAVA初步理解(2)">
+<meta name="twitter:description" content="1.observable.subscribe(observer)后发生了什么：先调用了observer.onSubscribe(disposable)方法（应用层重写的）（observer.onSubscribe(parent);） observer和parent其实都是observer，只是obersever被wrap了一下（CreateEmitter parent = new CreateEm">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/15/raxjava2/"/>
+
+
+
+
+
+  <title>RxJAVA初步理解(2) | Coco</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Coco</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Hello world</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/15/raxjava2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ke Yu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Coco">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">RxJAVA初步理解(2)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-15T22:14:35+08:00">
+                2019-03-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>1.observable.subscribe(observer)后发生了什么：<br>先调用了observer.onSubscribe(disposable)方法（应用层重写的）（observer.onSubscribe(parent);）</p>
+<p>observer和parent其实都是observer，只是obersever被wrap了一下（CreateEmitter<t> parent = new CreateEmitter<t>(observer);，）就成了parent，多了一些其他作用。</t></t></p>
+<p>再调用了observable.subscribe方法（应用层重写的）（source.subscribe(parent);），做两件事：a. 做真正的事件；2.把通过事件得到的信息用createEmmiter发给observer</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">CreateEmitter</span>&lt;<span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class">   <span class="keyword">extends</span> <span class="title">AtomicReference</span>&lt;<span class="title">Disposable</span>&gt;</span></span><br><span class="line"><span class="class">   <span class="keyword">implements</span> <span class="title">ObservableEmitter</span>&lt;<span class="title">T</span>&gt;, <span class="title">Disposable</span></span></span><br></pre></td></tr></table></figure>
+<p>createEmmiter怎么发信息给observer?</p>
+<p>它作为ObservableEmitter，把observer包裹起来了，所以执行source.subscribe(parent);的时候，相当于是ObservableOnSubscribe(它是source).subscribe(observer)(它是parent)</p>
+<p>用DisposableHelper来控制disposable是否disposed…厉害了…</p>
+<p>就连subscribeOn都是一样的套路….</p>
+<p>create是 RxJavaPlugins.onAssembly(new ObservableCreate<t>(source));</t></p>
+<p>subscribeOn是RxJavaPlugins.onAssembly(new ObservableSubscribeOn<t>(this, scheduler));</t></p>
+<p>ObservableSubscribeOn相比ObservableCreate，只是多实现了一个接口：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public interface HasUpstreamObservableSource&lt;T&gt; &#123;</span><br><span class="line">    /**</span><br><span class="line">     * Returns the upstream source of this Observable.</span><br><span class="line">     * &lt;p&gt;Allows discovering the chain of observables.</span><br><span class="line">     * @return the source ObservableSource</span><br><span class="line">     */</span><br><span class="line">    ObservableSource&lt;T&gt; source();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>即多了一个ObservableSource（也就是上游的observable)。</p>
+<p>在它的subscribeActual里面，也对observer进行了包装（SubscribeOnObserver<t> parent = new SubscribeOnObserver<t>(s);）。</t></t></p>
+<p>首先同样进行了observable.onSubscribe(parent)，接着，并没有像create一样source.subscribe(parent)，而是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">parent.setDisposable(scheduler.scheduleDirect(new SubscribeTask(parent)));</span><br></pre></td></tr></table></figure>
+<p>但是看看SubscribeTask = =</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">SubscribeTask</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">       <span class="keyword">private</span> <span class="keyword">final</span> SubscribeOnObserver&lt;T&gt; parent;</span><br><span class="line"></span><br><span class="line">       SubscribeTask(SubscribeOnObserver&lt;T&gt; parent) &#123;</span><br><span class="line">           <span class="keyword">this</span>.parent = parent;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="meta">@Override</span></span><br><span class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">           source.subscribe(parent);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>嗯… 用runnable把source.subscribe(parent);这句执行了。</p>
+<p>所以还是observable.subscribe(observer)</p>
+<p>那么很明显，就是让指定的那个scheduler去执行这个runnable。</p>
+<p>看看RxJava的线程调度怎么写的（正好最近在做这个东西），但是源码真长….</p>
+<p>先看一下刚才的涉及到的scheduleDirect：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Schedules the given task on this scheduler non-delayed execution.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;</span></span><br><span class="line"><span class="comment"> * This method is safe to be called from multiple threads but there are no</span></span><br><span class="line"><span class="comment"> * ordering guarantees between tasks.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> run the task to execute</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> the Disposable instance that let's one cancel this particular task.</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 2.0</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@NonNull</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Disposable <span class="title">scheduleDirect</span><span class="params">(@NonNull Runnable run)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> scheduleDirect(run, <span class="number">0L</span>, TimeUnit.NANOSECONDS);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Schedules the execution of the given task with the given delay amount.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;</span></span><br><span class="line"><span class="comment"> * This method is safe to be called from multiple threads but there are no</span></span><br><span class="line"><span class="comment"> * ordering guarantees between tasks.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> run the task to schedule</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> delay the delay amount, non-positive values indicate non-delayed scheduling</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> unit the unit of measure of the delay amount</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> the Disposable that let's one cancel this particular delayed task.</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 2.0</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@NonNull</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Disposable <span class="title">scheduleDirect</span><span class="params">(@NonNull Runnable run, <span class="keyword">long</span> delay, @NonNull TimeUnit unit)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> Worker w = createWorker();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> Runnable decoratedRun = RxJavaPlugins.onSchedule(run);</span><br><span class="line"></span><br><span class="line">    DisposeTask task = <span class="keyword">new</span> DisposeTask(decoratedRun, w);</span><br><span class="line"></span><br><span class="line">    w.schedule(task, delay, unit);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> task;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>有runnable、task、worker，不难猜到接下来会发生什么（自己在写taskManager的时候也用到了类似方法，把runnable包裹了一层.hh）这里是把runnable和worker包裹起来（其实看这个原意是因为在考虑怎么实现线程的切换，把回调切回到主线程，确实也考虑过这种方法，把执行调度的worker也放到runn里）</p>
+<p>然后worker是怎么调度执行task的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">         * Schedules an Runnable for execution at some point in the future.</span></span><br><span class="line"><span class="comment">         * &lt;p&gt;</span></span><br><span class="line"><span class="comment">         * Note to implementors: non-positive &#123;<span class="doctag">@code</span> delayTime&#125; should be regarded as non-delayed schedule, i.e.,</span></span><br><span class="line"><span class="comment">         * as if the &#123;<span class="doctag">@link</span> #schedule(Runnable)&#125; was called.</span></span><br><span class="line"><span class="comment">         *</span></span><br><span class="line"><span class="comment">         * <span class="doctag">@param</span> run</span></span><br><span class="line"><span class="comment">         *            the Runnable to schedule</span></span><br><span class="line"><span class="comment">         * <span class="doctag">@param</span> delay</span></span><br><span class="line"><span class="comment">         *            time to wait before executing the action; non-positive values indicate an non-delayed</span></span><br><span class="line"><span class="comment">         *            schedule</span></span><br><span class="line"><span class="comment">         * <span class="doctag">@param</span> unit</span></span><br><span class="line"><span class="comment">         *            the time unit of &#123;<span class="doctag">@code</span> delayTime&#125;</span></span><br><span class="line"><span class="comment">         * <span class="doctag">@return</span> a Disposable to be able to unsubscribe the action (cancel it if not executed)</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="meta">@NonNull</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> Disposable <span class="title">schedule</span><span class="params">(@NonNull Runnable run, <span class="keyword">long</span> delay, @NonNull TimeUnit unit)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>很明显不同worker的调度方法是不一样的。</p>
+<p>那么找到这个worker是怎么创建的就Ok了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Retrieves or creates a new &#123;<span class="doctag">@link</span> Scheduler.Worker&#125; that represents serial execution of actions.</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;</span></span><br><span class="line"><span class="comment"> * When work is completed it should be unsubscribed using &#123;<span class="doctag">@link</span> Scheduler.Worker#dispose()&#125;.</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;</span></span><br><span class="line"><span class="comment"> * Work on a &#123;<span class="doctag">@link</span> Scheduler.Worker&#125; is guaranteed to be sequential.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> a Worker representing a serial queue of actions to be executed</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@NonNull</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> Worker <span class="title">createWorker</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
+<p>看到这个createWorker是抽象的，想想刚才提到的，scheduleDirect这个方法是Scheduler（就是我们应用自己指定的scheduler）去调用的，那么很明显Scheduler这个类多半是抽象的，通过重写它里面的各种方法（比如现在的createWorker)，来实现各种各样的scheduler，比如io，newThread，computation 等等。</p>
+<p>回去看一眼Scheduler的开头，嗯…果然是abstract的。</p>
+<p>并且很明显这个worker肯定也根据不同的scheduler有很多不同的实现。</p>
+<p>好了，其实想不到也没关系，看一下createWorker的实现就知道了，有10个左右的实现，而且确实是在各个具体的scheduler中实现的。</p>
+<p>直接看看常用的NewThread吧：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Schedules work on a new thread.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">NewThreadScheduler</span> <span class="keyword">extends</span> <span class="title">Scheduler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> ThreadFactory threadFactory;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String THREAD_NAME_PREFIX = <span class="string">"RxNewThreadScheduler"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> RxThreadFactory THREAD_FACTORY;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** The name of the system property for setting the thread priority for this Scheduler. */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String KEY_NEWTHREAD_PRIORITY = <span class="string">"rx2.newthread-priority"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="keyword">int</span> priority = Math.max(Thread.MIN_PRIORITY, Math.min(Thread.MAX_PRIORITY,</span><br><span class="line">                Integer.getInteger(KEY_NEWTHREAD_PRIORITY, Thread.NORM_PRIORITY)));</span><br><span class="line"></span><br><span class="line">        THREAD_FACTORY = <span class="keyword">new</span> RxThreadFactory(THREAD_NAME_PREFIX, priority);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NewThreadScheduler</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>(THREAD_FACTORY);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NewThreadScheduler</span><span class="params">(ThreadFactory threadFactory)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.threadFactory = threadFactory;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@NonNull</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Worker <span class="title">createWorker</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> NewThreadWorker(threadFactory);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>不出意料，worker终于可以具体出来了，看看newThreadWorker的具体实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@NonNull</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Disposable <span class="title">schedule</span><span class="params">(@NonNull <span class="keyword">final</span> Runnable run)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> schedule(run, <span class="number">0</span>, <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@NonNull</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Disposable <span class="title">schedule</span><span class="params">(@NonNull <span class="keyword">final</span> Runnable action, <span class="keyword">long</span> delayTime, @NonNull TimeUnit unit)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (disposed) &#123;</span><br><span class="line">            <span class="keyword">return</span> EmptyDisposable.INSTANCE;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> scheduleActual(action, delayTime, unit, <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Schedules the given runnable on the underlying executor directly and</span></span><br><span class="line"><span class="comment">     * returns its future wrapped into a Disposable.</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> run the Runnable to execute in a delayed fashion</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> delayTime the delay amount</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> unit the delay time unit</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> the ScheduledRunnable instance</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Disposable <span class="title">scheduleDirect</span><span class="params">(<span class="keyword">final</span> Runnable run, <span class="keyword">long</span> delayTime, TimeUnit unit)</span> </span>&#123;</span><br><span class="line">        ScheduledDirectTask task = <span class="keyword">new</span> ScheduledDirectTask(RxJavaPlugins.onSchedule(run));</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Future&lt;?&gt; f;</span><br><span class="line">            <span class="keyword">if</span> (delayTime &lt;= <span class="number">0L</span>) &#123;</span><br><span class="line">                f = executor.submit(task);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                f = executor.schedule(task, delayTime, unit);</span><br><span class="line">            &#125;</span><br><span class="line">            task.setFuture(f);</span><br><span class="line">            <span class="keyword">return</span> task;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (RejectedExecutionException ex) &#123;</span><br><span class="line">            RxJavaPlugins.onError(ex);</span><br><span class="line">            <span class="keyword">return</span> EmptyDisposable.INSTANCE;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>最终还是交给了juc的excutors，而且居然用的是ScheduledExecutorService（线程数为1）…. 那我在taskManager中把这个service单独拿来做定时任务不是浪费吗….. 去把fixedExecutor删掉吧。而且看了callable没啥作用…删掉。</p>
+<p>线程数为1 ?? </p>
+<p>看看ioScheduler，里面的worker是EventLooperWorker：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">return new EventLoopWorker(pool.get());</span><br></pre></td></tr></table></figure>
+<p>而且看来还有很多个worker，仔细一看还是有很多个CachedWorkerPool，每个pool对应一个ThreadWorker，这个ThreadWorker继承自刚才提到的NewThreadWorker：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadWorker</span> <span class="keyword">extends</span> <span class="title">NewThreadWorker</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">long</span> expirationTime;</span><br><span class="line"></span><br><span class="line">        ThreadWorker(ThreadFactory threadFactory) &#123;</span><br><span class="line">            <span class="keyword">super</span>(threadFactory);</span><br><span class="line">            <span class="keyword">this</span>.expirationTime = <span class="number">0L</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">getExpirationTime</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> expirationTime;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setExpirationTime</span><span class="params">(<span class="keyword">long</span> expirationTime)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.expirationTime = expirationTime;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>每个eventLoopWorker是这样schedule的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@NonNull</span></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Disposable <span class="title">schedule</span><span class="params">(@NonNull Runnable action, <span class="keyword">long</span> delayTime, @NonNull TimeUnit unit)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (tasks.isDisposed()) &#123;</span><br><span class="line">                <span class="comment">// don't schedule, we are unsubscribed</span></span><br><span class="line">                <span class="keyword">return</span> EmptyDisposable.INSTANCE;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> threadWorker.scheduleActual(action, delayTime, unit, tasks);</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<p>不能再看下去了。</p>
+<p>但是发现还有优先级的用法。。再看看。。</p>
+<p>但其实就是在createFactory的时候把它的优先级建好，然后new thread的时候set下… 具体的优先级翻转操作看来还是在底层。</p>
+<p>好了 不看了。</p>
+<p>但是怎么切回来，还是应该看看，估计也是换汤不换药。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">return RxJavaPlugins.onAssembly(new ObservableObserveOn&lt;T&gt;(this, scheduler, delayError, bufferSize));</span><br></pre></td></tr></table></figure>
+<p>相比subscribleOn，多了delayError和bufferSize。</p>
+<p>在ObservableObserveOn的subscribeActual里面，已经没有observer.onSubscribe的操作呢，为什么呢…很明显，onSubscribe是为了开始发送触发事件，现在要切回来了，不用触发事件了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">subscribeActual</span><span class="params">(Observer&lt;? <span class="keyword">super</span> T&gt; observer)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (scheduler <span class="keyword">instanceof</span> TrampolineScheduler) &#123;</span><br><span class="line">        source.subscribe(observer);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        Scheduler.Worker w = scheduler.createWorker();</span><br><span class="line"></span><br><span class="line">        source.subscribe(<span class="keyword">new</span> ObserveOnObserver&lt;T&gt;(observer, w, delayError, bufferSize));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到source也执行了subscribe(observer)。</p>
+<p>看到这儿是不是感觉有一些发现….不停的subscribe，suscribeActual，source（源observable）.subscribe</p>
+<p>只要有了一个subscribe，那么整条链路就形成了。</p>
+<p>相当于将source一个个的保存到最后执行subscribe的时候，通过source（源observable）.subscribe，把上一级的observable.subscribe(observer)执行了，这样就一级级往上直到ObservableOnCreate的执行。（好像不是很好形容= =）</p>
+<p>这里的scheduler一般是AndroidSchedulers.mainThread。</p>
+<p>仔细找找，应该是rxandroid里面的HandlerScheduler：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> Disposable <span class="title">scheduleDirect</span><span class="params">(Runnable run, <span class="keyword">long</span> delay, TimeUnit unit)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">if</span> (run == <span class="keyword">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException(<span class="string">"run == null"</span>);</span><br><span class="line">       <span class="keyword">if</span> (unit == <span class="keyword">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException(<span class="string">"unit == null"</span>);</span><br><span class="line"></span><br><span class="line">       run = RxJavaPlugins.onSchedule(run);</span><br><span class="line">       ScheduledRunnable scheduled = <span class="keyword">new</span> ScheduledRunnable(handler, run);</span><br><span class="line">       handler.postDelayed(scheduled, Math.max(<span class="number">0L</span>, unit.toMillis(delay)));</span><br><span class="line">       <span class="keyword">return</span> scheduled;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>里面的handler其实不难猜到，应该就是new Handler(Looper.getMainLooper())</p>
+<p>保险一点，还是看看onSubscribe做了啥，可以发现Observer的实现真多…. 一般我们subscribe的时候，observer都没有具体定义是哪个…这有点尴尬… 看ObservableCreaate包装observer的是CreateEmitter，</p>
+<p>只好找找中途的操作符… 比如ObservableSubscribeOn的observer是被SubscribeOnObserver包装的。</p>
+<p>它的onSubscribe是这样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">        public void onSubscribe(Disposable s) &#123;</span><br><span class="line">            DisposableHelper.setOnce(this.s, s);</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<p>en…真的很欺骗感情….所以实际上几乎每个xxxxObserver，除了实现observe<t>，也都实现了disposable。</t></p>
+<p>换句话说，这个subscribe要看看源头（也就是我们平常写代码是调的那个，那里是起源）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SchedulerSupport</span>(SchedulerSupport.NONE)</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">subscribe</span><span class="params">(Observer&lt;? <span class="keyword">super</span> T&gt; observer)</span> </span>&#123;</span><br><span class="line">        ObjectHelper.requireNonNull(observer, <span class="string">"observer is null"</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            observer = RxJavaPlugins.onSubscribe(<span class="keyword">this</span>, observer);</span><br><span class="line"></span><br><span class="line">            ObjectHelper.requireNonNull(observer, <span class="string">"Plugin returned null Observer"</span>);</span><br><span class="line"></span><br><span class="line">            subscribeActual(observer);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (NullPointerException e) &#123; <span class="comment">// NOPMD</span></span><br><span class="line">            <span class="keyword">throw</span> e;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">            Exceptions.throwIfFatal(e);</span><br><span class="line">            <span class="comment">// can't call onError because no way to know if a Disposable has been set or not</span></span><br><span class="line">            <span class="comment">// can't call onSubscribe because the call might have set a Subscription already</span></span><br><span class="line">            RxJavaPlugins.onError(e);</span><br><span class="line"></span><br><span class="line">            NullPointerException npe = <span class="keyword">new</span> NullPointerException(<span class="string">"Actually not, but can't throw other exceptions due to RS"</span>);</span><br><span class="line">            npe.initCause(e);</span><br><span class="line">            <span class="keyword">throw</span> npe;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>看看RxJavaPlugins的onSubscribe：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">  * Calls the associated hook function.</span><br><span class="line">  * @param &lt;T&gt; the value type</span><br><span class="line">  * @param source the hook&apos;s input value</span><br><span class="line">  * @param observer the observer</span><br><span class="line">  * @return the value returned by the hook</span><br><span class="line">  */</span><br><span class="line"> @SuppressWarnings(&#123; &quot;rawtypes&quot;, &quot;unchecked&quot; &#125;)</span><br><span class="line"> @NonNull</span><br><span class="line"> public static &lt;T&gt; Observer&lt;? super T&gt; onSubscribe(@NonNull Observable&lt;T&gt; source, @NonNull Observer&lt;? super T&gt; observer) &#123;</span><br><span class="line">     BiFunction&lt;? super Observable, ? super Observer, ? extends Observer&gt; f = onObservableSubscribe;</span><br><span class="line">     if (f != null) &#123;</span><br><span class="line">         return apply(f, source, observer);</span><br><span class="line">     &#125;</span><br><span class="line">     return observer;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到f不会null的话，直接返回observer，而这里面的onObservableSubscribe确实默认为null。</p>
+<p>这样的话，从我们自己写的observer开始，可以愉快的开始进行操作变换了。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/源码/" rel="tag"># 源码</a>
+          
+            <a href="/tags/RxJava/" rel="tag"># RxJava</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/27/tf05/" rel="next" title="Tensorflow api整理(5)">
+                <i class="fa fa-chevron-left"></i> Tensorflow api整理(5)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/18/rxjava3/" rel="prev" title="RxJAVA初步理解(3)">
+                RxJAVA初步理解(3) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Ke Yu" />
+            
+              <p class="site-author-name" itemprop="name">Ke Yu</p>
+              <p class="site-description motion-element" itemprop="description">Keep moving. Don't settle.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">39</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ke Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

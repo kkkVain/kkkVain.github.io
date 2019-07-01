@@ -82,14 +82,14 @@
 <meta name="description" content="HandlerThread简介Handler的目标是解决子线程与主线程通信的问题，HandlerThread则是解决子线程和子线程之间的通信问题，官方给的子线程实现handler的机制。UI线程中的MessageQueue以及Looper是默认创建好的，只要创建Handler对象实例并调用handleMessage方法即可进行消息处理，而子线程要自己去自定义Looper才能实现相同的功能。Hand">
 <meta name="keywords" content="源码,HandlerThrea,Handler">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Effective Java 读书笔记（2.5）">
+<meta property="og:title" content="HandlerThread">
 <meta property="og:url" content="http://yoursite.com/2017/07/24/HandlerThread/index.html">
 <meta property="og:site_name" content="Coco">
 <meta property="og:description" content="HandlerThread简介Handler的目标是解决子线程与主线程通信的问题，HandlerThread则是解决子线程和子线程之间的通信问题，官方给的子线程实现handler的机制。UI线程中的MessageQueue以及Looper是默认创建好的，只要创建Handler对象实例并调用handleMessage方法即可进行消息处理，而子线程要自己去自定义Looper才能实现相同的功能。Hand">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-04-04T03:23:05.000Z">
+<meta property="og:updated_time" content="2018-04-04T08:39:36.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Effective Java 读书笔记（2.5）">
+<meta name="twitter:title" content="HandlerThread">
 <meta name="twitter:description" content="HandlerThread简介Handler的目标是解决子线程与主线程通信的问题，HandlerThread则是解决子线程和子线程之间的通信问题，官方给的子线程实现handler的机制。UI线程中的MessageQueue以及Looper是默认创建好的，只要创建Handler对象实例并调用handleMessage方法即可进行消息处理，而子线程要自己去自定义Looper才能实现相同的功能。Hand">
 
 
@@ -126,7 +126,7 @@
 
 
 
-  <title>Effective Java 读书笔记（2.5） | Coco</title>
+  <title>HandlerThread | Coco</title>
   
 
 
@@ -270,7 +270,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Effective Java 读书笔记（2.5）</h1>
+          <h1 class="post-title" itemprop="name headline">HandlerThread</h1>
         
 
         <div class="post-meta">
@@ -476,7 +476,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-count">39</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -498,7 +498,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">51</span>
+                  <span class="site-state-item-count">47</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
@@ -551,7 +551,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
